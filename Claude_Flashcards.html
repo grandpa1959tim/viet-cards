@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Viet Cards">
+<meta name="theme-color" content="#1a1a2e">
+<title>Viet Cards – Leitner Flashcards</title>
+
+<!-- ══════════════════════════════════════════════════════════
+     INLINE PWA MANIFEST  (avoids needing a separate file)
+     ══════════════════════════════════════════════════════════ -->
+<script>
+const manifestData = {
+  name: "Viet Cards – Leitner Flashcards",
+  short_name: "Viet Cards",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#1a1a2e",
+  theme_color: "#1a1a2e",
+  orientation: "portrait",
+  icons: [
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%231a1a2e'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle' font-family='serif'%3E🇻🇳%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
+    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%231a1a2e'/%3E%3Ctext x='256' y='360' font-size='300' text-anchor='middle' font-family='serif'%3E🇻🇳%3C/text%3E%3C/svg%3E", sizes: "512x512", type: "image/svg+xml" }
+  ]
+};
+const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
+const manifestURL = URL.createObjectURL(blob);
+const link = document.createElement('link');
+link.rel = 'manifest';
+link.href = manifestURL;
+document.head.appendChild(link);
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     GOOGLE FONTS
+     ══════════════════════════════════════════════════════════ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ══════ DESIGN TOKENS ══════ */
+:root {
+  --bg:       #0f0f1a;
+  --surface:  #1a1a2e;
+  --card-bg:  #16213e;
+  --accent:   #e94560;
+  --gold:     #f5a623;
+  --teal:     #0dcbbd;
+  --text:     #f0eff4;
+  --muted:    #8888aa;
+  --success:  #2ecc71;
+  --danger:   #e74c3c;
+  --warn:     #f39c12;
+
+  --b1-color: #e74c3c;
+  --b2-color: #e67e22;
+  --b3-color: #f1c40f;
+  --b4-color: #27ae60;
+  --b5-color: #16a085;
+
+  --radius:   18px;
+  --tap:      56px;   /* minimum tap target */
+  --font-ui:  'DM Sans', sans-serif;
+  --font-hd:  'Playfair Display', serif;
+}
+
+/* ══════ RESET ══════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overscroll-behavior: none; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ══════ HEADER ══════ */
+header {
+  background: var(--surface);
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+header h1 {
+  font-family: var(--font-hd);
+  font-size: clamp(20px, 5vw, 28px);
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-actions { display: flex; gap: 8px; }
+
+/* ══════ TABS ══════ */
+.tabs {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.tab {
+  flex: 1;
+  padding: 14px 8px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  color: var(--muted);
+  border-bottom: 3px solid transparent;
+  transition: all .2s;
+  text-transform: uppercase;
+}
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ══════ PANELS ══════ */
+.panel { display: none; padding: 20px; }
+.panel.active { display: block; }
+
+/* ══════ CARD AREA ══════ */
+.card-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Progress indicator */
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 500px;
+}
+.progress-label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.progress-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: rgba(255,255,255,.1);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+  border-radius: 99px;
+  transition: width .4s ease;
+}
+
+/* Pill chips */
+.mode-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.chip {
+  padding: 8px 16px;
+  border-radius: 99px;
+  border: 1.5px solid rgba(255,255,255,.15);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip:active { transform: scale(.95); }
+
+/* FLASHCARD */
+.flashcard-wrap {
+  width: 100%;
+  max-width: 500px;
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
+}
+.flashcard {
+  width: 100%;
+  aspect-ratio: 16/9;
+  position: relative;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform .55s cubic-bezier(.4,0,.2,1);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.flashcard.flipped {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+}
+.card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  gap: 10px;
+}
+.card-front {
+  background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.card-back {
+  background: linear-gradient(135deg, #1a0a2e 0%, #2d1b69 100%);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+}
+.card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.card-main {
+  font-size: clamp(22px, 6vw, 36px);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.3;
+}
+.card-breakdown {
+  font-size: clamp(13px, 3.5vw, 16px);
+  color: var(--teal);
+  text-align: center;
+  line-height: 1.6;
+}
+.card-breakdown b { color: var(--gold); font-weight: 700; }
+
+.card-box-badge {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+}
+
+.tap-hint {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+/* SPEAK BUTTON */
+.speak-btn {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 99px;
+  padding: 10px 24px;
+  color: var(--text);
+  font-size: 22px;
+  cursor: pointer;
+  transition: background .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.speak-btn:active { background: rgba(255,255,255,.18); }
+
+/* ACTION BUTTONS */
+.action-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 500px;
+}
+.action-btn {
+  flex: 1;
+  height: var(--tap);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.action-btn:active { transform: scale(.96); }
+.btn-wrong  { background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fff; box-shadow: 0 6px 20px rgba(231,76,60,.35); }
+.btn-correct{ background: linear-gradient(135deg, #1a8a4a, #2ecc71); color: #fff; box-shadow: 0 6px 20px rgba(46,204,113,.35); }
+.btn-remove { background: rgba(255,255,255,.07); color: var(--muted); border: 1px solid rgba(255,255,255,.1); flex: 0 0 auto; width: var(--tap); font-size: 20px; }
+
+/* NEXT REVIEW INFO */
+.next-review-info {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+.next-review-info span { color: var(--gold); font-weight: 600; }
+
+/* SPEED ROW */
+.speed-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 500px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.speed-row input[type=range] {
+  flex: 1;
+  accent-color: var(--accent);
+  height: 4px;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+.empty-state .emoji { font-size: 64px; display: block; margin-bottom: 16px; }
+.empty-state h2 { font-family: var(--font-hd); color: var(--text); margin-bottom: 8px; }
+
+/* ══════ ADD CARDS PANEL ══════ */
+.add-section h2 {
+  font-family: var(--font-hd);
+  font-size: 22px;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+.add-section p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+textarea {
+  width: 100%;
+  height: 160px;
+  background: var(--surface);
+  border: 1.5px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  padding: 14px;
+  resize: vertical;
+  outline: none;
+  transition: border-color .2s;
+  -webkit-appearance: none;
+}
+textarea:focus { border-color: var(--accent); }
+
+.big-btn {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .15s;
+  -webkit-tap-highlight-color: transparent;
+  margin-top: 12px;
+}
+.big-btn:active { transform: scale(.97); }
+.big-btn-primary { background: linear-gradient(135deg, var(--accent), #c0392b); color: #fff; box-shadow: 0 8px 24px rgba(233,69,96,.35); }
+.big-btn-secondary { background: rgba(255,255,255,.07); color: var(--text); border: 1px solid rgba(255,255,255,.12); }
+.big-btn-teal { background: linear-gradient(135deg, var(--teal), #0a8a80); color: #fff; box-shadow: 0 8px 24px rgba(13,203,189,.25); }
+
+.sample-hint {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  font-family: 'Courier New', monospace;
+  line-height: 1.8;
+  margin-top: 16px;
+}
+.sample-hint .lbl { color: var(--gold); font-family: var(--font-ui); font-weight: 600; font-size: 11px; letter-spacing: 1px; }
+
+/* ══════ BOXES PANEL ══════ */
+.boxes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.box-card {
+  background: var(--surface);
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1.5px solid rgba(255,255,255,.07);
+}
+.box-card:nth-child(5) { grid-column: 1 / -1; }
+.box-header {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.box-header-left { display: flex; align-items: center; gap: 8px; }
+.box-dot { width: 12px; height: 12px; border-radius: 50%; }
+.box-header h3 { font-size: 14px; font-weight: 700; }
+.box-count { font-size: 12px; color: var(--muted); }
+.box-interval { font-size: 11px; color: var(--muted); padding: 4px 14px 8px; }
+.box-items { padding: 0 8px 10px; max-height: 140px; overflow-y: auto; }
+.box-item-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  margin: 4px 0;
+  border-radius: 8px;
+  background: rgba(255,255,255,.04);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.box-item-pill:active { background: rgba(255,255,255,.1); }
+.box-item-pill .due-badge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-weight: 700;
+}
+.due-now { background: rgba(233,69,96,.25); color: var(--accent); }
+.due-later { background: rgba(255,255,255,.06); color: var(--muted); }
+
+/* ══════ SETTINGS PANEL ══════ */
+.settings-group { margin-bottom: 28px; }
+.settings-group h3 {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 15px; }
+.setting-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  width: 50px;
+  height: 28px;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.15);
+  border-radius: 99px;
+  cursor: pointer;
+  transition: background .2s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 22px; height: 22px;
+  left: 3px; top: 3px;
+  border-radius: 50%;
+  background: white;
+  transition: transform .2s;
+}
+.toggle input:checked + .toggle-slider { background: var(--success); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(22px); }
+
+/* Danger zone */
+.danger-btn {
+  width: 100%;
+  height: 52px;
+  border: 1.5px solid var(--danger);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--danger);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s;
+  margin-bottom: 10px;
+  -webkit-tap-highlight-color: transparent;
+}
+.danger-btn:active { background: rgba(231,76,60,.15); }
+
+/* ══════ TOAST ══════ */
+.toast {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 99px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  z-index: 9999;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  transition: transform .3s cubic-bezier(.4,0,.2,1);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ══════ ICON BUTTON ══════ */
+.icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .15s;
+}
+.icon-btn:active { background: rgba(255,255,255,.14); }
+
+/* ══════ SCROLLBARS ══════ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 99px; }
+
+/* ══════ STUDY FILTER BANNER ══════ */
+.study-banner {
+  background: linear-gradient(135deg, rgba(233,69,96,.15), rgba(245,166,35,.1));
+  border: 1px solid rgba(233,69,96,.3);
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold);
+  text-align: center;
+  width: 100%;
+  max-width: 500px;
+  display: none;
+}
+.study-banner.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ══════ HEADER ══════ -->
+<header>
+  <h1>🇻🇳 Viet Cards</h1>
+  <div class="header-actions">
+    <button class="icon-btn" title="Save to HTML" onclick="saveHTML()">💾</button>
+    <button class="icon-btn" title="Shuffle" onclick="shuffleCards()">🔀</button>
+  </div>
+</header>
+
+<!-- ══════ TABS ══════ -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('study')">Study</div>
+  <div class="tab" onclick="switchTab('add')">Add Cards</div>
+  <div class="tab" onclick="switchTab('boxes')">Boxes</div>
+  <div class="tab" onclick="switchTab('settings')">Settings</div>
+</div>
+
+<!-- ══════════════════════════════════
+     STUDY PANEL
+     ══════════════════════════════════ -->
+<div id="panel-study" class="panel active">
+  <div class="card-area">
+
+    <!-- Progress -->
+    <div class="progress-row">
+      <div class="progress-label" id="progressLabel">0 / 0</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Study mode / front language chips -->
+    <div class="mode-chips">
+      <button class="chip active" id="chipVN" onclick="setFront('vn')">🇻🇳 Vietnamese</button>
+      <button class="chip" id="chipEN" onclick="setFront('en')">🇬🇧 English</button>
+      <button class="chip" id="chipBreak" onclick="toggleBreak()">🔍 Breakdown</button>
+      <button class="chip" id="chipStudy" onclick="toggleStudyMode()">📦 Box 1 Only</button>
+    </div>
+
+    <div class="study-banner" id="studyBanner">📦 Study Mode: Reviewing Box 1 cards only</div>
+
+    <!-- FLASHCARD -->
+    <div class="flashcard-wrap">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="card-face card-front" id="cardFront">
+          <div class="card-label" id="frontLabel">VIETNAMESE</div>
+          <div class="card-main" id="frontText">Add your first card! →</div>
+          <div class="card-breakdown" id="breakdownText"></div>
+          <div class="card-box-badge" id="boxBadge">1</div>
+        </div>
+        <div class="card-face card-back" id="cardBack">
+          <div class="card-label" id="backLabel">ENGLISH</div>
+          <div class="card-main" id="backText">Tap "Add Cards" to begin</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tap-hint">Tap card to reveal answer</div>
+
+    <!-- Speak -->
+    <button class="speak-btn" onclick="speak()">🔊 Listen</button>
+
+    <!-- Speed -->
+    <div class="speed-row">
+      <span>🐢</span>
+      <input type="range" id="speedSlider" min="0.4" max="1.2" step="0.1" value="0.9" oninput="speedVal.textContent=parseFloat(this.value).toFixed(1)">
+      <span>🐇</span>
+      <span id="speedVal">0.9</span>×
+    </div>
+
+    <!-- Wrong / Correct / Remove -->
+    <div class="action-row">
+      <button class="action-btn btn-wrong"  onclick="markWrong()">✗ Again</button>
+      <button class="action-btn btn-correct" onclick="markCorrect()">✓ Got It</button>
+      <button class="action-btn btn-remove" onclick="removeCard()" title="Remove card">🗑</button>
+    </div>
+
+    <div class="next-review-info" id="nextReviewInfo"></div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     ADD CARDS PANEL
+     ══════════════════════════════════ -->
+<div id="panel-add" class="panel">
+  <div class="add-section">
+    <h2>Add Flashcards</h2>
+    <p>Paste one card per line. Use <strong>Tab</strong> to separate columns:<br>
+    <code style="color:var(--gold)">English [Tab] Vietnamese [Tab] Breakdown (optional)</code></p>
+
+    <textarea id="inputArea" placeholder="Hello	Xin chào	Xin–greeting; chào–hello
+Thank you	Cảm ơn	Cảm–feel; ơn–gratitude
+How are you?	Bạn khỏe không?	Bạn–you; khỏe–healthy; không–no/question"></textarea>
+
+    <button class="big-btn big-btn-primary" onclick="addCards()">＋ Add Cards</button>
+    <button class="big-btn big-btn-secondary" onclick="loadSampleCards()">📋 Load Sample Cards</button>
+
+    <div class="sample-hint">
+      <div class="lbl">FORMAT EXAMPLE (Tab-separated)</div>
+      Hello → Xin chào → Xin–greeting; chào–hello<br>
+      Thank you → Cảm ơn → Cảm–feel; ơn–gratitude<br>
+      <span style="color:var(--teal)">→ Each breakdown entry: word–meaning; word–meaning</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     BOXES PANEL
+     ══════════════════════════════════ -->
+<div id="panel-boxes" class="panel">
+  <div class="boxes-grid" id="boxesGrid">
+    <!-- Rendered by JS -->
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SETTINGS PANEL
+     ══════════════════════════════════ -->
+<div id="panel-settings" class="panel">
+
+  <div class="settings-group">
+    <h3>Display</h3>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Show Breakdown on Front</div>
+        <div class="setting-sub">Show word-by-word breakdown below Vietnamese</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="settingBreakdown" onchange="syncBreakdownSetting()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Auto-Speak on Card Load</div>
+        <div class="setting-sub">Speak the front of each new card automatically</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="settingAutoSpeak"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <h3>Leitner Box Intervals</h3>
+    <div class="setting-row"><div><div class="setting-label">Box 1 – Daily</div><div class="setting-sub">Review every 1 day</div></div><span style="color:var(--b1-color); font-size:20px">●</span></div>
+    <div class="setting-row"><div><div class="setting-label">Box 2 – Every 2 days</div><div class="setting-sub">Review every 2 days</div></div><span style="color:var(--b2-color); font-size:20px">●</span></div>
+    <div class="setting-row"><div><div class="setting-label">Box 3 – Every 4 days</div><div class="setting-sub">Review every 4 days</div></div><span style="color:var(--b3-color); font-size:20px">●</span></div>
+    <div class="setting-row"><div><div class="setting-label">Box 4 – Every 8 days</div><div class="setting-sub">Review every 8 days</div></div><span style="color:var(--b4-color); font-size:20px">●</span></div>
+    <div class="setting-row"><div><div class="setting-label">Box 5 – Every 16 days</div><div class="setting-sub">Review every 16 days (Mastered!)</div></div><span style="color:var(--b5-color); font-size:20px">●</span></div>
+  </div>
+
+  <div class="settings-group">
+    <h3>Data</h3>
+    <button class="big-btn big-btn-teal" onclick="saveHTML()" style="margin-bottom:10px">💾 Save as HTML File</button>
+    <button class="big-btn big-btn-secondary" onclick="exportJSON()">📤 Export JSON Backup</button>
+  </div>
+
+  <div class="settings-group">
+    <h3>Danger Zone</h3>
+    <button class="danger-btn" onclick="resetAllProgress()">↺ Reset All Progress (keep cards)</button>
+    <button class="danger-btn" onclick="deleteAllCards()">🗑 Delete ALL Cards</button>
+  </div>
+
+</div>
+
+<!-- ══════ TOAST ══════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   LEITNER INTERVALS (days)
+   Box 1: review daily
+   Box 2: every 2 days
+   Box 3: every 4 days
+   Box 4: every 8 days
+   Box 5: every 16 days (considered "mastered")
+   ══════════════════════════════════════════════════════════ */
+const BOX_INTERVALS = [0, 1, 2, 4, 8, 16]; // index = box number
+
+/* ══════ STATE ══════ */
+let cards = [];          // all cards
+let queue = [];          // current study queue (indices into cards[])
+let qPos  = 0;           // position in queue
+let front = 'vn';        // 'vn' | 'en'
+let breakdownOn = false;
+let studyMode = false;   // only show box-1 due cards
+let currentTab = 'study';
+
+/* ══════ STORAGE ══════ */
+const STORAGE_KEY = 'vietcards_v2';
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+  } catch(e) { showToast('⚠️ Storage full – exported instead'); exportJSON(); }
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) cards = JSON.parse(raw);
+    // Validate / migrate old data
+    cards = cards.map(c => ({
+      en: c.en || '',
+      vn: c.vn || '',
+      break: c.break || '',
+      box: Math.min(5, Math.max(1, parseInt(c.box) || 1)),
+      nextReview: c.nextReview || Date.now()  // milliseconds timestamp
+    }));
+  } catch(e) { cards = []; }
+}
+
+/* ══════ LEITNER LOGIC ══════ */
+function dayStart(ms) {
+  // Returns midnight timestamp for the day of ms
+  const d = new Date(ms);
+  d.setHours(0,0,0,0);
+  return d.getTime();
+}
+
+function isDue(card) {
+  return Date.now() >= card.nextReview;
+}
+
+function scheduleCard(card, boxAfter) {
+  const intervalDays = BOX_INTERVALS[boxAfter];
+  const nextMs = dayStart(Date.now()) + intervalDays * 86400000;
+  card.nextReview = nextMs;
+  card.box = boxAfter;
+}
+
+function markCorrect() {
+  if (!cards.length) return;
+  const card = currentCard();
+  if (!card) return;
+
+  const newBox = Math.min(5, card.box + 1);
+  scheduleCard(card, newBox);
+  save();
+  renderBoxBadge(card);
+  showToast(`✓ Moved to Box ${newBox} · Next review in ${BOX_INTERVALS[newBox]} day${BOX_INTERVALS[newBox]===1?'':'s'}`);
+  nextCard();
+}
+
+function markWrong() {
+  if (!cards.length) return;
+  const card = currentCard();
+  if (!card) return;
+
+  // Wrong: always drop back to Box 1, schedule for tomorrow
+  scheduleCard(card, 1);
+  save();
+  showToast('✗ Back to Box 1 – review again tomorrow');
+
+  // Move to end of queue so they see it again this session
+  const idx = queue[qPos];
+  queue.splice(qPos, 1);
+  queue.push(idx);
+  // Don't advance qPos — it now points to next card
+  if (qPos >= queue.length) qPos = 0;
+  loadCard();
+}
+
+/* ══════ QUEUE BUILDING ══════ */
+function buildQueue() {
+  let pool;
+  if (studyMode) {
+    pool = cards
+      .map((c,i) => ({i, c}))
+      .filter(({c}) => c.box === 1)
+      .map(({i}) => i);
+  } else {
+    // Due cards first, then everything else sorted by box ascending
+    const due = [], later = [];
+    cards.forEach((c,i) => {
+      if (isDue(c)) due.push(i); else later.push(i);
+    });
+    later.sort((a,b) => cards[a].nextReview - cards[b].nextReview);
+    pool = [...due, ...later];
+  }
+  queue = pool;
+  qPos = 0;
+}
+
+function currentCard() {
+  if (!queue.length || qPos >= queue.length) return null;
+  return cards[queue[qPos]];
+}
+
+function nextCard() {
+  if (!queue.length) return;
+  qPos = (qPos + 1) % queue.length;
+  loadCard();
+}
+
+/* ══════ RENDER CARD ══════ */
+function loadCard() {
+  const card = currentCard();
+  updateProgress();
+
+  if (!card) {
+    document.getElementById('frontText').textContent = cards.length ? '🎉 All done for today!' : 'Add your first card →';
+    document.getElementById('backText').textContent  = cards.length ? 'Come back tomorrow for reviews!' : 'Tap "Add Cards" to begin';
+    document.getElementById('breakdownText').innerHTML = '';
+    document.getElementById('boxBadge').textContent = '';
+    document.getElementById('boxBadge').style.background = '';
+    document.getElementById('nextReviewInfo').textContent = '';
+    document.getElementById('flashcard').classList.remove('flipped');
+    return;
+  }
+
+  const isVNFront = (front === 'vn');
+  document.getElementById('frontLabel').textContent  = isVNFront ? 'VIETNAMESE' : 'ENGLISH';
+  document.getElementById('backLabel').textContent   = isVNFront ? 'ENGLISH' : 'VIETNAMESE';
+  document.getElementById('frontText').textContent   = isVNFront ? card.vn : card.en;
+  document.getElementById('backText').textContent    = isVNFront ? card.en : card.vn;
+  document.getElementById('flashcard').classList.remove('flipped');
+
+  if (isVNFront && breakdownOn && card.break) {
+    document.getElementById('breakdownText').innerHTML = formatBreakdown(card.break);
+  } else {
+    document.getElementById('breakdownText').innerHTML = '';
+  }
+
+  renderBoxBadge(card);
+
+  // Next review info
+  const daysUntil = Math.max(0, Math.round((card.nextReview - Date.now()) / 86400000));
+  const dStr = daysUntil === 0 ? 'today' : `in ${daysUntil} day${daysUntil===1?'':'s'}`;
+  document.getElementById('nextReviewInfo').innerHTML =
+    `Box <span>${card.box}</span> · Next review <span>${dStr}</span>`;
+
+  // Auto-speak if enabled
+  if (document.getElementById('settingAutoSpeak').checked) {
+    setTimeout(speak, 300);
+  }
+}
+
+function renderBoxBadge(card) {
+  const badge = document.getElementById('boxBadge');
+  const colors = ['','#e74c3c','#e67e22','#f1c40f','#27ae60','#16a085'];
+  badge.textContent = card.box;
+  badge.style.background = colors[card.box] || '#888';
+}
+
+function updateProgress() {
+  const total = queue.length;
+  const done  = Math.min(qPos, total);
+  document.getElementById('progressLabel').textContent = `${done} / ${total}`;
+  document.getElementById('progressFill').style.width =
+    total ? `${Math.round(done/total*100)}%` : '0%';
+}
+
+function formatBreakdown(text) {
+  return text.split(';').map(part => {
+    const pieces = part.trim().split('–');
+    if (pieces.length === 2) {
+      return `<b>${pieces[0].trim()}</b> – ${pieces[1].trim()}`;
+    }
+    return part.trim();
+  }).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+}
+
+/* ══════ FLIP ══════ */
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+/* ══════ SPEAK ══════ */
+function speak() {
+  const card = currentCard();
+  if (!card && !cards.length) return;
+  const isFlipped = document.getElementById('flashcard').classList.contains('flipped');
+  const isVNFront = (front === 'vn');
+  const speakVN = isVNFront !== isFlipped; // XOR: VN if front=VN and not flipped, or front=EN and flipped
+  const text = speakVN ? (card ? card.vn : '') : (card ? card.en : '');
+  const lang = speakVN ? 'vi-VN' : 'en-US';
+  const rate = parseFloat(document.getElementById('speedSlider').value);
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = rate;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* ══════ REMOVE CARD ══════ */
+function removeCard() {
+  if (!queue.length) return;
+  const idx = queue[qPos];
+  cards.splice(idx, 1);
+  save();
+  buildQueue();
+  if (qPos >= queue.length) qPos = Math.max(0, queue.length - 1);
+  loadCard();
+  renderBoxes();
+  showToast('🗑 Card removed');
+}
+
+/* ══════ FRONT / BREAKDOWN / STUDY MODE ══════ */
+function setFront(lang) {
+  front = lang;
+  document.getElementById('chipVN').classList.toggle('active', lang === 'vn');
+  document.getElementById('chipEN').classList.toggle('active', lang === 'en');
+  loadCard();
+}
+
+function toggleBreak() {
+  breakdownOn = !breakdownOn;
+  document.getElementById('chipBreak').classList.toggle('active', breakdownOn);
+  document.getElementById('settingBreakdown').checked = breakdownOn;
+  loadCard();
+}
+
+function syncBreakdownSetting() {
+  breakdownOn = document.getElementById('settingBreakdown').checked;
+  document.getElementById('chipBreak').classList.toggle('active', breakdownOn);
+  loadCard();
+}
+
+function toggleStudyMode() {
+  studyMode = !studyMode;
+  document.getElementById('chipStudy').classList.toggle('active', studyMode);
+  document.getElementById('studyBanner').classList.toggle('active', studyMode);
+  buildQueue();
+  loadCard();
+}
+
+/* ══════ SHUFFLE ══════ */
+function shuffleCards() {
+  queue.sort(() => Math.random() - 0.5);
+  qPos = 0;
+  loadCard();
+  showToast('🔀 Deck shuffled');
+}
+
+/* ══════ ADD CARDS ══════ */
+function addCards() {
+  const lines = document.getElementById('inputArea').value.trim().split('\n');
+  let added = 0;
+  lines.forEach(line => {
+    const p = line.split('\t');
+    if (p.length >= 2 && p[0].trim() && p[1].trim()) {
+      cards.push({
+        en:   p[0].trim(),
+        vn:   p[1].trim(),
+        break: (p[2] || '').trim(),
+        box:  1,
+        nextReview: Date.now() // due immediately
+      });
+      added++;
+    }
+  });
+  if (added > 0) {
+    save();
+    buildQueue();
+    loadCard();
+    renderBoxes();
+    document.getElementById('inputArea').value = '';
+    showToast(`✅ Added ${added} card${added===1?'':'s'}`);
+    switchTab('study');
+  } else {
+    showToast('⚠️ No valid cards found – check format');
+  }
+}
+
+function loadSampleCards() {
+  document.getElementById('inputArea').value =
+`Hello	Xin chào	Xin–greeting; chào–hello
+Thank you	Cảm ơn	Cảm–feel; ơn–gratitude
+How are you?	Bạn khỏe không?	Bạn–you; khỏe–healthy; không–no/question
+I love you	Tôi yêu bạn	Tôi–I; yêu–love; bạn–you
+Water	Nước	
+Rice	Cơm	
+Good morning	Chào buổi sáng	Chào–hello; buổi sáng–morning
+Goodbye	Tạm biệt	Tạm–temporary; biệt–farewell
+Yes	Vâng	
+No	Không	
+Delicious	Ngon	
+Where is...?	...ở đâu?	ở đâu–where is`;
+  showToast('📋 Sample cards loaded — tap Add Cards');
+}
+
+/* ══════ BOXES PANEL ══════ */
+function renderBoxes() {
+  const boxColors = ['','#e74c3c','#e67e22','#f1c40f','#27ae60','#16a085'];
+  const boxBg     = ['','#ffeaea','#fff2e5','#fff9e1','#eaffea','#e6fffb'];
+  const boxNames  = ['','Box 1 – Daily','Box 2 – 2 Days','Box 3 – 4 Days','Box 4 – 8 Days','Box 5 – 16 Days (Mastered)'];
+  const grid = document.getElementById('boxesGrid');
+  grid.innerHTML = '';
+
+  for (let b = 1; b <= 5; b++) {
+    const boxCards = cards.filter(c => c.box === b);
+    const dueCount = boxCards.filter(c => isDue(c)).length;
+
+    const div = document.createElement('div');
+    div.className = 'box-card';
+    div.style.borderColor = boxColors[b] + '55';
+
+    div.innerHTML = `
+      <div class="box-header">
+        <div class="box-header-left">
+          <div class="box-dot" style="background:${boxColors[b]}"></div>
+          <h3>${boxNames[b]}</h3>
+        </div>
+        <div class="box-count">${boxCards.length} cards${dueCount ? ` · <span style="color:${boxColors[1]}">${dueCount} due</span>` : ''}</div>
+      </div>
+      <div class="box-interval">Review interval: ${BOX_INTERVALS[b]} day${BOX_INTERVALS[b]===1?'':'s'}</div>
+      <div class="box-items" id="box-items-${b}"></div>
+    `;
+    grid.appendChild(div);
+
+    const itemsEl = div.querySelector(`#box-items-${b}`);
+    boxCards.forEach((card, idx) => {
+      const pill = document.createElement('div');
+      pill.className = 'box-item-pill';
+      const due = isDue(card);
+      const daysLeft = due ? 0 : Math.ceil((card.nextReview - Date.now()) / 86400000);
+      pill.innerHTML = `
+        <span>${card.vn}</span>
+        <span class="due-badge ${due ? 'due-now' : 'due-later'}">${due ? 'DUE' : `+${daysLeft}d`}</span>
+      `;
+      pill.onclick = () => {
+        const ci = cards.indexOf(card);
+        const qi = queue.indexOf(ci);
+        if (qi !== -1) { qPos = qi; }
+        switchTab('study');
+        loadCard();
+      };
+      itemsEl.appendChild(pill);
+    });
+  }
+}
+
+/* ══════ TABS ══════ */
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((el,i) => {
+    el.classList.toggle('active', ['study','add','boxes','settings'][i] === tab);
+  });
+  document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+  document.getElementById(`panel-${tab}`).classList.add('active');
+  if (tab === 'boxes') renderBoxes();
+}
+
+/* ══════ SETTINGS ACTIONS ══════ */
+function resetAllProgress() {
+  if (!confirm('Reset all progress? Cards stay but all go back to Box 1.')) return;
+  cards.forEach(c => { c.box = 1; c.nextReview = Date.now(); });
+  save();
+  buildQueue();
+  loadCard();
+  showToast('↺ Progress reset');
+}
+
+function deleteAllCards() {
+  if (!confirm('Delete ALL cards? This cannot be undone!')) return;
+  cards = [];
+  save();
+  buildQueue();
+  loadCard();
+  renderBoxes();
+  showToast('🗑 All cards deleted');
+}
+
+/* ══════ EXPORT / SAVE ══════ */
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(cards, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'viet_cards_backup.json';
+  a.click();
+  showToast('📤 JSON backup downloaded');
+}
+
+function saveHTML() {
+  // Embed current cards into the HTML before saving
+  const scriptTag = `<script id="embedded-data">
+    window.__EMBEDDED_CARDS__ = ${JSON.stringify(cards)};
+  <\/script>`;
+  let html = document.documentElement.outerHTML;
+  // Remove old embedded data if present
+  html = html.replace(/<script id="embedded-data">[\s\S]*?<\/script>/, '');
+  html = html.replace('</head>', scriptTag + '\n</head>');
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'VietCards.html';
+  a.click();
+  showToast('💾 HTML file saved!');
+}
+
+/* ══════ TOAST ══════ */
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/* ══════ SERVICE WORKER (inline registration) ══════ */
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+
+  const swCode = `
+const CACHE = 'vietcards-v1';
+const ASSETS = ['.'];
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    fetch(e.request).catch(() => caches.match(e.request))
+  );
+});
+  `;
+
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swURL = URL.createObjectURL(blob);
+
+  navigator.serviceWorker.register(swURL, {scope: './'})
+    .then(() => console.log('SW registered'))
+    .catch(err => console.warn('SW registration failed:', err));
+}
+
+/* ══════ INIT ══════ */
+window.addEventListener('DOMContentLoaded', () => {
+  // Load embedded cards (from saved HTML) or from localStorage
+  if (window.__EMBEDDED_CARDS__ && window.__EMBEDDED_CARDS__.length) {
+    cards = window.__EMBEDDED_CARDS__;
+    // Merge with any newer localStorage progress
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const ls = JSON.parse(stored);
+        // If localStorage has more cards, use it
+        if (ls.length >= cards.length) cards = ls;
+      } catch(e) {}
+    }
+    save(); // write embedded cards to localStorage
+  } else {
+    load();
+  }
+
+  buildQueue();
+  loadCard();
+  registerServiceWorker();
+
+  // Keyboard support (Mac)
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+    if (e.code === 'Space' || e.code === 'ArrowDown') { e.preventDefault(); flipCard(); }
+    if (e.code === 'ArrowRight') markCorrect();
+    if (e.code === 'ArrowLeft')  markWrong();
+    if (e.code === 'KeyS')       speak();
+  });
+
+  // Swipe support (iPhone)
+  let touchStartX = 0, touchStartY = 0;
+  const fc = document.getElementById('flashcard');
+  fc.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].clientX;
+    touchStartY = e.changedTouches[0].clientY;
+  }, {passive: true});
+  fc.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) { flipCard(); return; } // tap
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+      if (dx > 0) markCorrect(); else markWrong();
+    }
+  }, {passive: true});
+});
+</script>
+</body>
+</html>
