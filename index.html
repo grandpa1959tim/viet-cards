@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Viet Cards">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23cc0000'/%3E%3Cpolygon points='90,30 102,66 140,66 110,88 122,124 90,102 58,124 70,88 40,66 78,66' fill='%23ffd700'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#0d0d0d">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -38,7 +39,7 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 #progTxt{font-size:12px;color:#666;font-weight:700;white-space:nowrap;}
 #progBar{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;}
 #progFill{height:100%;background:linear-gradient(90deg,var(--acc),var(--gold));border-radius:99px;transition:width .3s;}
-#deckTag{font-size:11px;color:var(--acc);font-weight:700;}
+#deckTag{font-size:13px;color:var(--acc);font-weight:800;background:rgba(255,107,53,.12);padding:3px 10px;border-radius:99px;border:1px solid rgba(255,107,53,.25);}
 
 #chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
 .ch{padding:7px 13px;border-radius:99px;border:1.5px solid var(--brd);background:transparent;color:#f5f5f0;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;}
@@ -69,8 +70,8 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 #speakRow{display:flex;align-items:center;gap:8px;width:100%;max-width:500px;}
 #speakBtn{flex:1;height:44px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:var(--rad);color:var(--teal);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;}
 #speakBtn:active{background:rgba(0,212,170,.2);}
-#spdWrap{display:flex;align-items:center;gap:5px;font-size:12px;color:#666;}
-#spdWrap input{width:65px;accent-color:var(--acc);}
+#spdWrap{display:flex;align-items:center;gap:8px;font-size:13px;color:#666;}
+#spdWrap input{width:90px;accent-color:var(--acc);height:28px;cursor:pointer;}
 
 #actRow{display:flex;gap:10px;width:100%;max-width:500px;}
 .abt{flex:1;height:52px;border:none;border-radius:var(--rad);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;}
@@ -392,12 +393,12 @@ function renderCard(){
   document.getElementById('btxt').textContent=isVN?c.en:c.vn;
   document.getElementById('card').classList.remove('flip');
 
-  // Numbers
+  // Numbers — 1,1A,2,2A pattern (odd=Q, even=A)
   if(document.getElementById('sNM').checked){
-    var dk=vis().slice().sort(function(a,b){return a.ord-b.ord;});
-    var pos=dk.findIndex(function(x){return x.id===c.id;})+1;
-    var pn=Math.ceil(pos/2);
-    var lbl=(pos%2===0)?(pn+'A'):''+pn;
+    var allDkCards=cards.filter(function(x){return actDeck===null||x.deckId===actDeck;}).slice().sort(function(a,b){return a.ord-b.ord;});
+    var pos=allDkCards.findIndex(function(x){return x.id===c.id;})+1;
+    var pairNum=Math.ceil(pos/2);
+    var lbl=(pos%2===0)?(pairNum+'A'):''+pairNum;
     document.getElementById('fnm').textContent=lbl;
     document.getElementById('bnm').textContent=lbl;
   }else{
@@ -444,7 +445,11 @@ function doRight(){
   var c=curCard();if(!c)return;
   var nb=Math.min(5,c.box+1);sched(c,nb);saveData();
   toast('✓ Box '+nb+' · Next in '+BD[nb]+' day'+(BD[nb]===1?'':'s'));
-  qp=(qp+1)%Math.max(1,Q.length);renderCard();
+  var nextQp=(qp+1)%Math.max(1,Q.length);
+  if(nextQp===0&&Q.length>0){
+    setTimeout(function(){toast('🎉 Deck complete! Starting over...');},400);
+  }
+  qp=nextQp;renderCard();
 }
 
 function doWrong(){
