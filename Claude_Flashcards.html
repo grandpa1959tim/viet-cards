@@ -184,51 +184,55 @@ header h1 {
 .chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .chip:active { transform: scale(.95); }
 
-/* FLASHCARD */
+/* FLASHCARD — iOS-safe flip using opacity instead of 3D transform */
 .flashcard-wrap {
   width: 100%;
   max-width: 500px;
-  perspective: 1200px;
-  -webkit-perspective: 1200px;
 }
 .flashcard {
   width: 100%;
   aspect-ratio: 16/9;
   position: relative;
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-  transition: transform .55s cubic-bezier(.4,0,.2,1);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
-.flashcard.flipped {
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
 }
 .card-face {
   position: absolute;
   inset: 0;
   border-radius: var(--radius);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 24px;
   gap: 10px;
+  transition: opacity .3s ease;
 }
 .card-front {
   background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
   border: 1px solid rgba(255,255,255,.08);
   box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
 }
 .card-back {
   background: linear-gradient(135deg, #1a0a2e 0%, #2d1b69 100%);
   border: 1px solid rgba(255,255,255,.08);
   box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
-  transform: rotateY(180deg);
-  -webkit-transform: rotateY(180deg);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.flashcard.flipped .card-front {
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.flashcard.flipped .card-back {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 2;
 }
 .card-label {
   font-size: 11px;
@@ -634,6 +638,7 @@ textarea:focus { border-color: var(--accent); }
         <div class="card-face card-back" id="cardBack">
           <div class="card-label" id="backLabel">ENGLISH</div>
           <div class="card-main" id="backText">Tap "Add Cards" to begin</div>
+          <div class="card-breakdown" id="breakdownTextBack"></div>
         </div>
       </div>
     </div>
@@ -707,9 +712,16 @@ How are you?	Bạn khỏe không?	Bạn–you; khỏe–healthy; không–no/que
     <div class="setting-row">
       <div>
         <div class="setting-label">Show Breakdown on Front</div>
-        <div class="setting-sub">Show word-by-word breakdown below Vietnamese</div>
+        <div class="setting-sub">Show word-by-word breakdown below Vietnamese (front side)</div>
       </div>
       <label class="toggle"><input type="checkbox" id="settingBreakdown" onchange="syncBreakdownSetting()"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Show Breakdown on Back Too</div>
+        <div class="setting-sub">Also show breakdown when English is on front (flipped to Vietnamese)</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="settingBreakdownBack" onchange="loadCard()"><span class="toggle-slider"></span></label>
     </div>
     <div class="setting-row">
       <div>
@@ -717,6 +729,17 @@ How are you?	Bạn khỏe không?	Bạn–you; khỏe–healthy; không–no/que
         <div class="setting-sub">Speak the front of each new card automatically</div>
       </div>
       <label class="toggle"><input type="checkbox" id="settingAutoSpeak"><span class="toggle-slider"></span></label>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <h3>Study Order</h3>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Keep Original Card Order</div>
+        <div class="setting-sub">Study cards in the exact order you added them (question/answer pairs stay together)</div>
+      </div>
+      <label class="toggle"><input type="checkbox" id="settingOriginalOrder" onchange="applyOrderSetting()"><span class="toggle-slider"></span></label>
     </div>
   </div>
 
@@ -843,14 +866,18 @@ function markWrong() {
 
 /* ══════ QUEUE BUILDING ══════ */
 function buildQueue() {
+  const keepOrder = document.getElementById('settingOriginalOrder') && document.getElementById('settingOriginalOrder').checked;
   let pool;
   if (studyMode) {
     pool = cards
       .map((c,i) => ({i, c}))
       .filter(({c}) => c.box === 1)
       .map(({i}) => i);
+  } else if (keepOrder) {
+    // Original insertion order — all cards, no sorting
+    pool = cards.map((_,i) => i);
   } else {
-    // Due cards first, then everything else sorted by box ascending
+    // Due cards first, then everything else sorted by next review date
     const due = [], later = [];
     cards.forEach((c,i) => {
       if (isDue(c)) due.push(i); else later.push(i);
@@ -860,6 +887,13 @@ function buildQueue() {
   }
   queue = pool;
   qPos = 0;
+}
+
+function applyOrderSetting() {
+  buildQueue();
+  loadCard();
+  const on = document.getElementById('settingOriginalOrder').checked;
+  showToast(on ? '📋 Original order — cards stay in sequence' : '📅 Smart order — due cards shown first');
 }
 
 function currentCard() {
@@ -896,10 +930,19 @@ function loadCard() {
   document.getElementById('backText').textContent    = isVNFront ? card.en : card.vn;
   document.getElementById('flashcard').classList.remove('flipped');
 
+  // Breakdown on FRONT (Vietnamese is front)
   if (isVNFront && breakdownOn && card.break) {
     document.getElementById('breakdownText').innerHTML = formatBreakdown(card.break);
   } else {
     document.getElementById('breakdownText').innerHTML = '';
+  }
+
+  // Breakdown on BACK (English is front, Vietnamese is back)
+  const showBreakdownBack = document.getElementById('settingBreakdownBack').checked;
+  if (!isVNFront && showBreakdownBack && card.break) {
+    document.getElementById('breakdownTextBack').innerHTML = formatBreakdown(card.break);
+  } else {
+    document.getElementById('breakdownTextBack').innerHTML = '';
   }
 
   renderBoxBadge(card);
