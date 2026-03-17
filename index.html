@@ -324,7 +324,9 @@ How are you?	Bạn khỏe không?	Bạn–you; khỏe–healthy; không–?"></t
   <div class="sg">
     <h3>Data</h3>
     <button class="big-btn btn-teal" onclick="saveHTML()" style="margin-bottom:8px">💾 Save as HTML File</button>
-    <button class="big-btn btn-secondary" onclick="exportJSON()">📤 Export JSON Backup</button>
+    <button class="big-btn btn-secondary" onclick="exportJSON()" style="margin-bottom:8px">📤 Export JSON Backup</button>
+    <button class="big-btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Import JSON Backup</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
   </div>
   <div class="sg">
     <h3>Danger Zone</h3>
@@ -400,8 +402,8 @@ function loadCard(){
   if(document.getElementById('setShowNums').checked){
     const dk=[...(activeDeckId===null?cards:cards.filter(x=>x.deckId===activeDeckId))].sort((a,b)=>a.order-b.order);
     const pos=dk.findIndex(x=>x.id===c.id)+1;
-    document.getElementById('cardNum').textContent=isVN?`${pos}`:`${pos}A`;
-    document.getElementById('cardNumBack').textContent=isVN?`${pos}A`:`${pos}`;
+    const pairNum=Math.ceil(pos/2);const label=(pos%2===0)?`${pairNum}A`:`${pairNum}`;document.getElementById("cardNum").textContent=label;
+    document.getElementById("cardNumBack").textContent=label;
   }else{
     document.getElementById('cardNum').textContent='';
     document.getElementById('cardNumBack').textContent='';
@@ -592,6 +594,35 @@ function switchTab(tab){
 function resetProgress(){if(!confirm('Reset all progress?'))return;cards.forEach(c=>{c.box=1;c.nextReview=Date.now();});save();buildQueue();loadCard();showToast('Progress reset');}
 function deleteAll(){if(!confirm('Delete everything?'))return;cards=[];decks=[];activeDeckId=null;document.getElementById('activeDeckName').textContent='All Decks';save();buildQueue();loadCard();renderDecks();renderBoxes();showToast('Deleted');}
 function exportJSON(){const b=new Blob([JSON.stringify({decks,cards},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='vietcards_backup.json';a.click();}
+function importJSON(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data.cards||!Array.isArray(data.cards)){showToast('Invalid backup file');return;}
+      if(!confirm('Import backup? This will merge with your current cards.'))return;
+      // Merge: add any cards not already present (by id)
+      const existingIds=new Set(cards.map(c=>c.id));
+      let added=0;
+      (data.cards||[]).forEach(c=>{
+        if(!existingIds.has(c.id)){cards.push(c);added++;}
+        else{
+          // Update progress (box + nextReview) for existing cards
+          const existing=cards.find(x=>x.id===c.id);
+          if(existing){existing.box=c.box;existing.nextReview=c.nextReview;}
+        }
+      });
+      // Merge decks
+      const existingDeckIds=new Set(decks.map(d=>d.id));
+      (data.decks||[]).forEach(d=>{if(!existingDeckIds.has(d.id))decks.push(d);});
+      save();buildQueue();loadCard();renderDecks();
+      showToast('Imported! '+added+' new cards added, progress updated');
+    }catch(err){showToast('Error reading file');}
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
 function saveHTML(){
   const tag=`<script id="ed">window.__ED__=${JSON.stringify({decks,cards})};<\/script>`;
   let html=document.documentElement.outerHTML;
