@@ -6,1314 +6,633 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Viet Cards">
-<meta name="theme-color" content="#1a1a2e">
-<title>Viet Cards – Leitner Flashcards</title>
-
-<!-- ══════════════════════════════════════════════════════════
-     INLINE PWA MANIFEST  (avoids needing a separate file)
-     ══════════════════════════════════════════════════════════ -->
-<script>
-const manifestData = {
-  name: "Viet Cards – Leitner Flashcards",
-  short_name: "Viet Cards",
-  start_url: ".",
-  display: "standalone",
-  background_color: "#1a1a2e",
-  theme_color: "#1a1a2e",
-  orientation: "portrait",
-  icons: [
-    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%231a1a2e'/%3E%3Ctext x='96' y='130' font-size='110' text-anchor='middle' font-family='serif'%3E🇻🇳%3C/text%3E%3C/svg%3E", sizes: "192x192", type: "image/svg+xml" },
-    { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%231a1a2e'/%3E%3Ctext x='256' y='360' font-size='300' text-anchor='middle' font-family='serif'%3E🇻🇳%3C/text%3E%3C/svg%3E", sizes: "512x512", type: "image/svg+xml" }
-  ]
-};
-const blob = new Blob([JSON.stringify(manifestData)], {type: 'application/json'});
-const manifestURL = URL.createObjectURL(blob);
-const link = document.createElement('link');
-link.rel = 'manifest';
-link.href = manifestURL;
-document.head.appendChild(link);
-</script>
-
-<!-- ══════════════════════════════════════════════════════════
-     GOOGLE FONTS
-     ══════════════════════════════════════════════════════════ -->
+<meta name="theme-color" content="#0d0d0d">
+<title>Viet Cards</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ══════ DESIGN TOKENS ══════ */
 :root {
-  --bg:       #0f0f1a;
-  --surface:  #1a1a2e;
-  --card-bg:  #16213e;
-  --accent:   #e94560;
-  --gold:     #f5a623;
-  --teal:     #0dcbbd;
-  --text:     #f0eff4;
-  --muted:    #8888aa;
-  --success:  #2ecc71;
-  --danger:   #e74c3c;
-  --warn:     #f39c12;
+  --bg:#0d0d0d;--surface:#1a1a1a;--surface2:#252525;--border:rgba(255,255,255,.08);
+  --text:#f5f5f0;--muted:#777;--accent:#ff6b35;--gold:#ffd700;--teal:#00d4aa;
+  --success:#00c853;--danger:#ff3d57;
+  --b1:#ff3d57;--b2:#ff8c00;--b3:#ffd700;--b4:#00c853;--b5:#00d4aa;
+  --radius:16px;--tap:54px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:env(safe-area-inset-bottom,20px);}
 
-  --b1-color: #e74c3c;
-  --b2-color: #e67e22;
-  --b3-color: #f1c40f;
-  --b4-color: #27ae60;
-  --b5-color: #16a085;
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--accent);}
+.logo span{color:var(--gold);}
+.deck-sel{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text);max-width:180px;}
 
-  --radius:   18px;
-  --tap:      56px;   /* minimum tap target */
-  --font-ui:  'DM Sans', sans-serif;
-  --font-hd:  'Playfair Display', serif;
-}
+.tabs{display:flex;background:var(--surface);border-bottom:1px solid var(--border);}
+.tab{flex:1;padding:13px 4px;text-align:center;cursor:pointer;font-size:11px;font-weight:800;letter-spacing:.8px;color:var(--muted);border-bottom:3px solid transparent;text-transform:uppercase;transition:all .2s;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 
-/* ══════ RESET ══════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; overscroll-behavior: none; }
+.panel{display:none;padding:16px;}
+.panel.active{display:block;}
 
-body {
-  font-family: var(--font-ui);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  padding-bottom: env(safe-area-inset-bottom);
-}
+.card-area{display:flex;flex-direction:column;align-items:center;gap:14px;}
+.progress-row{display:flex;align-items:center;gap:10px;width:100%;max-width:520px;}
+.prog-label{font-size:12px;color:var(--muted);white-space:nowrap;font-weight:700;}
+.prog-bar{flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:99px;transition:width .4s;}
 
-/* ══════ HEADER ══════ */
-header {
-  background: var(--surface);
-  padding: 16px 20px 12px;
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-header h1 {
-  font-family: var(--font-hd);
-  font-size: clamp(20px, 5vw, 28px);
-  background: linear-gradient(135deg, var(--accent), var(--gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.header-actions { display: flex; gap: 8px; }
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;}
+.chip{padding:7px 14px;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--text);font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s;}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.chip:active{transform:scale(.94);}
 
-/* ══════ TABS ══════ */
-.tabs {
-  display: flex;
-  background: var(--surface);
-  border-bottom: 1px solid rgba(255,255,255,.07);
-}
-.tab {
-  flex: 1;
-  padding: 14px 8px;
-  text-align: center;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: .5px;
-  color: var(--muted);
-  border-bottom: 3px solid transparent;
-  transition: all .2s;
-  text-transform: uppercase;
-}
-.tab.active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
+.card-wrap{width:100%;max-width:520px;}
+.flashcard{width:100%;aspect-ratio:16/9;border-radius:var(--radius);position:relative;cursor:pointer;user-select:none;-webkit-user-select:none;}
+.card-face{position:absolute;inset:0;border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:8px;transition:opacity .25s ease;}
+.card-front{background:linear-gradient(145deg,#1a2a1a,#0d1a0d);border:1px solid rgba(0,212,170,.15);box-shadow:0 0 40px rgba(0,212,170,.08),0 20px 60px rgba(0,0,0,.6);opacity:1;z-index:2;}
+.card-back{background:linear-gradient(145deg,#1a1a2e,#0d0d1a);border:1px solid rgba(255,107,53,.15);box-shadow:0 0 40px rgba(255,107,53,.08),0 20px 60px rgba(0,0,0,.6);opacity:0;z-index:1;}
+.flashcard.flipped .card-front{opacity:0;z-index:1;}
+.flashcard.flipped .card-back{opacity:1;z-index:2;}
+.card-num{position:absolute;top:10px;left:14px;font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1px;}
+.card-box-dot{position:absolute;top:10px;right:14px;width:10px;height:10px;border-radius:50%;}
+.card-lang{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.card-main{font-size:clamp(20px,5.5vw,34px);font-weight:800;text-align:center;line-height:1.3;}
+.card-breakdown{font-size:clamp(12px,3vw,15px);color:var(--teal);text-align:center;line-height:1.7;}
+.card-breakdown b{color:var(--gold);font-weight:800;}
 
-/* ══════ PANELS ══════ */
-.panel { display: none; padding: 20px; }
-.panel.active { display: block; }
+.flip-btn{width:100%;max-width:520px;height:var(--tap);background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,transform .1s;-webkit-tap-highlight-color:transparent;}
+.flip-btn:active{background:rgba(255,255,255,.12);transform:scale(.98);}
 
-/* ══════ CARD AREA ══════ */
-.card-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
+.speak-row{display:flex;align-items:center;gap:10px;width:100%;max-width:520px;}
+.speak-btn{flex:1;height:46px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:var(--radius);color:var(--teal);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;}
+.speak-btn:active{background:rgba(0,212,170,.2);}
+.speed-wrap{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+.speed-wrap input{width:70px;accent-color:var(--accent);}
 
-/* Progress indicator */
-.progress-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 500px;
-}
-.progress-label { font-size: 13px; color: var(--muted); white-space: nowrap; }
-.progress-bar-wrap {
-  flex: 1;
-  height: 6px;
-  background: rgba(255,255,255,.1);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--gold));
-  border-radius: 99px;
-  transition: width .4s ease;
-}
+.action-row{display:flex;gap:10px;width:100%;max-width:520px;}
+.act-btn{flex:1;height:var(--tap);border:none;border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:transform .1s;-webkit-tap-highlight-color:transparent;}
+.act-btn:active{transform:scale(.96);}
+.btn-wrong{background:linear-gradient(135deg,#8b0000,var(--danger));color:#fff;box-shadow:0 6px 20px rgba(255,61,87,.3);}
+.btn-correct{background:linear-gradient(135deg,#006400,var(--success));color:#fff;box-shadow:0 6px 20px rgba(0,200,83,.3);}
+.btn-del{flex:0 0 auto;width:var(--tap);background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);font-size:18px;}
+.next-info{font-size:11px;color:var(--muted);text-align:center;font-weight:700;}
+.next-info span{color:var(--gold);}
+.study-banner{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:10px;padding:8px 14px;font-size:12px;font-weight:800;color:var(--accent);text-align:center;width:100%;max-width:520px;display:none;}
+.study-banner.on{display:block;}
 
-/* Pill chips */
-.mode-chips {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.chip {
-  padding: 8px 16px;
-  border-radius: 99px;
-  border: 1.5px solid rgba(255,255,255,.15);
-  background: transparent;
-  color: var(--text);
-  font-family: var(--font-ui);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .2s;
-  -webkit-tap-highlight-color: transparent;
-}
-.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-.chip:active { transform: scale(.95); }
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;margin-bottom:4px;}
+.section-sub{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6;}
+.field-label{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.row-inp{display:flex;gap:8px;margin-bottom:14px;}
+.row-inp input,input.full{flex:1;height:46px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;padding:0 14px;outline:none;-webkit-appearance:none;transition:border-color .2s;width:100%;}
+.row-inp input:focus,input.full:focus{border-color:var(--accent);}
+textarea{width:100%;height:150px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Courier New',monospace;font-size:13px;padding:12px;resize:vertical;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+textarea:focus{border-color:var(--accent);}
+.big-btn{width:100%;height:52px;border:none;border-radius:var(--radius);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:transform .1s;margin-top:10px;-webkit-tap-highlight-color:transparent;}
+.big-btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,#c0392b,var(--accent));color:#fff;box-shadow:0 8px 24px rgba(255,107,53,.3);}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1.5px solid var(--border);}
+.btn-teal{background:linear-gradient(135deg,#008a70,var(--teal));color:#000;font-weight:900;}
+.hint-box{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;color:var(--muted);font-family:'Courier New',monospace;line-height:1.9;margin-top:14px;}
+.hint-box .hl{color:var(--gold);font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;letter-spacing:1px;}
 
-/* FLASHCARD — iOS-safe flip using opacity instead of 3D transform */
-.flashcard-wrap {
-  width: 100%;
-  max-width: 500px;
-}
-.flashcard {
-  width: 100%;
-  aspect-ratio: 16/9;
-  position: relative;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.card-face {
-  position: absolute;
-  inset: 0;
-  border-radius: var(--radius);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  gap: 10px;
-  transition: opacity .3s ease;
-}
-.card-front {
-  background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
-  opacity: 1;
-  pointer-events: auto;
-  z-index: 2;
-}
-.card-back {
-  background: linear-gradient(135deg, #1a0a2e 0%, #2d1b69 100%);
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.1);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-.flashcard.flipped .card-front {
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-.flashcard.flipped .card-back {
-  opacity: 1;
-  pointer-events: auto;
-  z-index: 2;
-}
-.card-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.card-main {
-  font-size: clamp(22px, 6vw, 36px);
-  font-weight: 700;
-  text-align: center;
-  line-height: 1.3;
-}
-.card-breakdown {
-  font-size: clamp(13px, 3.5vw, 16px);
-  color: var(--teal);
-  text-align: center;
-  line-height: 1.6;
-}
-.card-breakdown b { color: var(--gold); font-weight: 700; }
+.decks-list{display:flex;flex-direction:column;gap:10px;}
+.deck-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color .2s;}
+.deck-card.active-deck{border-color:var(--accent);}
+.deck-card:active{background:var(--surface2);}
+.deck-info h3{font-size:16px;font-weight:800;margin-bottom:2px;}
+.deck-info p{font-size:12px;color:var(--muted);}
+.deck-actions{display:flex;gap:8px;}
+.icon-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.icon-btn:active{background:rgba(255,255,255,.1);}
+.new-deck-row{display:flex;gap:8px;margin-bottom:16px;}
+.new-deck-row input{flex:1;height:46px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;padding:0 14px;outline:none;-webkit-appearance:none;}
+.new-deck-row input:focus{border-color:var(--accent);}
+.new-deck-row button{height:46px;padding:0 18px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;}
 
-.card-box-badge {
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  color: #000;
-}
+.boxes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.box-card{background:var(--surface);border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--border);}
+.box-card:nth-child(5){grid-column:1/-1;}
+.box-hd{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;}
+.box-hd-left{display:flex;align-items:center;gap:8px;}
+.box-dot{width:10px;height:10px;border-radius:50%;}
+.box-hd h3{font-size:13px;font-weight:800;}
+.box-count{font-size:11px;color:var(--muted);font-weight:700;}
+.box-int{font-size:11px;color:var(--muted);padding:0 12px 6px;font-weight:600;}
+.box-items{padding:0 8px 8px;max-height:120px;overflow-y:auto;}
+.box-pill{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;margin:3px 0;border-radius:8px;background:rgba(255,255,255,.03);font-size:12px;cursor:pointer;font-weight:600;}
+.box-pill:active{background:rgba(255,255,255,.08);}
+.due-badge{font-size:10px;padding:2px 6px;border-radius:99px;font-weight:800;}
+.due-now{background:rgba(255,61,87,.2);color:var(--danger);}
+.due-later{background:rgba(255,255,255,.05);color:var(--muted);}
 
-.tap-hint {
-  font-size: 12px;
-  color: var(--muted);
-  letter-spacing: 1px;
-  text-align: center;
-}
+.sg{margin-bottom:24px;}
+.sg h3{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);}
+.srow:last-child{border-bottom:none;}
+.slabel{font-size:14px;font-weight:700;}
+.ssub{font-size:11px;color:var(--muted);margin-top:2px;}
+.toggle{position:relative;width:48px;height:26px;}
+.toggle input{opacity:0;width:0;height:0;}
+.tslider{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:99px;cursor:pointer;transition:background .2s;}
+.tslider::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;border-radius:50%;background:white;transition:transform .2s;}
+.toggle input:checked + .tslider{background:var(--success);}
+.toggle input:checked + .tslider::before{transform:translateX(22px);}
+.danger-btn{width:100%;height:50px;border:1.5px solid var(--danger);border-radius:var(--radius);background:transparent;color:var(--danger);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;}
+.danger-btn:active{background:rgba(255,61,87,.1);}
 
-/* SPEAK BUTTON */
-.speak-btn {
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 99px;
-  padding: 10px 24px;
-  color: var(--text);
-  font-size: 22px;
-  cursor: pointer;
-  transition: background .2s;
-  -webkit-tap-highlight-color: transparent;
-}
-.speak-btn:active { background: rgba(255,255,255,.18); }
+.qr-section{text-align:center;padding:10px 0;}
+.qr-section p{font-size:13px;color:var(--muted);margin:8px 0 16px;line-height:1.7;}
+#qrCanvas{border-radius:12px;}
+.qr-url{font-size:11px;color:var(--teal);word-break:break-all;margin-top:10px;font-weight:700;}
 
-/* ACTION BUTTONS */
-.action-row {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-  max-width: 500px;
-}
-.action-btn {
-  flex: 1;
-  height: var(--tap);
-  border: none;
-  border-radius: var(--radius);
-  font-family: var(--font-ui);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: .5px;
-  cursor: pointer;
-  transition: transform .15s, box-shadow .15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.action-btn:active { transform: scale(.96); }
-.btn-wrong  { background: linear-gradient(135deg, #c0392b, #e74c3c); color: #fff; box-shadow: 0 6px 20px rgba(231,76,60,.35); }
-.btn-correct{ background: linear-gradient(135deg, #1a8a4a, #2ecc71); color: #fff; box-shadow: 0 6px 20px rgba(46,204,113,.35); }
-.btn-remove { background: rgba(255,255,255,.07); color: var(--muted); border: 1px solid rgba(255,255,255,.1); flex: 0 0 auto; width: var(--tap); font-size: 20px; }
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:flex-end;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:70vh;overflow-y:auto;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px));}
+.modal h2{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:14px;}
+.modal-item{padding:14px;border-radius:var(--radius);background:var(--surface2);margin-bottom:8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:15px;}
+.modal-item.sel{border:2px solid var(--accent);}
+.modal-item:active{background:rgba(255,255,255,.08);}
+.modal-close{width:100%;height:48px;background:transparent;border:1.5px solid var(--border);border-radius:var(--radius);color:var(--muted);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-top:8px;}
 
-/* NEXT REVIEW INFO */
-.next-review-info {
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
-}
-.next-review-info span { color: var(--gold); font-weight: 600; }
+.toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface2);border:1px solid var(--border);border-radius:99px;padding:11px 22px;font-size:13px;font-weight:800;white-space:nowrap;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.6);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+.toast.show{transform:translateX(-50%) translateY(0);}
 
-/* SPEED ROW */
-.speed-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 500px;
-  font-size: 13px;
-  color: var(--muted);
-}
-.speed-row input[type=range] {
-  flex: 1;
-  accent-color: var(--accent);
-  height: 4px;
-}
-
-/* EMPTY STATE */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--muted);
-}
-.empty-state .emoji { font-size: 64px; display: block; margin-bottom: 16px; }
-.empty-state h2 { font-family: var(--font-hd); color: var(--text); margin-bottom: 8px; }
-
-/* ══════ ADD CARDS PANEL ══════ */
-.add-section h2 {
-  font-family: var(--font-hd);
-  font-size: 22px;
-  margin-bottom: 6px;
-  color: var(--text);
-}
-.add-section p {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 16px;
-  line-height: 1.6;
-}
-
-textarea {
-  width: 100%;
-  height: 160px;
-  background: var(--surface);
-  border: 1.5px solid rgba(255,255,255,.1);
-  border-radius: 12px;
-  color: var(--text);
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  padding: 14px;
-  resize: vertical;
-  outline: none;
-  transition: border-color .2s;
-  -webkit-appearance: none;
-}
-textarea:focus { border-color: var(--accent); }
-
-.big-btn {
-  width: 100%;
-  height: 56px;
-  border: none;
-  border-radius: var(--radius);
-  font-family: var(--font-ui);
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform .15s;
-  -webkit-tap-highlight-color: transparent;
-  margin-top: 12px;
-}
-.big-btn:active { transform: scale(.97); }
-.big-btn-primary { background: linear-gradient(135deg, var(--accent), #c0392b); color: #fff; box-shadow: 0 8px 24px rgba(233,69,96,.35); }
-.big-btn-secondary { background: rgba(255,255,255,.07); color: var(--text); border: 1px solid rgba(255,255,255,.12); }
-.big-btn-teal { background: linear-gradient(135deg, var(--teal), #0a8a80); color: #fff; box-shadow: 0 8px 24px rgba(13,203,189,.25); }
-
-.sample-hint {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 10px;
-  padding: 12px 14px;
-  font-size: 12px;
-  color: var(--muted);
-  font-family: 'Courier New', monospace;
-  line-height: 1.8;
-  margin-top: 16px;
-}
-.sample-hint .lbl { color: var(--gold); font-family: var(--font-ui); font-weight: 600; font-size: 11px; letter-spacing: 1px; }
-
-/* ══════ BOXES PANEL ══════ */
-.boxes-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.box-card {
-  background: var(--surface);
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1.5px solid rgba(255,255,255,.07);
-}
-.box-card:nth-child(5) { grid-column: 1 / -1; }
-.box-header {
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.box-header-left { display: flex; align-items: center; gap: 8px; }
-.box-dot { width: 12px; height: 12px; border-radius: 50%; }
-.box-header h3 { font-size: 14px; font-weight: 700; }
-.box-count { font-size: 12px; color: var(--muted); }
-.box-interval { font-size: 11px; color: var(--muted); padding: 4px 14px 8px; }
-.box-items { padding: 0 8px 10px; max-height: 140px; overflow-y: auto; }
-.box-item-pill {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 7px 10px;
-  margin: 4px 0;
-  border-radius: 8px;
-  background: rgba(255,255,255,.04);
-  font-size: 13px;
-  cursor: pointer;
-  transition: background .15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.box-item-pill:active { background: rgba(255,255,255,.1); }
-.box-item-pill .due-badge {
-  font-size: 10px;
-  padding: 2px 7px;
-  border-radius: 99px;
-  font-weight: 700;
-}
-.due-now { background: rgba(233,69,96,.25); color: var(--accent); }
-.due-later { background: rgba(255,255,255,.06); color: var(--muted); }
-
-/* ══════ SETTINGS PANEL ══════ */
-.settings-group { margin-bottom: 28px; }
-.settings-group h3 {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 12px;
-}
-.setting-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(255,255,255,.05);
-}
-.setting-row:last-child { border-bottom: none; }
-.setting-label { font-size: 15px; }
-.setting-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-/* Toggle switch */
-.toggle {
-  position: relative;
-  width: 50px;
-  height: 28px;
-}
-.toggle input { opacity: 0; width: 0; height: 0; }
-.toggle-slider {
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,.15);
-  border-radius: 99px;
-  cursor: pointer;
-  transition: background .2s;
-}
-.toggle-slider::before {
-  content: '';
-  position: absolute;
-  width: 22px; height: 22px;
-  left: 3px; top: 3px;
-  border-radius: 50%;
-  background: white;
-  transition: transform .2s;
-}
-.toggle input:checked + .toggle-slider { background: var(--success); }
-.toggle input:checked + .toggle-slider::before { transform: translateX(22px); }
-
-/* Danger zone */
-.danger-btn {
-  width: 100%;
-  height: 52px;
-  border: 1.5px solid var(--danger);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--danger);
-  font-family: var(--font-ui);
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background .2s;
-  margin-bottom: 10px;
-  -webkit-tap-highlight-color: transparent;
-}
-.danger-btn:active { background: rgba(231,76,60,.15); }
-
-/* ══════ TOAST ══════ */
-.toast {
-  position: fixed;
-  bottom: calc(20px + env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%) translateY(120px);
-  background: var(--surface);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 99px;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  z-index: 9999;
-  box-shadow: 0 8px 32px rgba(0,0,0,.5);
-  transition: transform .3s cubic-bezier(.4,0,.2,1);
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-
-/* ══════ ICON BUTTON ══════ */
-.icon-btn {
-  width: 40px; height: 40px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,.1);
-  background: rgba(255,255,255,.06);
-  color: var(--text);
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  -webkit-tap-highlight-color: transparent;
-  transition: background .15s;
-}
-.icon-btn:active { background: rgba(255,255,255,.14); }
-
-/* ══════ SCROLLBARS ══════ */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 99px; }
-
-/* ══════ STUDY FILTER BANNER ══════ */
-.study-banner {
-  background: linear-gradient(135deg, rgba(233,69,96,.15), rgba(245,166,35,.1));
-  border: 1px solid rgba(233,69,96,.3);
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--gold);
-  text-align: center;
-  width: 100%;
-  max-width: 500px;
-  display: none;
-}
-.study-banner.active { display: block; }
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px;}
 </style>
 </head>
 <body>
 
-<!-- ══════ HEADER ══════ -->
+<div class="modal-overlay" id="deckModal" onclick="closeDeckModal(event)">
+  <div class="modal">
+    <h2>Switch Deck</h2>
+    <div id="modalDeckList"></div>
+    <button class="modal-close" onclick="closeDeckModalDirect()">Cancel</button>
+  </div>
+</div>
+
 <header>
-  <h1>🇻🇳 Viet Cards</h1>
-  <div class="header-actions">
-    <button class="icon-btn" title="Save to HTML" onclick="saveHTML()">💾</button>
-    <button class="icon-btn" title="Shuffle" onclick="shuffleCards()">🔀</button>
+  <div class="logo">VIET<span>CARDS</span></div>
+  <div class="deck-sel" onclick="openDeckModal()">
+    <span id="activeDeckName" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">All Decks</span>
+    <span style="color:var(--muted);font-size:10px;">▼</span>
   </div>
 </header>
 
-<!-- ══════ TABS ══════ -->
 <div class="tabs">
   <div class="tab active" onclick="switchTab('study')">Study</div>
-  <div class="tab" onclick="switchTab('add')">Add Cards</div>
+  <div class="tab" onclick="switchTab('add')">Add</div>
+  <div class="tab" onclick="switchTab('decks')">Decks</div>
   <div class="tab" onclick="switchTab('boxes')">Boxes</div>
   <div class="tab" onclick="switchTab('settings')">Settings</div>
 </div>
 
-<!-- ══════════════════════════════════
-     STUDY PANEL
-     ══════════════════════════════════ -->
+<!-- STUDY -->
 <div id="panel-study" class="panel active">
   <div class="card-area">
-
-    <!-- Progress -->
     <div class="progress-row">
-      <div class="progress-label" id="progressLabel">0 / 0</div>
-      <div class="progress-bar-wrap">
-        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
-      </div>
+      <div class="prog-label" id="progLabel">0 / 0</div>
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-label" id="deckBadge" style="color:var(--accent);font-size:11px;"></div>
     </div>
-
-    <!-- Study mode / front language chips -->
-    <div class="mode-chips">
-      <button class="chip active" id="chipVN" onclick="setFront('vn')">🇻🇳 Vietnamese</button>
+    <div class="chips">
+      <button class="chip active" id="chipVN" onclick="setFront('vn')">🇻🇳 Viet</button>
       <button class="chip" id="chipEN" onclick="setFront('en')">🇬🇧 English</button>
       <button class="chip" id="chipBreak" onclick="toggleBreak()">🔍 Breakdown</button>
-      <button class="chip" id="chipStudy" onclick="toggleStudyMode()">📦 Box 1 Only</button>
+      <button class="chip" id="chipStudy" onclick="toggleStudyMode()">📦 Box 1</button>
     </div>
-
-    <div class="study-banner" id="studyBanner">📦 Study Mode: Reviewing Box 1 cards only</div>
-
-    <!-- FLASHCARD -->
-    <div class="flashcard-wrap">
+    <div class="study-banner" id="studyBanner">📦 Studying Box 1 cards only</div>
+    <div class="card-wrap">
       <div class="flashcard" id="flashcard">
-        <div class="card-face card-front" id="cardFront">
-          <div class="card-label" id="frontLabel">VIETNAMESE</div>
-          <div class="card-main" id="frontText">Add your first card! →</div>
-          <div class="card-breakdown" id="breakdownText"></div>
-          <div class="card-box-badge" id="boxBadge">1</div>
+        <div class="card-face card-front">
+          <div class="card-num" id="cardNum"></div>
+          <div class="card-box-dot" id="boxDot"></div>
+          <div class="card-lang" id="frontLang">VIETNAMESE</div>
+          <div class="card-main" id="frontText">Add your first card →</div>
+          <div class="card-breakdown" id="breakFront"></div>
         </div>
-        <div class="card-face card-back" id="cardBack">
-          <div class="card-label" id="backLabel">ENGLISH</div>
-          <div class="card-main" id="backText">Tap "Add Cards" to begin</div>
-          <div class="card-breakdown" id="breakdownTextBack"></div>
+        <div class="card-face card-back">
+          <div class="card-num" id="cardNumBack"></div>
+          <div class="card-lang" id="backLang">ENGLISH</div>
+          <div class="card-main" id="backText">Tap "Add" to begin</div>
+          <div class="card-breakdown" id="breakBack"></div>
         </div>
       </div>
     </div>
-
-    <div class="tap-hint">Tap card to reveal · or use button below</div>
-
-    <button class="big-btn big-btn-secondary" onclick="flipCard()" style="max-width:500px;width:100%;margin-top:-4px">👆 Flip Card</button>
-
-    <!-- Speak -->
-    <button class="speak-btn" onclick="speak()">🔊 Listen</button>
-
-    <!-- Speed -->
-    <div class="speed-row">
-      <span>🐢</span>
-      <input type="range" id="speedSlider" min="0.4" max="1.2" step="0.1" value="0.9" oninput="speedVal.textContent=parseFloat(this.value).toFixed(1)">
-      <span>🐇</span>
-      <span id="speedVal">0.9</span>×
+    <button class="flip-btn" onclick="flipCard()">👆 Flip Card</button>
+    <div class="speak-row">
+      <button class="speak-btn" onclick="speak()">🔊 Listen</button>
+      <div class="speed-wrap">
+        🐢<input type="range" id="speedSlider" min="0.4" max="1.2" step="0.1" value="0.9" oninput="speedVal.textContent=parseFloat(this.value).toFixed(1)">🐇
+        <span id="speedVal">0.9</span>×
+      </div>
     </div>
-
-    <!-- Wrong / Correct / Remove -->
     <div class="action-row">
-      <button class="action-btn btn-wrong"  onclick="markWrong()">✗ Again</button>
-      <button class="action-btn btn-correct" onclick="markCorrect()">✓ Got It</button>
-      <button class="action-btn btn-remove" onclick="removeCard()" title="Remove card">🗑</button>
+      <button class="act-btn btn-wrong" onclick="markWrong()">✗ Again</button>
+      <button class="act-btn btn-correct" onclick="markCorrect()">✓ Got It</button>
+      <button class="act-btn btn-del" onclick="removeCard()">🗑</button>
     </div>
-
-    <div class="next-review-info" id="nextReviewInfo"></div>
-
+    <div class="next-info" id="nextInfo"></div>
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     ADD CARDS PANEL
-     ══════════════════════════════════ -->
+<!-- ADD -->
 <div id="panel-add" class="panel">
-  <div class="add-section">
-    <h2>Add Flashcards</h2>
-    <p>Paste one card per line. Use <strong>Tab</strong> to separate columns:<br>
-    <code style="color:var(--gold)">English [Tab] Vietnamese [Tab] Breakdown (optional)</code></p>
-
-    <textarea id="inputArea" placeholder="Hello	Xin chào	Xin–greeting; chào–hello
+  <div class="section-title">Add Cards</div>
+  <div class="section-sub">One card per line · Tab between columns · Copy straight from Google Sheets!</div>
+  <div class="field-label">Deck name (creates new deck if needed)</div>
+  <div class="row-inp" style="margin-bottom:14px">
+    <input type="text" id="targetDeckInput" placeholder="e.g. Greetings 1, At the Market...">
+  </div>
+  <div class="field-label">Cards — Column A: English · Column B: Vietnamese · Column C: Breakdown</div>
+  <textarea id="inputArea" placeholder="Hello	Xin chào	Xin–greeting; chào–hello
 Thank you	Cảm ơn	Cảm–feel; ơn–gratitude
-How are you?	Bạn khỏe không?	Bạn–you; khỏe–healthy; không–no/question"></textarea>
-
-    <button class="big-btn big-btn-primary" onclick="addCards()">＋ Add Cards</button>
-    <button class="big-btn big-btn-secondary" onclick="loadSampleCards()">📋 Load Sample Cards</button>
-
-    <div class="sample-hint">
-      <div class="lbl">FORMAT EXAMPLE (Tab-separated)</div>
-      Hello → Xin chào → Xin–greeting; chào–hello<br>
-      Thank you → Cảm ơn → Cảm–feel; ơn–gratitude<br>
-      <span style="color:var(--teal)">→ Each breakdown entry: word–meaning; word–meaning</span>
-    </div>
+How are you?	Bạn khỏe không?	Bạn–you; khỏe–healthy; không–?"></textarea>
+  <button class="big-btn btn-primary" onclick="addCards()">＋ Add Cards to Deck</button>
+  <button class="big-btn btn-secondary" onclick="loadSample()">📋 Load Sample Cards</button>
+  <div class="hint-box">
+    <div class="hl">💡 GOOGLE SHEETS TIP</div>
+    Put English in column A, Vietnamese in B, Breakdown in C.<br>
+    Select your cells → Copy → Paste here. Tabs carry over automatically!<br><br>
+    <div class="hl">BREAKDOWN FORMAT</div>
+    <span style="color:var(--teal)">word–meaning; word–meaning; word–meaning</span>
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     BOXES PANEL
-     ══════════════════════════════════ -->
+<!-- DECKS -->
+<div id="panel-decks" class="panel">
+  <div class="section-title">My Decks</div>
+  <div class="section-sub">Organize cards into themed groups</div>
+  <div class="new-deck-row">
+    <input type="text" id="newDeckInput" placeholder="New deck name...">
+    <button onclick="createDeck()">＋ Create</button>
+  </div>
+  <div class="decks-list" id="decksList"></div>
+</div>
+
+<!-- BOXES -->
 <div id="panel-boxes" class="panel">
-  <div class="boxes-grid" id="boxesGrid">
-    <!-- Rendered by JS -->
-  </div>
+  <div class="boxes-grid" id="boxesGrid"></div>
 </div>
 
-<!-- ══════════════════════════════════
-     SETTINGS PANEL
-     ══════════════════════════════════ -->
+<!-- SETTINGS -->
 <div id="panel-settings" class="panel">
-
-  <div class="settings-group">
+  <div class="sg">
     <h3>Display</h3>
-    <div class="setting-row">
-      <div>
-        <div class="setting-label">Show Breakdown on Front</div>
-        <div class="setting-sub">Show word-by-word breakdown below Vietnamese (front side)</div>
-      </div>
-      <label class="toggle"><input type="checkbox" id="settingBreakdown" onchange="syncBreakdownSetting()"><span class="toggle-slider"></span></label>
+    <div class="srow">
+      <div><div class="slabel">Breakdown on Front</div><div class="ssub">Show below Vietnamese when on front</div></div>
+      <label class="toggle"><input type="checkbox" id="setBreakFront" onchange="loadCard()"><span class="tslider"></span></label>
     </div>
-    <div class="setting-row">
-      <div>
-        <div class="setting-label">Show Breakdown on Back Too</div>
-        <div class="setting-sub">Also show breakdown when English is on front (flipped to Vietnamese)</div>
-      </div>
-      <label class="toggle"><input type="checkbox" id="settingBreakdownBack" onchange="loadCard()"><span class="toggle-slider"></span></label>
+    <div class="srow">
+      <div><div class="slabel">Breakdown on Back Too</div><div class="ssub">Show Vietnamese breakdown after flipping from English</div></div>
+      <label class="toggle"><input type="checkbox" id="setBreakBack" onchange="loadCard()"><span class="tslider"></span></label>
     </div>
-    <div class="setting-row">
-      <div>
-        <div class="setting-label">Auto-Speak on Card Load</div>
-        <div class="setting-sub">Speak the front of each new card automatically</div>
-      </div>
-      <label class="toggle"><input type="checkbox" id="settingAutoSpeak"><span class="toggle-slider"></span></label>
+    <div class="srow">
+      <div><div class="slabel">Show Card Numbers (1 / 1A)</div><div class="ssub">Reference numbers matching your Google Sheets</div></div>
+      <label class="toggle"><input type="checkbox" id="setShowNums" checked onchange="loadCard()"><span class="tslider"></span></label>
+    </div>
+    <div class="srow">
+      <div><div class="slabel">Auto-Speak on Load</div><div class="ssub">Speak front automatically when card loads</div></div>
+      <label class="toggle"><input type="checkbox" id="setAutoSpeak"><span class="tslider"></span></label>
     </div>
   </div>
-
-  <div class="settings-group">
+  <div class="sg">
     <h3>Study Order</h3>
-    <div class="setting-row">
-      <div>
-        <div class="setting-label">Keep Original Card Order</div>
-        <div class="setting-sub">Study cards in the exact order you added them (question/answer pairs stay together)</div>
-      </div>
-      <label class="toggle"><input type="checkbox" id="settingOriginalOrder" onchange="applyOrderSetting()"><span class="toggle-slider"></span></label>
+    <div class="srow">
+      <div><div class="slabel">Keep Original Order</div><div class="ssub">Cards in the order you added them — Q&amp;A pairs stay together</div></div>
+      <label class="toggle"><input type="checkbox" id="setOrigOrder" onchange="applyOrder()"><span class="tslider"></span></label>
     </div>
   </div>
-
-  <div class="settings-group">
-    <h3>Leitner Box Intervals</h3>
-    <div class="setting-row"><div><div class="setting-label">Box 1 – Daily</div><div class="setting-sub">Review every 1 day</div></div><span style="color:var(--b1-color); font-size:20px">●</span></div>
-    <div class="setting-row"><div><div class="setting-label">Box 2 – Every 2 days</div><div class="setting-sub">Review every 2 days</div></div><span style="color:var(--b2-color); font-size:20px">●</span></div>
-    <div class="setting-row"><div><div class="setting-label">Box 3 – Every 4 days</div><div class="setting-sub">Review every 4 days</div></div><span style="color:var(--b3-color); font-size:20px">●</span></div>
-    <div class="setting-row"><div><div class="setting-label">Box 4 – Every 8 days</div><div class="setting-sub">Review every 8 days</div></div><span style="color:var(--b4-color); font-size:20px">●</span></div>
-    <div class="setting-row"><div><div class="setting-label">Box 5 – Every 16 days</div><div class="setting-sub">Review every 16 days (Mastered!)</div></div><span style="color:var(--b5-color); font-size:20px">●</span></div>
+  <div class="sg">
+    <h3>Leitner Intervals</h3>
+    <div class="srow"><div><div class="slabel">Box 1 – Every day</div></div><span style="color:var(--b1);font-size:18px">●</span></div>
+    <div class="srow"><div><div class="slabel">Box 2 – Every 2 days</div></div><span style="color:var(--b2);font-size:18px">●</span></div>
+    <div class="srow"><div><div class="slabel">Box 3 – Every 4 days</div></div><span style="color:var(--b3);font-size:18px">●</span></div>
+    <div class="srow"><div><div class="slabel">Box 4 – Every 8 days</div></div><span style="color:var(--b4);font-size:18px">●</span></div>
+    <div class="srow"><div><div class="slabel">Box 5 – Every 16 days (Mastered!)</div></div><span style="color:var(--b5);font-size:18px">●</span></div>
   </div>
-
-  <div class="settings-group">
+  <div class="sg">
+    <h3>Open on iPhone — Scan QR Code</h3>
+    <div class="qr-section">
+      <p>Scan this with your iPhone camera 📷<br>Opens the app instantly — no typing!</p>
+      <img id="qrImg" src="" alt="QR Code" style="width:200px;height:200px;border-radius:12px;background:white;padding:8px;">
+      <div class="qr-url" id="qrUrl"></div>
+    </div>
+  </div>
+  <div class="sg">
     <h3>Data</h3>
-    <button class="big-btn big-btn-teal" onclick="saveHTML()" style="margin-bottom:10px">💾 Save as HTML File</button>
-    <button class="big-btn big-btn-secondary" onclick="exportJSON()">📤 Export JSON Backup</button>
+    <button class="big-btn btn-teal" onclick="saveHTML()" style="margin-bottom:8px">💾 Save as HTML File</button>
+    <button class="big-btn btn-secondary" onclick="exportJSON()">📤 Export JSON Backup</button>
   </div>
-
-  <div class="settings-group">
+  <div class="sg">
     <h3>Danger Zone</h3>
-    <button class="danger-btn" onclick="resetAllProgress()">↺ Reset All Progress (keep cards)</button>
-    <button class="danger-btn" onclick="deleteAllCards()">🗑 Delete ALL Cards</button>
+    <button class="danger-btn" onclick="resetProgress()">↺ Reset All Progress (keep cards)</button>
+    <button class="danger-btn" onclick="deleteAll()">🗑 Delete All Cards &amp; Decks</button>
   </div>
-
 </div>
 
-<!-- ══════ TOAST ══════ -->
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══════════════════════════════════════════════════════════
-   LEITNER INTERVALS (days)
-   Box 1: review daily
-   Box 2: every 2 days
-   Box 3: every 4 days
-   Box 4: every 8 days
-   Box 5: every 16 days (considered "mastered")
-   ══════════════════════════════════════════════════════════ */
-const BOX_INTERVALS = [0, 1, 2, 4, 8, 16]; // index = box number
+const BOX_DAYS=[0,1,2,4,8,16];
+const STORE_KEY='vietcards_v3';
+let decks=[],cards=[],activeDeckId=null,queue=[],qPos=0,front='vn',breakOn=false,studyMode=false;
 
-/* ══════ STATE ══════ */
-let cards = [];          // all cards
-let queue = [];          // current study queue (indices into cards[])
-let qPos  = 0;           // position in queue
-let front = 'vn';        // 'vn' | 'en'
-let breakdownOn = false;
-let studyMode = false;   // only show box-1 due cards
-let currentTab = 'study';
-
-/* ══════ STORAGE ══════ */
-const STORAGE_KEY = 'vietcards_v2';
-
-function save() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-  } catch(e) { showToast('⚠️ Storage full – exported instead'); exportJSON(); }
-}
-
-function load() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) cards = JSON.parse(raw);
-    // Validate / migrate old data
-    cards = cards.map(c => ({
-      en: c.en || '',
-      vn: c.vn || '',
-      break: c.break || '',
-      box: Math.min(5, Math.max(1, parseInt(c.box) || 1)),
-      nextReview: c.nextReview || Date.now()  // milliseconds timestamp
+function save(){try{localStorage.setItem(STORE_KEY,JSON.stringify({decks,cards}));}catch(e){showToast('Storage full!');}}
+function load(){
+  try{
+    const r=localStorage.getItem(STORE_KEY);if(!r)return;
+    const d=JSON.parse(r);
+    decks=d.decks||[];
+    cards=(d.cards||[]).map((c,i)=>({
+      id:c.id||uid(),deckId:c.deckId||null,
+      en:c.en||'',vn:c.vn||'',break:c.break||'',
+      box:Math.min(5,Math.max(1,parseInt(c.box)||1)),
+      nextReview:c.nextReview||Date.now(),
+      order:c.order!==undefined?c.order:i
     }));
-  } catch(e) { cards = []; }
+  }catch(e){decks=[];cards=[];}
 }
+function uid(){return Math.random().toString(36).slice(2,10);}
+function isDue(c){return Date.now()>=c.nextReview;}
+function schedule(c,box){c.box=box;c.nextReview=new Date().setHours(0,0,0,0)+BOX_DAYS[box]*86400000;}
+function visibleCards(){return activeDeckId===null?cards:cards.filter(c=>c.deckId===activeDeckId);}
 
-/* ══════ LEITNER LOGIC ══════ */
-function dayStart(ms) {
-  // Returns midnight timestamp for the day of ms
-  const d = new Date(ms);
-  d.setHours(0,0,0,0);
-  return d.getTime();
-}
-
-function isDue(card) {
-  return Date.now() >= card.nextReview;
-}
-
-function scheduleCard(card, boxAfter) {
-  const intervalDays = BOX_INTERVALS[boxAfter];
-  const nextMs = dayStart(Date.now()) + intervalDays * 86400000;
-  card.nextReview = nextMs;
-  card.box = boxAfter;
-}
-
-function markCorrect() {
-  if (!cards.length) return;
-  const card = currentCard();
-  if (!card) return;
-
-  const newBox = Math.min(5, card.box + 1);
-  scheduleCard(card, newBox);
-  save();
-  renderBoxBadge(card);
-  showToast(`✓ Moved to Box ${newBox} · Next review in ${BOX_INTERVALS[newBox]} day${BOX_INTERVALS[newBox]===1?'':'s'}`);
-  nextCard();
-}
-
-function markWrong() {
-  if (!cards.length) return;
-  const card = currentCard();
-  if (!card) return;
-
-  // Wrong: always drop back to Box 1, schedule for tomorrow
-  scheduleCard(card, 1);
-  save();
-  showToast('✗ Back to Box 1 – review again tomorrow');
-
-  // Move to end of queue so they see it again this session
-  const idx = queue[qPos];
-  queue.splice(qPos, 1);
-  queue.push(idx);
-  // Don't advance qPos — it now points to next card
-  if (qPos >= queue.length) qPos = 0;
-  loadCard();
-}
-
-/* ══════ QUEUE BUILDING ══════ */
-function buildQueue() {
-  const keepOrder = document.getElementById('settingOriginalOrder') && document.getElementById('settingOriginalOrder').checked;
-  let pool;
-  if (studyMode) {
-    pool = cards
-      .map((c,i) => ({i, c}))
-      .filter(({c}) => c.box === 1)
-      .map(({i}) => i);
-  } else if (keepOrder) {
-    // Original insertion order — all cards, no sorting
-    pool = cards.map((_,i) => i);
-  } else {
-    // Due cards first, then everything else sorted by next review date
-    const due = [], later = [];
-    cards.forEach((c,i) => {
-      if (isDue(c)) due.push(i); else later.push(i);
-    });
-    later.sort((a,b) => cards[a].nextReview - cards[b].nextReview);
-    pool = [...due, ...later];
+function buildQueue(){
+  const pool=visibleCards();
+  const keepOrder=document.getElementById('setOrigOrder').checked;
+  let idxs;
+  if(studyMode){
+    idxs=pool.filter(c=>c.box===1).map(c=>cards.indexOf(c));
+  }else if(keepOrder){
+    idxs=[...pool].sort((a,b)=>a.order-b.order).map(c=>cards.indexOf(c));
+  }else{
+    const due=[],later=[];
+    pool.forEach(c=>{const i=cards.indexOf(c);if(isDue(c))due.push(i);else later.push(i);});
+    later.sort((a,b)=>cards[a].nextReview-cards[b].nextReview);
+    idxs=[...due,...later];
   }
-  queue = pool;
-  qPos = 0;
+  queue=idxs;qPos=0;
 }
+function currentCard(){if(!queue.length||qPos>=queue.length)return null;return cards[queue[qPos]];}
 
-function applyOrderSetting() {
-  buildQueue();
-  loadCard();
-  const on = document.getElementById('settingOriginalOrder').checked;
-  showToast(on ? '📋 Original order — cards stay in sequence' : '📅 Smart order — due cards shown first');
-}
-
-function currentCard() {
-  if (!queue.length || qPos >= queue.length) return null;
-  return cards[queue[qPos]];
-}
-
-function nextCard() {
-  if (!queue.length) return;
-  qPos = (qPos + 1) % queue.length;
-  loadCard();
-}
-
-/* ══════ RENDER CARD ══════ */
-function loadCard() {
-  const card = currentCard();
-  updateProgress();
-
-  if (!card) {
-    document.getElementById('frontText').textContent = cards.length ? '🎉 All done for today!' : 'Add your first card →';
-    document.getElementById('backText').textContent  = cards.length ? 'Come back tomorrow for reviews!' : 'Tap "Add Cards" to begin';
-    document.getElementById('breakdownText').innerHTML = '';
-    document.getElementById('boxBadge').textContent = '';
-    document.getElementById('boxBadge').style.background = '';
-    document.getElementById('nextReviewInfo').textContent = '';
+function loadCard(){
+  const c=currentCard();updateProgress();
+  if(!c){
+    document.getElementById('frontText').textContent=cards.length?'All done for today!':'Add your first card';
+    document.getElementById('backText').textContent=cards.length?'Come back tomorrow!':'Tap Add to begin';
+    ['breakFront','breakBack'].forEach(id=>document.getElementById(id).innerHTML='');
+    ['cardNum','cardNumBack'].forEach(id=>document.getElementById(id).textContent='');
+    document.getElementById('boxDot').style.background='';
+    document.getElementById('nextInfo').textContent='';
     document.getElementById('flashcard').classList.remove('flipped');
     return;
   }
-
-  const isVNFront = (front === 'vn');
-  document.getElementById('frontLabel').textContent  = isVNFront ? 'VIETNAMESE' : 'ENGLISH';
-  document.getElementById('backLabel').textContent   = isVNFront ? 'ENGLISH' : 'VIETNAMESE';
-  document.getElementById('frontText').textContent   = isVNFront ? card.vn : card.en;
-  document.getElementById('backText').textContent    = isVNFront ? card.en : card.vn;
+  const isVN=front==='vn';
+  document.getElementById('frontLang').textContent=isVN?'VIETNAMESE':'ENGLISH';
+  document.getElementById('backLang').textContent=isVN?'ENGLISH':'VIETNAMESE';
+  document.getElementById('frontText').textContent=isVN?c.vn:c.en;
+  document.getElementById('backText').textContent=isVN?c.en:c.vn;
   document.getElementById('flashcard').classList.remove('flipped');
 
-  // Breakdown on FRONT (Vietnamese is front)
-  if (isVNFront && breakdownOn && card.break) {
-    document.getElementById('breakdownText').innerHTML = formatBreakdown(card.break);
-  } else {
-    document.getElementById('breakdownText').innerHTML = '';
+  if(document.getElementById('setShowNums').checked){
+    const dk=[...(activeDeckId===null?cards:cards.filter(x=>x.deckId===activeDeckId))].sort((a,b)=>a.order-b.order);
+    const pos=dk.findIndex(x=>x.id===c.id)+1;
+    document.getElementById('cardNum').textContent=isVN?`${pos}`:`${pos}A`;
+    document.getElementById('cardNumBack').textContent=isVN?`${pos}A`:`${pos}`;
+  }else{
+    document.getElementById('cardNum').textContent='';
+    document.getElementById('cardNumBack').textContent='';
   }
 
-  // Breakdown on BACK (English is front, Vietnamese is back)
-  const showBreakdownBack = document.getElementById('settingBreakdownBack').checked;
-  if (!isVNFront && showBreakdownBack && card.break) {
-    document.getElementById('breakdownTextBack').innerHTML = formatBreakdown(card.break);
-  } else {
-    document.getElementById('breakdownTextBack').innerHTML = '';
+  const dc=['','#ff3d57','#ff8c00','#ffd700','#00c853','#00d4aa'];
+  document.getElementById('boxDot').style.background=dc[c.box];
+
+  document.getElementById('breakFront').innerHTML=
+    (isVN&&document.getElementById('setBreakFront').checked&&c.break)?fmtBreak(c.break):'';
+  document.getElementById('breakBack').innerHTML=
+    (!isVN&&document.getElementById('setBreakBack').checked&&c.break)?fmtBreak(c.break):'';
+
+  const days=Math.max(0,Math.round((c.nextReview-Date.now())/86400000));
+  document.getElementById('nextInfo').innerHTML=
+    `Box <span>${c.box}</span> · Review <span>${days===0?'today':'in '+days+' day'+(days===1?'':'s')}</span>`;
+
+  if(document.getElementById('setAutoSpeak').checked)setTimeout(speak,300);
+}
+
+function fmtBreak(t){
+  return t.split(';').map(p=>{const x=p.trim().split('–');return x.length===2?`<b>${x[0].trim()}</b> – ${x[1].trim()}`:p.trim();}).join(' · ');
+}
+
+function updateProgress(){
+  const t=queue.length,d=Math.min(qPos,t);
+  document.getElementById('progLabel').textContent=`${d} / ${t}`;
+  document.getElementById('progFill').style.width=t?`${Math.round(d/t*100)}%`:'0%';
+  const dk=activeDeckId?decks.find(d=>d.id===activeDeckId):null;
+  document.getElementById('deckBadge').textContent=dk?dk.name:'';
+}
+
+function flipCard(){document.getElementById('flashcard').classList.toggle('flipped');}
+
+function markCorrect(){
+  const c=currentCard();if(!c)return;
+  const nb=Math.min(5,c.box+1);schedule(c,nb);save();
+  showToast(`✓ Box ${nb} · Next in ${BOX_DAYS[nb]} day${BOX_DAYS[nb]===1?'':'s'}`);
+  qPos=(qPos+1)%Math.max(1,queue.length);loadCard();
+}
+function markWrong(){
+  const c=currentCard();if(!c)return;
+  schedule(c,1);save();
+  const idx=queue.splice(qPos,1)[0];queue.push(idx);
+  if(qPos>=queue.length)qPos=0;
+  showToast('✗ Back to Box 1');loadCard();
+}
+function removeCard(){
+  const c=currentCard();if(!c)return;
+  cards=cards.filter(x=>x.id!==c.id);save();buildQueue();
+  if(qPos>=queue.length)qPos=Math.max(0,queue.length-1);
+  loadCard();renderBoxes();showToast('Removed');
+}
+function speak(){
+  const c=currentCard();if(!c)return;
+  const flipped=document.getElementById('flashcard').classList.contains('flipped');
+  const vn=(front==='vn')!==flipped;
+  const u=new SpeechSynthesisUtterance(vn?c.vn:c.en);
+  u.lang=vn?'vi-VN':'en-US';u.rate=parseFloat(document.getElementById('speedSlider').value);
+  speechSynthesis.cancel();speechSynthesis.speak(u);
+}
+function setFront(lang){front=lang;document.getElementById('chipVN').classList.toggle('active',lang==='vn');document.getElementById('chipEN').classList.toggle('active',lang==='en');loadCard();}
+function toggleBreak(){breakOn=!breakOn;document.getElementById('chipBreak').classList.toggle('active',breakOn);document.getElementById('setBreakFront').checked=breakOn;loadCard();}
+function toggleStudyMode(){studyMode=!studyMode;document.getElementById('chipStudy').classList.toggle('active',studyMode);document.getElementById('studyBanner').classList.toggle('on',studyMode);buildQueue();loadCard();}
+function applyOrder(){buildQueue();loadCard();showToast(document.getElementById('setOrigOrder').checked?'Original order':'Smart order');}
+
+function addCards(){
+  const lines=document.getElementById('inputArea').value.trim().split('\n');
+  let deckName=document.getElementById('targetDeckInput').value.trim();
+  let deckId=activeDeckId;
+  if(deckName){
+    let dk=decks.find(d=>d.name.toLowerCase()===deckName.toLowerCase());
+    if(!dk){dk={id:uid(),name:deckName,createdAt:Date.now()};decks.push(dk);}
+    deckId=dk.id;
   }
-
-  renderBoxBadge(card);
-
-  // Next review info
-  const daysUntil = Math.max(0, Math.round((card.nextReview - Date.now()) / 86400000));
-  const dStr = daysUntil === 0 ? 'today' : `in ${daysUntil} day${daysUntil===1?'':'s'}`;
-  document.getElementById('nextReviewInfo').innerHTML =
-    `Box <span>${card.box}</span> · Next review <span>${dStr}</span>`;
-
-  // Auto-speak if enabled
-  if (document.getElementById('settingAutoSpeak').checked) {
-    setTimeout(speak, 300);
-  }
-}
-
-function renderBoxBadge(card) {
-  const badge = document.getElementById('boxBadge');
-  const colors = ['','#e74c3c','#e67e22','#f1c40f','#27ae60','#16a085'];
-  badge.textContent = card.box;
-  badge.style.background = colors[card.box] || '#888';
-}
-
-function updateProgress() {
-  const total = queue.length;
-  const done  = Math.min(qPos, total);
-  document.getElementById('progressLabel').textContent = `${done} / ${total}`;
-  document.getElementById('progressFill').style.width =
-    total ? `${Math.round(done/total*100)}%` : '0%';
-}
-
-function formatBreakdown(text) {
-  return text.split(';').map(part => {
-    const pieces = part.trim().split('–');
-    if (pieces.length === 2) {
-      return `<b>${pieces[0].trim()}</b> – ${pieces[1].trim()}`;
-    }
-    return part.trim();
-  }).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
-}
-
-/* ══════ FLIP ══════ */
-function flipCard() {
-  document.getElementById('flashcard').classList.toggle('flipped');
-}
-
-/* ══════ SPEAK ══════ */
-function speak() {
-  const card = currentCard();
-  if (!card && !cards.length) return;
-  const isFlipped = document.getElementById('flashcard').classList.contains('flipped');
-  const isVNFront = (front === 'vn');
-  const speakVN = isVNFront !== isFlipped; // XOR: VN if front=VN and not flipped, or front=EN and flipped
-  const text = speakVN ? (card ? card.vn : '') : (card ? card.en : '');
-  const lang = speakVN ? 'vi-VN' : 'en-US';
-  const rate = parseFloat(document.getElementById('speedSlider').value);
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = lang;
-  u.rate = rate;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}
-
-/* ══════ REMOVE CARD ══════ */
-function removeCard() {
-  if (!queue.length) return;
-  const idx = queue[qPos];
-  cards.splice(idx, 1);
-  save();
-  buildQueue();
-  if (qPos >= queue.length) qPos = Math.max(0, queue.length - 1);
-  loadCard();
-  renderBoxes();
-  showToast('🗑 Card removed');
-}
-
-/* ══════ FRONT / BREAKDOWN / STUDY MODE ══════ */
-function setFront(lang) {
-  front = lang;
-  document.getElementById('chipVN').classList.toggle('active', lang === 'vn');
-  document.getElementById('chipEN').classList.toggle('active', lang === 'en');
-  loadCard();
-}
-
-function toggleBreak() {
-  breakdownOn = !breakdownOn;
-  document.getElementById('chipBreak').classList.toggle('active', breakdownOn);
-  document.getElementById('settingBreakdown').checked = breakdownOn;
-  loadCard();
-}
-
-function syncBreakdownSetting() {
-  breakdownOn = document.getElementById('settingBreakdown').checked;
-  document.getElementById('chipBreak').classList.toggle('active', breakdownOn);
-  loadCard();
-}
-
-function toggleStudyMode() {
-  studyMode = !studyMode;
-  document.getElementById('chipStudy').classList.toggle('active', studyMode);
-  document.getElementById('studyBanner').classList.toggle('active', studyMode);
-  buildQueue();
-  loadCard();
-}
-
-/* ══════ SHUFFLE ══════ */
-function shuffleCards() {
-  queue.sort(() => Math.random() - 0.5);
-  qPos = 0;
-  loadCard();
-  showToast('🔀 Deck shuffled');
-}
-
-/* ══════ ADD CARDS ══════ */
-function addCards() {
-  const lines = document.getElementById('inputArea').value.trim().split('\n');
-  let added = 0;
-  lines.forEach(line => {
-    const p = line.split('\t');
-    if (p.length >= 2 && p[0].trim() && p[1].trim()) {
-      cards.push({
-        en:   p[0].trim(),
-        vn:   p[1].trim(),
-        break: (p[2] || '').trim(),
-        box:  1,
-        nextReview: Date.now() // due immediately
-      });
+  const dkCards=cards.filter(c=>c.deckId===deckId);
+  let nextOrder=dkCards.length?Math.max(...dkCards.map(c=>c.order))+1:0;
+  let added=0;
+  lines.forEach(line=>{
+    const p=line.split('\t');
+    if(p.length>=2&&p[0].trim()&&p[1].trim()){
+      cards.push({id:uid(),deckId,en:p[0].trim(),vn:p[1].trim(),break:(p[2]||'').trim(),box:1,nextReview:Date.now(),order:nextOrder++});
       added++;
     }
   });
-  if (added > 0) {
-    save();
-    buildQueue();
-    loadCard();
-    renderBoxes();
-    document.getElementById('inputArea').value = '';
-    showToast(`✅ Added ${added} card${added===1?'':'s'}`);
-    switchTab('study');
-  } else {
-    showToast('⚠️ No valid cards found – check format');
-  }
+  if(added>0){
+    save();buildQueue();loadCard();renderDecks();renderBoxes();
+    document.getElementById('inputArea').value='';document.getElementById('targetDeckInput').value='';
+    showToast(`Added ${added} card${added===1?'':'s'}`);switchTab('study');
+  }else showToast('No valid cards — check format');
 }
 
-function loadSampleCards() {
-  document.getElementById('inputArea').value =
-`Hello	Xin chào	Xin–greeting; chào–hello
-Thank you	Cảm ơn	Cảm–feel; ơn–gratitude
-How are you?	Bạn khỏe không?	Bạn–you; khỏe–healthy; không–no/question
-I love you	Tôi yêu bạn	Tôi–I; yêu–love; bạn–you
-Water	Nước	
-Rice	Cơm	
-Good morning	Chào buổi sáng	Chào–hello; buổi sáng–morning
-Goodbye	Tạm biệt	Tạm–temporary; biệt–farewell
-Yes	Vâng	
-No	Không	
-Delicious	Ngon	
-Where is...?	...ở đâu?	ở đâu–where is`;
-  showToast('📋 Sample cards loaded — tap Add Cards');
+function loadSample(){
+  document.getElementById('targetDeckInput').value='Greetings 1';
+  document.getElementById('inputArea').value=`Hello\tXin chào\tXin–greeting; chào–hello\nThank you\tCảm ơn\tCảm–feel; ơn–gratitude\nHow are you?\tBạn khỏe không?\tBạn–you; khỏe–healthy; không–?\nI love you\tTôi yêu bạn\tTôi–I; yêu–love; bạn–you\nGood morning\tChào buổi sáng\tChào–hello; buổi sáng–morning\nGoodbye\tTạm biệt\tTạm–temporary; biệt–farewell\nYes\tVâng\t\nNo\tKhông\t\nExcuse me\tXin lỗi\tXin–please; lỗi–fault\nPlease\tLàm ơn\tLàm–do; ơn–favor`;
+  showToast('Sample loaded — tap Add Cards');
 }
 
-/* ══════ BOXES PANEL ══════ */
-function renderBoxes() {
-  const boxColors = ['','#e74c3c','#e67e22','#f1c40f','#27ae60','#16a085'];
-  const boxBg     = ['','#ffeaea','#fff2e5','#fff9e1','#eaffea','#e6fffb'];
-  const boxNames  = ['','Box 1 – Daily','Box 2 – 2 Days','Box 3 – 4 Days','Box 4 – 8 Days','Box 5 – 16 Days (Mastered)'];
-  const grid = document.getElementById('boxesGrid');
-  grid.innerHTML = '';
+function createDeck(){
+  const name=document.getElementById('newDeckInput').value.trim();if(!name)return;
+  if(decks.find(d=>d.name.toLowerCase()===name.toLowerCase())){showToast('Deck already exists');return;}
+  decks.push({id:uid(),name,createdAt:Date.now()});save();renderDecks();
+  document.getElementById('newDeckInput').value='';showToast(`Deck "${name}" created`);
+}
 
-  for (let b = 1; b <= 5; b++) {
-    const boxCards = cards.filter(c => c.box === b);
-    const dueCount = boxCards.filter(c => isDue(c)).length;
+function setActiveDeck(id){
+  activeDeckId=id;
+  document.getElementById('activeDeckName').textContent=id===null?'All Decks':(decks.find(d=>d.id===id)||{name:'?'}).name;
+  buildQueue();loadCard();renderDecks();closeDeckModalDirect();
+}
 
-    const div = document.createElement('div');
-    div.className = 'box-card';
-    div.style.borderColor = boxColors[b] + '55';
+function deleteDeck(id){
+  if(!confirm('Delete this deck and all its cards?'))return;
+  decks=decks.filter(d=>d.id!==id);cards=cards.filter(c=>c.deckId!==id);
+  if(activeDeckId===id)activeDeckId=null;
+  save();renderDecks();buildQueue();loadCard();showToast('Deck deleted');
+}
 
-    div.innerHTML = `
-      <div class="box-header">
-        <div class="box-header-left">
-          <div class="box-dot" style="background:${boxColors[b]}"></div>
-          <h3>${boxNames[b]}</h3>
-        </div>
-        <div class="box-count">${boxCards.length} cards${dueCount ? ` · <span style="color:${boxColors[1]}">${dueCount} due</span>` : ''}</div>
-      </div>
-      <div class="box-interval">Review interval: ${BOX_INTERVALS[b]} day${BOX_INTERVALS[b]===1?'':'s'}</div>
-      <div class="box-items" id="box-items-${b}"></div>
-    `;
+function renderDecks(){
+  const el=document.getElementById('decksList');el.innerHTML='';
+  const all=document.createElement('div');
+  all.className='deck-card'+(activeDeckId===null?' active-deck':'');
+  all.innerHTML=`<div class="deck-info"><h3>📚 All Decks</h3><p>${cards.length} cards total</p></div>`;
+  all.onclick=()=>setActiveDeck(null);el.appendChild(all);
+  decks.forEach(dk=>{
+    const dc=cards.filter(c=>c.deckId===dk.id);
+    const due=dc.filter(c=>isDue(c)).length;
+    const div=document.createElement('div');
+    div.className='deck-card'+(activeDeckId===dk.id?' active-deck':'');
+    div.innerHTML=`<div class="deck-info" style="flex:1" onclick="setActiveDeck('${dk.id}')"><h3>${dk.name}</h3><p>${dc.length} cards${due?` · <span style="color:var(--danger)">${due} due</span>`:''}</p></div><div class="deck-actions"><button class="icon-btn" onclick="event.stopPropagation();deleteDeck('${dk.id}')">🗑</button></div>`;
+    el.appendChild(div);
+  });
+  renderModalDecks();
+}
+
+function renderModalDecks(){
+  const el=document.getElementById('modalDeckList');el.innerHTML='';
+  const all=document.createElement('div');
+  all.className='modal-item'+(activeDeckId===null?' sel':'');
+  all.textContent='📚 All Decks';all.onclick=()=>setActiveDeck(null);el.appendChild(all);
+  decks.forEach(dk=>{
+    const item=document.createElement('div');
+    item.className='modal-item'+(activeDeckId===dk.id?' sel':'');
+    item.textContent=dk.name;item.onclick=()=>setActiveDeck(dk.id);el.appendChild(item);
+  });
+}
+
+function openDeckModal(){renderModalDecks();document.getElementById('deckModal').classList.add('open');}
+function closeDeckModal(e){if(e.target===document.getElementById('deckModal'))closeDeckModalDirect();}
+function closeDeckModalDirect(){document.getElementById('deckModal').classList.remove('open');}
+
+function renderBoxes(){
+  const colors=['','#ff3d57','#ff8c00','#ffd700','#00c853','#00d4aa'];
+  const names=['','Box 1 · Daily','Box 2 · 2d','Box 3 · 4d','Box 4 · 8d','Box 5 · Mastered'];
+  const grid=document.getElementById('boxesGrid');grid.innerHTML='';
+  const pool=visibleCards();
+  for(let b=1;b<=5;b++){
+    const bc=pool.filter(c=>c.box===b);const due=bc.filter(c=>isDue(c)).length;
+    const div=document.createElement('div');div.className='box-card';div.style.borderColor=colors[b]+'44';
+    div.innerHTML=`<div class="box-hd"><div class="box-hd-left"><div class="box-dot" style="background:${colors[b]}"></div><h3>${names[b]}</h3></div><div class="box-count">${bc.length}${due?` · <span style="color:var(--danger)">${due}✦</span>`:''}</div></div><div class="box-int">${BOX_DAYS[b]}d interval</div><div class="box-items" id="bi${b}"></div>`;
     grid.appendChild(div);
-
-    const itemsEl = div.querySelector(`#box-items-${b}`);
-    boxCards.forEach((card, idx) => {
-      const pill = document.createElement('div');
-      pill.className = 'box-item-pill';
-      const due = isDue(card);
-      const daysLeft = due ? 0 : Math.ceil((card.nextReview - Date.now()) / 86400000);
-      pill.innerHTML = `
-        <span>${card.vn}</span>
-        <span class="due-badge ${due ? 'due-now' : 'due-later'}">${due ? 'DUE' : `+${daysLeft}d`}</span>
-      `;
-      pill.onclick = () => {
-        const ci = cards.indexOf(card);
-        const qi = queue.indexOf(ci);
-        if (qi !== -1) { qPos = qi; }
-        switchTab('study');
-        loadCard();
-      };
-      itemsEl.appendChild(pill);
+    const items=div.querySelector(`#bi${b}`);
+    bc.sort((a,z)=>a.order-z.order).forEach(card=>{
+      const pill=document.createElement('div');pill.className='box-pill';
+      const d=isDue(card),dl=d?0:Math.ceil((card.nextReview-Date.now())/86400000);
+      pill.innerHTML=`<span>${card.vn}</span><span class="due-badge ${d?'due-now':'due-later'}">${d?'DUE':'+'+dl+'d'}</span>`;
+      pill.onclick=()=>{const qi=queue.indexOf(cards.indexOf(card));if(qi!==-1)qPos=qi;switchTab('study');loadCard();};
+      items.appendChild(pill);
     });
   }
 }
 
-/* ══════ TABS ══════ */
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab').forEach((el,i) => {
-    el.classList.toggle('active', ['study','add','boxes','settings'][i] === tab);
-  });
-  document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+function drawQR(){
+  const url=location.href.split('?')[0];
+  document.getElementById('qrUrl').textContent=url;
+  document.getElementById('qrImg').src=`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['study','add','decks','boxes','settings'][i]===tab));
+  document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
   document.getElementById(`panel-${tab}`).classList.add('active');
-  if (tab === 'boxes') renderBoxes();
+  if(tab==='boxes')renderBoxes();
+  if(tab==='decks')renderDecks();
+  if(tab==='settings')drawQR();
 }
 
-/* ══════ SETTINGS ACTIONS ══════ */
-function resetAllProgress() {
-  if (!confirm('Reset all progress? Cards stay but all go back to Box 1.')) return;
-  cards.forEach(c => { c.box = 1; c.nextReview = Date.now(); });
-  save();
-  buildQueue();
-  loadCard();
-  showToast('↺ Progress reset');
+function resetProgress(){if(!confirm('Reset all progress?'))return;cards.forEach(c=>{c.box=1;c.nextReview=Date.now();});save();buildQueue();loadCard();showToast('Progress reset');}
+function deleteAll(){if(!confirm('Delete everything?'))return;cards=[];decks=[];activeDeckId=null;document.getElementById('activeDeckName').textContent='All Decks';save();buildQueue();loadCard();renderDecks();renderBoxes();showToast('Deleted');}
+function exportJSON(){const b=new Blob([JSON.stringify({decks,cards},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='vietcards_backup.json';a.click();}
+function saveHTML(){
+  const tag=`<script id="ed">window.__ED__=${JSON.stringify({decks,cards})};<\/script>`;
+  let html=document.documentElement.outerHTML;
+  html=html.replace(/<script id="ed">[\s\S]*?<\/script>/,'');
+  html=html.replace('</head>',tag+'\n</head>');
+  const b=new Blob([html],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='VietCards.html';a.click();
+  showToast('Saved!');
 }
 
-function deleteAllCards() {
-  if (!confirm('Delete ALL cards? This cannot be undone!')) return;
-  cards = [];
-  save();
-  buildQueue();
-  loadCard();
-  renderBoxes();
-  showToast('🗑 All cards deleted');
-}
+let _tt=null;
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');if(_tt)clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),2800);}
 
-/* ══════ EXPORT / SAVE ══════ */
-function exportJSON() {
-  const blob = new Blob([JSON.stringify(cards, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'viet_cards_backup.json';
-  a.click();
-  showToast('📤 JSON backup downloaded');
-}
+window.addEventListener('DOMContentLoaded',()=>{
+  if(window.__ED__&&(window.__ED__.cards||[]).length){
+    const stored=localStorage.getItem(STORE_KEY);let useEmbed=true;
+    if(stored){try{const ls=JSON.parse(stored);if((ls.cards||[]).length>=(window.__ED__.cards||[]).length)useEmbed=false;}catch(e){}}
+    if(useEmbed){decks=window.__ED__.decks||[];cards=window.__ED__.cards||[];}else load();
+    save();
+  }else load();
 
-function saveHTML() {
-  // Embed current cards into the HTML before saving
-  const scriptTag = `<script id="embedded-data">
-    window.__EMBEDDED_CARDS__ = ${JSON.stringify(cards)};
-  <\/script>`;
-  let html = document.documentElement.outerHTML;
-  // Remove old embedded data if present
-  html = html.replace(/<script id="embedded-data">[\s\S]*?<\/script>/, '');
-  html = html.replace('</head>', scriptTag + '\n</head>');
-  const blob = new Blob([html], {type:'text/html'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'VietCards.html';
-  a.click();
-  showToast('💾 HTML file saved!');
-}
+  buildQueue();loadCard();renderDecks();
 
-/* ══════ TOAST ══════ */
-let toastTimer = null;
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
-}
+  // iOS tap to flip
+  const fc=document.getElementById('flashcard');
+  let sx=0,sy=0,moved=false;
+  fc.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;moved=false;},{passive:true});
+  fc.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-sx)>8||Math.abs(e.touches[0].clientY-sy)>8)moved=true;},{passive:true});
+  fc.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    if(!moved){flipCard();return;}
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(e.changedTouches[0].clientY-sy)){if(dx<0)markWrong();else markCorrect();}
+  },{passive:true});
+  fc.addEventListener('click',flipCard);
 
-/* ══════ SERVICE WORKER (inline registration) ══════ */
-function registerServiceWorker() {
-  if (!('serviceWorker' in navigator)) return;
-
-  const swCode = `
-const CACHE = 'vietcards-v1';
-const ASSETS = ['.'];
-
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
-  );
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
-  );
-});
-  `;
-
-  const blob = new Blob([swCode], {type: 'application/javascript'});
-  const swURL = URL.createObjectURL(blob);
-
-  navigator.serviceWorker.register(swURL, {scope: './'})
-    .then(() => console.log('SW registered'))
-    .catch(err => console.warn('SW registration failed:', err));
-}
-
-/* ══════ INIT ══════ */
-window.addEventListener('DOMContentLoaded', () => {
-  // Load embedded cards (from saved HTML) or from localStorage
-  if (window.__EMBEDDED_CARDS__ && window.__EMBEDDED_CARDS__.length) {
-    cards = window.__EMBEDDED_CARDS__;
-    // Merge with any newer localStorage progress
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const ls = JSON.parse(stored);
-        // If localStorage has more cards, use it
-        if (ls.length >= cards.length) cards = ls;
-      } catch(e) {}
-    }
-    save(); // write embedded cards to localStorage
-  } else {
-    load();
-  }
-
-  buildQueue();
-  loadCard();
-  registerServiceWorker();
-
-  // Keyboard support (Mac)
-  document.addEventListener('keydown', e => {
-    if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
-    if (e.code === 'Space' || e.code === 'ArrowDown') { e.preventDefault(); flipCard(); }
-    if (e.code === 'ArrowRight') markCorrect();
-    if (e.code === 'ArrowLeft')  markWrong();
-    if (e.code === 'KeyS')       speak();
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
+    if(e.code==='Space'||e.code==='ArrowDown'){e.preventDefault();flipCard();}
+    if(e.code==='ArrowRight')markCorrect();
+    if(e.code==='ArrowLeft')markWrong();
+    if(e.code==='KeyS')speak();
   });
-
-  // Simple reliable tap to flip for iOS
-  const fc = document.getElementById('flashcard');
-  let startX = 0, startY = 0;
-
-  fc.addEventListener('touchstart', e => {
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-  }, {passive: true});
-
-  fc.addEventListener('touchend', e => {
-    const dx = Math.abs(e.changedTouches[0].clientX - startX);
-    const dy = Math.abs(e.changedTouches[0].clientY - startY);
-    if (dx < 30 && dy < 30) {
-      flipCard();
-    } else if (dx > 50 && dx > dy) {
-      if (e.changedTouches[0].clientX < startX) markWrong();
-      else markCorrect();
-    }
-  }, {passive: true});
-
-  fc.addEventListener('click', flipCard);
 });
 </script>
 </body>
