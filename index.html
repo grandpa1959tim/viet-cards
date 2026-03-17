@@ -326,7 +326,7 @@ How are you?	Bạn khỏe không?	Bạn–you; khỏe–healthy; không–?"></t
   </div>
   <div class="sg">
     <h3>Data</h3>
-    <button class="big-btn btn-teal" onclick="saveHTML()" style="margin-bottom:8px">💾 Save as HTML File</button>
+    <button class="big-btn btn-teal" onclick="saveHTML()" style="margin-bottom:8px">💾 Save as index.html (for GitHub)</button>
     <button class="big-btn btn-secondary" onclick="exportJSON()" style="margin-bottom:8px">📤 Export JSON Backup</button>
     <button class="big-btn btn-secondary" onclick="document.getElementById('importFile').click()">📥 Import JSON Backup</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
@@ -631,7 +631,7 @@ function saveHTML(){
   let html=document.documentElement.outerHTML;
   html=html.replace(/<script id="ed">[\s\S]*?<\/script>/,'');
   html=html.replace('</head>',tag+'\n</head>');
-  const b=new Blob([html],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='VietCards.html';a.click();
+  const b=new Blob([html],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='index.html';a.click();
   showToast('Saved!');
 }
 
