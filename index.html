@@ -305,8 +305,11 @@ Thank you	Cảm ơn	Cảm–feel; ơn–gratitude"></textarea>
     <h3>Data</h3>
     <button class="bb btea" onclick="doSaveHTML()" style="margin-bottom:8px">💾 Save as index.html (for GitHub)</button>
     <button class="bb bsec" onclick="doExport()" style="margin-bottom:8px">📤 Export JSON Backup</button>
-    <button class="bb bsec" onclick="document.getElementById('impFile').click()">📥 Import JSON Backup</button>
-    <input type="file" id="impFile" accept=".json" style="display:none" onchange="doImport(event)">
+    <button class="bb bsec" onclick="togglePasteBox()">📥 Import JSON Backup (Paste)</button>
+    <div id="pasteBox" style="display:none;margin-top:10px;">
+      <textarea id="pasteInp" style="height:100px;font-size:11px;" placeholder="Paste your JSON backup text here..."></textarea>
+      <button class="bb bpri" onclick="doImportPaste()">✓ Import Pasted Data</button>
+    </div>
   </div>
   <div class="sg">
     <h3>Danger Zone</h3>
@@ -641,6 +644,36 @@ function doExport(){
   var b=new Blob([JSON.stringify({decks:decks,cards:cards},null,2)],{type:'application/json'});
   var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='vietcards_backup.json';a.click();
   toast('Backup saved!');
+}
+
+function togglePasteBox(){
+  var box=document.getElementById('pasteBox');
+  box.style.display=box.style.display==='none'?'block':'none';
+}
+
+function doImportPaste(){
+  var txt=document.getElementById('pasteInp').value.trim();
+  if(!txt){toast('Nothing to import');return;}
+  try{
+    var d=JSON.parse(txt);
+    if(!d.cards||!Array.isArray(d.cards)){toast('Invalid backup data');return;}
+    if(!confirm('Import backup? Merges with current cards.'))return;
+    var eids=new Set(cards.map(function(c){return c.id;}));
+    var added=0;
+    (d.cards||[]).forEach(function(c){
+      c.brk=c.brk||c.break||'';
+      c.nr=c.nr||c.nextReview||Date.now();
+      c.ord=c.ord!==undefined?c.ord:(c.order!==undefined?c.order:cards.length);
+      if(!eids.has(c.id)){cards.push(c);added++;}
+      else{var ex=cards.find(function(x){return x.id===c.id;});if(ex){ex.box=c.box;ex.nr=c.nr;}}
+    });
+    var edids=new Set(decks.map(function(d){return d.id;}));
+    (d.decks||[]).forEach(function(dk){if(!edids.has(dk.id))decks.push(dk);});
+    saveData();rebuildQ();renderCard();renderDecks();
+    document.getElementById('pasteInp').value='';
+    document.getElementById('pasteBox').style.display='none';
+    toast('Imported! '+added+' new cards added');
+  }catch(err){toast('Error reading data — check format');}
 }
 
 function doImport(ev){
