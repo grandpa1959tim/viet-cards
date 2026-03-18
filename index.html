@@ -60,8 +60,8 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 .cdot{position:absolute;top:11px;right:12px;width:9px;height:9px;border-radius:50%;}
 .clang{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#555;}
 .cmain{font-size:clamp(19px,5vw,32px);font-weight:800;text-align:center;line-height:1.3;}
-.cbrk{font-size:clamp(11px,2.8vw,14px);color:var(--teal);text-align:center;line-height:1.7;}
-.cbrk b{color:var(--gold);font-weight:800;}
+.cbrk{font-size:clamp(14px,3.5vw,17px);color:var(--teal);text-align:center;line-height:2.0;}
+.cbrk b{color:var(--gold);font-weight:900;background:rgba(255,215,0,.12);padding:2px 5px;border-radius:4px;}
 
 /* BUTTONS */
 #flipBtn{width:100%;max-width:500px;height:52px;background:var(--sur2);border:1.5px solid var(--brd);border-radius:var(--rad);color:#f5f5f0;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;}
@@ -162,6 +162,8 @@ textarea:focus{border-color:var(--acc);}
 /* TOAST */
 #toast{position:fixed;bottom:calc(22px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(90px);background:var(--sur2);border:1px solid var(--brd);border-radius:99px;padding:10px 20px;font-size:13px;font-weight:800;white-space:nowrap;z-index:999;box-shadow:0 7px 28px rgba(0,0,0,.6);transition:transform .28s ease;}
 #toast.on{transform:translateX(-50%) translateY(0);}
+#toastBig{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,#1a3a1a,#0d2a0d);border:2px solid var(--ok);border-radius:20px;padding:24px 36px;font-size:22px;font-weight:800;text-align:center;z-index:1000;box-shadow:0 20px 60px rgba(0,0,0,.8);transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+#toastBig.on{transform:translate(-50%,-50%) scale(1);}
 
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px;}
@@ -319,6 +321,7 @@ Thank you	Cảm ơn	Cảm–feel; ơn–gratitude"></textarea>
 </div>
 
 <div id="toast"></div>
+<div id="toastBig"></div>
 
 <script>
 // ── CONSTANTS ──
@@ -413,11 +416,18 @@ function renderCard(){
   var dc=['','#ff3d57','#ff8c00','#ffd700','#00c853','#00d4aa'];
   document.getElementById('fdot').style.background=dc[c.box]||'';
 
-  // Breakdown
-  var bf=document.getElementById('sBF').checked;
-  var bb=document.getElementById('sBB').checked;
-  document.getElementById('fbrk').innerHTML=(isVN&&bf&&c.brk)?fmtBrk(c.brk):'';
-  document.getElementById('bbrk').innerHTML=(!isVN&&bb&&c.brk)?fmtBrk(c.brk):'';
+  // Breakdown — ALWAYS shows on Vietnamese side when breakdown is ON
+  // VN mode: breakdown on front. EN mode: breakdown on back.
+  var brkEnabled=document.getElementById('sBF').checked||brkOn;
+  if(isVN){
+    // Vietnamese is on front
+    document.getElementById('fbrk').innerHTML=(brkEnabled&&c.brk)?fmtBrk(c.brk):'';
+    document.getElementById('bbrk').innerHTML='';
+  }else{
+    // English is on front, Vietnamese is on back
+    document.getElementById('fbrk').innerHTML='';
+    document.getElementById('bbrk').innerHTML=(brkEnabled&&c.brk)?fmtBrk(c.brk):'';
+  }
 
   // Next review
   var days=Math.max(0,Math.round((c.nr-Date.now())/86400000));
@@ -427,10 +437,23 @@ function renderCard(){
 }
 
 function fmtBrk(t){
+  // Split on semicolons, handle each word-meaning pair
   return t.split(';').map(function(p){
-    var x=p.trim().split('–');
-    return x.length===2?('<b>'+x[0].trim()+'</b> – '+x[1].trim()):p.trim();
-  }).join(' · ');
+    p=p.trim();
+    if(!p)return'';
+    // Split on em-dash or regular dash
+    var dashIdx=p.indexOf('–');
+    if(dashIdx===-1)dashIdx=p.indexOf('-');
+    if(dashIdx>0){
+      var word=p.substring(0,dashIdx).trim();
+      var meaning=p.substring(dashIdx+1).trim();
+      // ALL Vietnamese words bold and highlighted in gold
+      return '<b style="color:#ffd700;font-weight:900">'+word+'</b>'
+           +'<span style="color:#888;font-weight:400"> – </span>'
+           +'<span style="color:#e0e0e0">'+meaning+'</span>';
+    }
+    return '<span style="color:#e0e0e0">'+p+'</span>';
+  }).filter(Boolean).join('<span style="color:#444;padding:0 10px">·</span>');
 }
 
 function updProg(){
@@ -450,7 +473,7 @@ function doRight(){
   toast('✓ Box '+nb+' · Next in '+BD[nb]+' day'+(BD[nb]===1?'':'s'));
   var nextQp=(qp+1)%Math.max(1,Q.length);
   if(nextQp===0&&Q.length>0){
-    setTimeout(function(){toast('🎉 Deck complete! Starting over...');},400);
+    setTimeout(function(){toastBig('🎉 Deck Complete! Starting over...');},400);
   }
   qp=nextQp;renderCard();
 }
@@ -492,6 +515,7 @@ function togBreak(){
   brkOn=!brkOn;
   document.getElementById('chBrk').classList.toggle('on',brkOn);
   document.getElementById('sBF').checked=brkOn;
+  document.getElementById('sBB').checked=brkOn;
   renderCard();
 }
 
@@ -715,10 +739,16 @@ function doSaveHTML(){
 }
 
 // ── TOAST ──
-var _tt=null;
+var _tt=null,_tb=null;
+function toastBig(m){
+  var el=document.getElementById('toastBig');
+  el.textContent=m;el.classList.add('on');
+  if(_tb)clearTimeout(_tb);
+  _tb=setTimeout(function(){el.classList.remove('on');},3500);
+}
 function toast(m){
   var el=document.getElementById('toast');el.textContent=m;el.classList.add('on');
-  if(_tt)clearTimeout(_tt);_tt=setTimeout(function(){el.classList.remove('on');},2800);
+  if(_tt)clearTimeout(_tt);_tt=setTimeout(function(){el.classList.remove('on');},4000);
 }
 
 // ── INIT ──
