@@ -449,11 +449,11 @@ function fmtBrk(t){
       var meaning=p.substring(dashIdx+1).trim();
       // ALL Vietnamese words bold and highlighted in gold
       return '<b style="color:#ffd700;font-weight:900">'+word+'</b>'
-           +'<span style="color:#888;font-weight:400"> – </span>'
+           +'<span style="color:#555;font-weight:400"> </span>'
            +'<span style="color:#e0e0e0">'+meaning+'</span>';
     }
     return '<span style="color:#e0e0e0">'+p+'</span>';
-  }).filter(Boolean).join('<span style="color:#444;padding:0 10px">·</span>');
+  }).filter(Boolean).join('<span style="display:inline-block;width:22px"></span>');
 }
 
 function updProg(){
