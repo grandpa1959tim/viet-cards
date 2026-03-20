@@ -6,7 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Viet Cards">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%23cc0000'/%3E%3Cpolygon points='90,30 102,66 140,66 110,88 122,124 90,102 58,124 70,88 40,66 78,66' fill='%23ffd700'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAAloAfzAAAACXBIWXMAAAsTAAALEwEAmpwYAAAF8klEQVR4nO3dS2sUQRSA0a4kiqioiIqIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiA==">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='38' fill='%23da251d'/%3E%3Cpolygon points='90,28 104,72 150,72 114,96 128,140 90,116 52,140 66,96 30,72 76,72' fill='%23ffd700'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#0d0d0d">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -19,10 +20,12 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 :root{--acc:#ff6b35;--gold:#ffd700;--teal:#00d4aa;--ok:#00c853;--no:#ff3d57;--sur:#1a1a1a;--sur2:#252525;--brd:rgba(255,255,255,.09);--rad:14px;}
 
 /* HEADER */
-#hdr{background:var(--sur);border-bottom:1px solid var(--brd);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99;}
-#logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--acc);}
+#hdr{background:var(--sur);border-bottom:1px solid var(--brd);padding:8px 14px;display:flex;align-items:center;gap:8px;justify-content:space-between;position:sticky;top:0;z-index:99;}
+#logo{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--acc);white-space:nowrap;}
 #logo span{color:var(--gold);}
-#deckBtn{background:var(--sur2);border:1px solid var(--brd);border-radius:99px;padding:6px 13px;font-size:13px;font-weight:700;color:#f5f5f0;cursor:pointer;max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+#hdrSpd{display:flex;align-items:center;gap:4px;flex:1;padding:0 8px;}
+#hdrSpd input[type=range]{flex:1;accent-color:var(--acc);height:4px;cursor:pointer;}
+#deckBtn{background:var(--sur2);border:1px solid var(--brd);border-radius:99px;padding:6px 11px;font-size:12px;font-weight:700;color:#f5f5f0;cursor:pointer;white-space:nowrap;}
 
 /* TABS */
 #tabs{display:flex;background:var(--sur);border-bottom:1px solid var(--brd);}
@@ -34,7 +37,7 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 .pn.on{display:block;}
 
 /* STUDY */
-#study{display:flex;flex-direction:column;align-items:center;gap:8px;}
+#study{display:flex;flex-direction:column;align-items:center;gap:6px;}
 
 /* Top row: progress + next review */
 #topRow{display:flex;align-items:center;gap:8px;width:100%;max-width:500px;}
@@ -57,15 +60,7 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 #chDel.confirm{background:rgba(255,61,87,.25);border-color:var(--no);}
 #chMark.on{background:#c8a000;border-color:#ffd700;color:#000;}
 
-/* Vertical speed slider */
-#spdCol{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:#666;font-weight:700;}
-#spdCol input[type=range]{
-  -webkit-appearance:slider-vertical;
-  writing-mode:vertical-lr;
-  direction:rtl;
-  width:28px;height:70px;
-  accent-color:var(--acc);cursor:pointer;
-}
+
 
 #banner{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:10px;padding:6px 14px;font-size:12px;font-weight:800;color:var(--acc);text-align:center;width:100%;max-width:500px;display:none;}
 #banner.on{display:block;}
@@ -202,6 +197,12 @@ textarea:focus{border-color:var(--acc);}
 
 <div id="hdr">
   <div id="logo">VIET<span>CARDS</span></div>
+  <div id="hdrSpd">
+    <span style="font-size:10px;color:#666;">🐢</span>
+    <input type="range" id="spd" min="0.4" max="1.2" step="0.1" value="0.9" oninput="spdLbl.textContent=parseFloat(this.value).toFixed(1)">
+    <span style="font-size:10px;color:#666;">🐇</span>
+    <span id="spdLbl" style="font-size:11px;color:#666;font-weight:700;min-width:24px;">0.9</span>
+  </div>
   <div id="deckBtn" onclick="openMod()">All Decks ▾</div>
 </div>
 
