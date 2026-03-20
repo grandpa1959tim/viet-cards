@@ -84,7 +84,6 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 .abt:active{opacity:.85;}
 #wrongBtn{background:linear-gradient(135deg,#8b0000,var(--no));color:#fff;box-shadow:0 5px 18px rgba(255,61,87,.3);}
 #rightBtn{background:linear-gradient(135deg,#006400,var(--ok));color:#fff;box-shadow:0 5px 18px rgba(0,200,83,.3);}
-#delBtn{background:rgba(255,61,87,.08);border:1.5px solid rgba(255,61,87,.25);color:var(--no);font-size:14px;}
 #nxtInfo{font-size:11px;color:#555;text-align:center;font-weight:700;}
 #nxtInfo span{color:var(--gold);}
 
@@ -206,6 +205,7 @@ textarea:focus{border-color:var(--acc);}
       <div id="progBar"><div id="progFill" style="width:0%"></div></div>
       <div id="deckTag"></div>
     </div>
+    <div id="nxtInfo"></div>
     <div id="chips">
       <div class="ch on" id="chVN" onclick="setFront('vn')">🇻🇳 Viet</div>
       <div class="ch" id="chEN" onclick="setFront('en')">🇬🇧 English</div>
@@ -244,7 +244,6 @@ textarea:focus{border-color:var(--acc);}
       <button class="abt" id="rightBtn" onclick="doRight()">✓ Got It</button>
     </div>
     <div id="spdWrap">🐢<input type="range" id="spd" min="0.4" max="1.2" step="0.1" value="0.9" oninput="spdLbl.textContent=parseFloat(this.value).toFixed(1)">🐇 <span id="spdLbl">0.9</span>×</div>
-    <div id="nxtInfo"></div>
   </div>
 </div>
 
