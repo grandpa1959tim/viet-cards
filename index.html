@@ -49,11 +49,10 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 #deckTag{font-size:11px;color:var(--acc);font-weight:800;white-space:nowrap;}
 
 /* Chip rows with vertical speed slider */
-#chipSpeed1,#chipSpeed2{display:flex;align-items:center;gap:8px;width:100%;max-width:500px;}
 #chips,#chips2{display:flex;gap:5px;flex-wrap:wrap;flex:1;}
 .ch{padding:6px 11px;border-radius:99px;border:1.5px solid var(--brd);background:transparent;color:#f5f5f0;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;}
 .ch.on{background:var(--acc);border-color:var(--acc);color:#fff;}
-.ch2{padding:6px 11px;border-radius:99px;border:1.5px solid var(--brd);background:transparent;color:#f5f5f0;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;cursor:pointer;}
+.ch2{padding:9px 16px;border-radius:99px;border:1.5px solid var(--brd);background:transparent;color:#f5f5f0;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;}
 .ch2.on{background:var(--acc);border-color:var(--acc);color:#fff;}
 .ch2:active,.ch:active{transform:scale(.94);}
 #chDel{border-color:rgba(255,61,87,.3);color:var(--no);}
@@ -89,8 +88,6 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 #flipBtn:active{background:rgba(255,255,255,.1);}
 #speakBtn{flex:1;height:52px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:var(--rad);color:var(--teal);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;}
 #speakBtn:active{background:rgba(0,212,170,.2);}
-#spdWrap{display:flex;align-items:center;gap:8px;font-size:14px;color:#666;width:100%;max-width:500px;padding:4px 0;}
-#spdWrap input{flex:1;accent-color:var(--acc);height:32px;cursor:pointer;}
 .abt{flex:1;height:52px;border:none;border-radius:var(--rad);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;}
 .abt:active{opacity:.85;}
 #wrongBtn{background:linear-gradient(135deg,#8b0000,var(--no));color:#fff;box-shadow:0 5px 18px rgba(255,61,87,.3);}
@@ -218,7 +215,7 @@ textarea:focus{border-color:var(--acc);}
 <div id="pn-study" class="pn on">
   <div id="study">
 
-    <!-- Progress + Next Review in one compact row -->
+    <!-- Progress row -->
     <div id="topRow">
       <div id="progTxt">0 / 0</div>
       <div id="progBar"><div id="progFill" style="width:0%"></div></div>
@@ -226,27 +223,17 @@ textarea:focus{border-color:var(--acc);}
       <div id="deckTag"></div>
     </div>
 
-    <!-- Chip row 1: Language + Breakdown | Speed slider (vertical) -->
-    <div id="chipSpeed1">
-      <div id="chips">
-        <div class="ch on" id="chVN" onclick="setFront('vn')">🇻🇳 Viet</div>
-        <div class="ch" id="chEN" onclick="setFront('en')">🇬🇧 English</div>
-        <div class="ch" id="chBrk" onclick="togBreak()">🔍 Breakdown</div>
-      </div>
-      <div id="spdCol">
-        <span id="spdLbl">0.9</span>×
-        <input type="range" id="spd" min="0.4" max="1.2" step="0.1" value="0.9" orient="vertical" oninput="spdLbl.textContent=parseFloat(this.value).toFixed(1)">
-      </div>
+    <!-- Single chip row: Viet · English · Breakdown | 🗑️ · Box1 · Loop · Mark -->
+    <div id="chips">
+      <div class="ch on" id="chVN" onclick="setFront('vn')">🇻🇳 Viet</div>
+      <div class="ch" id="chEN" onclick="setFront('en')">🇬🇧 English</div>
+      <div class="ch" id="chBrk" onclick="togBreak()">🔍 Breakdown</div>
     </div>
-
-    <!-- Chip row 2: Actions | Speed slider (same column) -->
-    <div id="chipSpeed2">
-      <div id="chips2">
-        <div class="ch2" id="chDel" onclick="doDelete()">🗑️</div>
-        <div class="ch2" id="chBox1" onclick="togStudy()">📦 Box 1</div>
-        <div class="ch2" id="chLoop" onclick="togLoop()">⭐ Loop</div>
-        <div class="ch2" id="chMark" onclick="togStar()">☑️ Mark</div>
-      </div>
+    <div id="chips2">
+      <div class="ch2" id="chDel" onclick="doDelete()">🗑️</div>
+      <div class="ch2" id="chBox1" onclick="togStudy()">📦 Box 1</div>
+      <div class="ch2" id="chLoop" onclick="togLoop()">⭐ Loop</div>
+      <div class="ch2" id="chMark" onclick="togStar()">☑️ Mark</div>
     </div>
 
     <div id="banner">📦 Box 1 cards only</div>
