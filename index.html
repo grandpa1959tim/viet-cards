@@ -365,7 +365,6 @@ function closeTips(){
 }
 
 function renderCard(){
-  closeTips();
   var c=curCard();
   updProg();
   if(!c){
@@ -419,6 +418,8 @@ function renderCard(){
   document.getElementById('nxtInfo').innerHTML='Box <span>'+c.box+'</span> <span>'+(days===0?'Due today':'In '+days+'d')+'</span>';
 
   if(document.getElementById('sAS').checked)setTimeout(doSpeak,300);
+  // Refresh tips if open
+  if(tipsOn)refreshTip();
 }
 
 function fmtBrk(t){
@@ -455,19 +456,63 @@ function doSkip(){
   toast('Skipped');
 }
 
-function togTips(){
+function fmtTip(txt, vn){
+  if(!txt)return'';
+  // Extract Vietnamese words from the card breakdown for highlighting
+  var vnWords=[];
+  if(vn){
+    // Get all Vietnamese words/phrases from vn text (single words)
+    vn.split(/\s+/).forEach(function(w){if(w.length>1)vnWords.push(w);});
+  }
+
+  // Color scheme for different note markers:
+  // 💬 marker = usage tip (teal)
+  // Vietnamese words = gold
+  // Labels like "Very common", "Casual reply", "Note:", "Formal:", "Informal:" = accent colors
+
+  var result = txt
+    // Highlight 💬 marker
+    .replace(/💬/g,'<span style="color:var(--teal);font-weight:900">💬</span>')
+    // Highlight label patterns - "Word/phrase =" explanations
+    .replace(/([A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+(?:\s+[a-zà-ỹ]+)*)\s*=/g, function(match, word){
+      // Check if it looks like Vietnamese (has tone marks or common VN chars)
+      if(/[àáảãạăắặằẳẵâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ]/i.test(word)){
+        return '<b style="color:var(--gold);font-weight:900">'+word+'</b> =';
+      }
+      return match;
+    })
+    // Highlight section labels
+    .replace(/(Very common|Standard|Formal|Informal|Casual|Polite|Note|Important|Compare|Also|Literally|Example|Remember|Never|Always|Must|Do not|Avoid)/g,
+      '<span style="color:var(--acc);font-weight:800">$1</span>')
+    // Highlight quoted Vietnamese phrases in single quotes
+    .replace(/'([^']+)'/g, function(match, inner){
+      if(/[àáảãạăắặằẳẵâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ]/i.test(inner)){
+        return '"' + '<b style="color:var(--gold);font-weight:900">' + inner + '</b>' + '"';
+      }
+      return match;
+    });
+
+  return result;
+}
+
+function refreshTip(){
   var c=curCard();
+  var panel=document.getElementById('tipsPanel');
+  if(!c){document.getElementById('tipsTxt').textContent='No card loaded.';return;}
+  if(c.note&&c.note.trim()){
+    document.getElementById('tipsTxt').innerHTML=fmtTip(c.note, c.vn);
+  }else{
+    document.getElementById('tipsTxt').textContent='No notes yet. Add them in Column D of your Google Sheet!';
+  }
+}
+
+function togTips(){
   tipsOn=!tipsOn;
   document.getElementById('tipsBtn').classList.toggle('on',tipsOn);
   var panel=document.getElementById('tipsPanel');
   if(tipsOn){
     panel.style.display='block';
-    if(!c){document.getElementById('tipsTxt').textContent='No card loaded.';return;}
-    if(c.note&&c.note.trim()){
-      document.getElementById('tipsTxt').innerHTML=c.note.replace(/\ud83d\udcac|💬/g,'<span style="color:var(--gold)">💬</span>');
-    }else{
-      document.getElementById('tipsTxt').textContent='No notes yet. Add them in Column D of your Google Sheet!';
-    }
+    refreshTip();
   }else{
     panel.style.display='none';
   }
