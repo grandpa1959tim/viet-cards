@@ -555,35 +555,14 @@ function loadTip(){
   var c=curCard();
   if(!c){document.getElementById('tipsTxt').textContent='No card loaded.';return;}
 
-  // Show notes from Column D first
+  // Show notes from Column D
   if(c.note&&c.note.trim()){
     document.getElementById('tipsTxt').innerHTML=c.note.replace(/💬/g,'<span style="color:var(--gold)">💬</span>');
     document.getElementById('tipsAI').textContent='';
-    return;
+  }else{
+    document.getElementById('tipsTxt').textContent='No notes for this card yet. Add them in Column D of your Google Sheet!';
+    document.getElementById('tipsAI').textContent='';
   }
-
-  // No notes — generate AI tip
-  document.getElementById('tipsTxt').textContent='Generating tip...';
-  document.getElementById('tipsAI').textContent='';
-
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:200,
-      messages:[{role:'user',content:'Give a single concise natural speech tip (2-3 sentences max) for a 67-year-old English speaker learning Northern Vietnamese. Card: English="'+c.en+'" Vietnamese="'+c.vn+'". Focus on pronunciation, tone, or natural usage. No intro phrases.'}]
-    })
-  })
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var txt=d.content&&d.content[0]?d.content[0].text:'No tip available.';
-    document.getElementById('tipsTxt').textContent=txt;
-    document.getElementById('tipsAI').textContent='✨ AI generated tip';
-  })
-  .catch(function(){
-    document.getElementById('tipsTxt').textContent='Tip unavailable — check your connection.';
-  });
 }
 
 function doSkip(){
