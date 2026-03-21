@@ -1,4 +1,6 @@
-<html lang="en" __gchrome_remoteframetoken="826d352348fd7a78271b1989271dbbcc"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,7 +12,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Viet Cards</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Nunito:wght@600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans-serif;overscroll-behavior:none;}
@@ -82,8 +84,11 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 
 /* BUTTONS */
 .btnRow{display:flex;gap:10px;width:100%;max-width:500px;}
-#flipBtn{flex:1;height:52px;background:var(--sur2);border:1.5px solid var(--brd);border-radius:var(--rad);color:#f5f5f0;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;}
-#flipBtn:active{background:rgba(255,255,255,.1);}
+#tipsBtn{flex:1;height:52px;background:rgba(255,215,0,.08);border:1.5px solid rgba(255,215,0,.25);border-radius:var(--rad);color:var(--gold);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;}
+#tipsBtn:active{background:rgba(255,215,0,.18);}
+#tipsBtn.on{background:rgba(255,215,0,.2);border-color:var(--gold);}
+#skipBtn{flex:1;height:52px;background:rgba(255,255,255,.06);border:1.5px solid var(--brd);border-radius:var(--rad);color:#f5f5f0;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;}
+#skipBtn:active{background:rgba(255,255,255,.12);}
 #speakBtn{flex:1;height:52px;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:var(--rad);color:var(--teal);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;}
 #speakBtn:active{background:rgba(0,212,170,.2);}
 .abt{flex:1;height:52px;border:none;border-radius:var(--rad);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;}
@@ -179,14 +184,13 @@ textarea:focus{border-color:var(--acc);}
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px;}
 </style>
-<script id="ed">window.__ED__={"decks":[{"id":"q5wnqjp","name":"Greetings   #1","ca":1773848248117},{"id":"ou49lcv","name":"Greetings  #2","ca":1773851011490},{"id":"1smanzk","name":"Food/Restaurant/Market__#1","ca":1773851813849}],"cards":[{"id":"pk093xr","deckId":null,"en":"What is your name?","vn":"Bạn tên gì?","brk":"Bạn–you;  tên–name;  gì–what","box":2,"nr":1774112400000,"ord":0},{"id":"nftp99b","deckId":null,"en":"My name is …","vn":"Toi tên là …","brk":"Toi –I;  tên–name;  là–is","box":2,"nr":1774112400000,"ord":1},{"id":"xvh6qt6","deckId":null,"en":"Where are you from?","vn":"Bạn đến từ đâu?","brk":"Bạn–you;  đến từ–come from;  đâu–where","box":2,"nr":1774112400000,"ord":2},{"id":"0frw6mn","deckId":null,"en":"I am from America.","vn":"Toi đến từ Mỹ.","brk":"Toi–I;  đến từ–come from;  Mỹ–America","box":2,"nr":1774112400000,"ord":3},{"id":"usiaz9z","deckId":null,"en":"Where do you live?","vn":"Bạn sống ở đâu?","brk":"Bạn–you;  sống–live;  ở đâu–where","box":2,"nr":1774112400000,"ord":4},{"id":"11k3c5j","deckId":null,"en":"I live in Da Nang.","vn":"Toi sống ở Đà Nẵng.","brk":"Toi–I;  sống–live;  ở–in;  Đà Nẵng–Da Nang","box":2,"nr":1774112400000,"ord":5},{"id":"88jp9dn","deckId":null,"en":"(in)What part of Da Nang?","vn":"Ở khu nào Đà Nẵng?","brk":"Ở–in;  khu–area;  nào–which;  Đà Nẵng–Đà Nẵng","box":2,"nr":1774112400000,"ord":6},{"id":"cap66mz","deckId":null,"en":"I live near Le Quang Dao and Do Ba street.","vn":"Toi ở gần đường Lê Quang Đạo với Đỗ Bá.","brk":"Toi–I;  ở–live/stay;  gần–near;  đường–street;  Lê Quang Đạo–Le Quang Dao;  với-and;  Đỗ Bá–Do Ba","box":1,"nr":1773848111649,"ord":7},{"id":"5oam7p9","deckId":null,"en":"Have you lived here long?","vn":"Bạn ở đây lâu chưa?","brk":"Bạn–you;  ở–live/stay;  đây–here;  lâu–long;  chưa–yet","box":1,"nr":1773848111649,"ord":8},{"id":"mydl3xz","deckId":null,"en":"A little more than two years.","vn":"Hơn hai năm một chút.","brk":"Hơn–more than;  hai–two;  năm–years;  một chút–a little","box":1,"nr":1773848111649,"ord":9},{"id":"r2d4ia4","deckId":null,"en":"Do you like Da Nang?","vn":"Bạn thích Đà Nẵng không?","brk":"Bạn–you;  thích–like;  Đà Nẵng–Da Nang;  không–question marker","box":1,"nr":1773848111649,"ord":10},{"id":"umj2y8y","deckId":null,"en":"Yes, I like Da Nang very much. (Yes, very much)","vn":"Ừ, Toi thích Đà Nẵng lắm.  (Vâng, rất nhiều)","brk":"Ừ–yes;  mình–I;  thích–like;  Đà Nẵng–Da Nang;  lắm–very much","box":1,"nr":1773848111649,"ord":11},{"id":"9krxenr","deckId":null,"en":"Have you visited other cities in Vietnam?","vn":"Bạn đi chỗ khác ở Việt Nam chưa?","brk":"Bạn–you;  đi–go/visit;   chỗ khác–other places;  ở–in; Việt Nam–Vietnam;   chưa–yet","box":1,"nr":1773848111649,"ord":12},{"id":"gps4uln","deckId":null,"en":"Yes, I have been to Hanoi, Saigon, and Hue.","vn":"Rồi, Toi đi Hà Nội, Sài Gòn với Huế rồi.","brk":"Rồi–yes/already;  mình–I;   đi – went;   Hà Nội – Hanoi;   Sài Gòn–Saigon;  với–and;  Huế–Hue;  rồi – already","box":1,"nr":1773848111649,"ord":13},{"id":"894abaa","deckId":null,"en":"Did you like Saigon?","vn":"Bạn có thích Sài Gòn không?","brk":"Bạn–you;  có–yes/no frame;   thích–like;  Sài Gòn–Saigon;  không–question marker","box":1,"nr":1773848111649,"ord":14},{"id":"gm60war","deckId":null,"en":"No, not very much. Too busy and noisy.","vn":"Không, không thích lắm. Đông với ồn quá.","brk":"Không–no;  không–not;   thích–like;  lắm – much;  đông–crowded;  với–and;  ồn–noisy;  quá–too","box":1,"nr":1773848111649,"ord":15},{"id":"bvy8k9r","deckId":null,"en":"Where have you been?","vn":"Dạo này bạn đi đâu thế?","brk":"Dạo này–recently/these days;  bạn–you;  đi–go;  đâu–where;  thế–sentence particle","box":1,"nr":1773848111649,"ord":16},{"id":"ijdfaha","deckId":null,"en":"I stayed at my apartment today.","vn":"Hôm nay tôi ở căn hộ của tôi.","brk":"Hôm nay–today;  tôi–I;  ở–stay;  căn hộ–apartment;  của–of;  tôi–my","box":1,"nr":1773848111649,"ord":17},{"id":"jbhkjda","deckId":null,"en":"I haven't seen you in a long time.","vn":"Lâu lắm rồi không gặp bạn.","brk":"Lâu lắm–very long time;  rồi–already;  không–not;  gặp–meet/see;  bạn–you","box":1,"nr":1773848111649,"ord":18},{"id":"llyc2qh","deckId":null,"en":"Sorry, I have been busy.","vn":"Xin lỗi, dạo này tôi bận quá.","brk":"Xin lỗi–sorry;  dạo này–recently;  tôi–I;  bận–busy;  quá–very/too","box":1,"nr":1773848111649,"ord":19},{"id":"e7lcwei","deckId":null,"en":"Do you know Michael?","vn":"Bạn có biết Michael không?","brk":"Bạn–you; có...không–[question]; biết–know","box":1,"nr":1773848111649,"ord":20},{"id":"k6fmflz","deckId":null,"en":"Yes, he is my friend.","vn":"Có, anh ấy là bạn tôi.","brk":"Có–yes; anh ấy–he; là–is; bạn–friend; tôi–my","box":1,"nr":1773848111649,"ord":21},{"id":"gwyy0i0","deckId":null,"en":"Nice to meet you.","vn":"Rất vui được gặp bạn.","brk":"Rất–very;  vui–happy;  được–be able to;  gặp–meet;  bạn–you","box":1,"nr":1773848111649,"ord":22},{"id":"j4kxe6o","deckId":null,"en":"Nice to meet you, too!","vn":"Tôi cũng rất vui được gặp bạn.","brk":"Tôi–I;  cũng–also;  rất–very;  vui–happy;  được–be able to;  gặp–meet;  bạn–you","box":1,"nr":1773848111649,"ord":23},{"id":"3ixdad1","deckId":null,"en":"Hope to see you again soon.","vn":"Hy vọng sớm gặp lại bạn.","brk":"Hy vọng–hope;  sớm–soon;  gặp lại–meet again;  bạn–you","box":1,"nr":1773848111649,"ord":24},{"id":"1zdyn2p","deckId":null,"en":"Hope to see you again soon, too!","vn":"Tôi cũng hy vọng sớm gặp lại bạn.","brk":"Tôi–I;  cũng–also;  hy vọng–hope;  sớm–soon;  gặp lại–meet again;  bạn–you","box":1,"nr":1773848111649,"ord":25},{"id":"0nricl6","deckId":null,"en":"Goodbye!","vn":"Tạm biệt!","brk":"","box":1,"nr":1773848111649,"ord":26},{"id":"290o085","deckId":null,"en":"See you tomorrow!","vn":"Hẹn gặp lại ngày mai!","brk":"Hẹn–scheduled/promised;  gặp lại–meet again;  bạn–you;  ngày mai–tomorrow","box":1,"nr":1773848111649,"ord":27},{"id":"qzuoag9","deckId":"q5wnqjp","en":"What is your name?","vn":"Bạn tên gì?","brk":"Bạn–you;  tên–name;  gì–what","box":2,"nr":1774112400000,"ord":0},{"id":"ctje2sh","deckId":"q5wnqjp","en":"My name is …","vn":"Toi tên là …","brk":"Toi –I;  tên–name;  là–is","box":2,"nr":1774112400000,"ord":1},{"id":"6ti2q1g","deckId":"q5wnqjp","en":"Where are you from?","vn":"Bạn đến từ đâu?","brk":"Bạn–you;  đến từ–come from;  đâu–where","box":2,"nr":1774112400000,"ord":2},{"id":"rsgmsh6","deckId":"q5wnqjp","en":"I am from America.","vn":"Toi đến từ Mỹ.","brk":"Toi–I;  đến từ–come from;  Mỹ–America","box":2,"nr":1774112400000,"ord":3},{"id":"vsxpndm","deckId":"q5wnqjp","en":"Where do you live?","vn":"Bạn sống ở đâu?","brk":"Bạn–you;  sống–live;  ở đâu–where","box":2,"nr":1774112400000,"ord":4},{"id":"9thj4rj","deckId":"q5wnqjp","en":"I live in Da Nang.","vn":"Toi sống ở Đà Nẵng.","brk":"Toi–I;  sống–live;  ở–in;  Đà Nẵng–Da Nang","box":2,"nr":1774112400000,"ord":5},{"id":"h7522yf","deckId":"q5wnqjp","en":"(in)What part of Da Nang?","vn":"Ở khu nào Đà Nẵng?","brk":"Ở–in;  khu–area;  nào–which;  Đà Nẵng–Đà Nẵng","box":2,"nr":1774112400000,"ord":6},{"id":"xwskbfd","deckId":"q5wnqjp","en":"I live near Le Quang Dao and Do Ba street.","vn":"Toi ở gần đường Lê Quang Đạo với Đỗ Bá.","brk":"Toi–I;  ở–live/stay;  gần–near;  đường–street;  Lê Quang Đạo–Le Quang Dao;  với-and;  Đỗ Bá–Do Ba","box":2,"nr":1774112400000,"ord":7},{"id":"e0qtnb9","deckId":"q5wnqjp","en":"Have you lived here long?","vn":"Bạn ở đây lâu chưa?","brk":"Bạn–you;  ở–live/stay;  đây–here;  lâu–long;  chưa–yet","box":2,"nr":1774112400000,"ord":8},{"id":"afysxxa","deckId":"q5wnqjp","en":"A little more than two years.","vn":"Hơn hai năm một chút.","brk":"Hơn–more than;  hai–two;  năm–years;  một chút–a little","box":2,"nr":1774112400000,"ord":9},{"id":"fgkqgvf","deckId":"q5wnqjp","en":"Do you like Da Nang?","vn":"Bạn thích Đà Nẵng không?","brk":"Bạn–you;  thích–like;  Đà Nẵng–Da Nang;  không–question marker","box":2,"nr":1774112400000,"ord":10},{"id":"3ukurs8","deckId":"q5wnqjp","en":"Yes, I like Da Nang very much. (Yes, very much)","vn":"Ừ, Toi thích Đà Nẵng lắm.  (Vâng, rất nhiều)","brk":"Ừ–yes;  mình–I;  thích–like;  Đà Nẵng–Da Nang;  lắm–very much","box":2,"nr":1774112400000,"ord":11},{"id":"3kjxrq6","deckId":"q5wnqjp","en":"Have you visited other cities in Vietnam?","vn":"Bạn đi chỗ khác ở Việt Nam chưa?","brk":"Bạn–you;  đi–go/visit;   chỗ khác–other places;  ở–in; Việt Nam–Vietnam;   chưa–yet","box":2,"nr":1774112400000,"ord":12},{"id":"4tm1e19","deckId":"q5wnqjp","en":"Yes, I have been to Hanoi, Saigon, and Hue.","vn":"Rồi, Toi đi Hà Nội, Sài Gòn với Huế rồi.","brk":"Rồi–yes/already;  mình–I;   đi – went;   Hà Nội – Hanoi;   Sài Gòn–Saigon;  với–and;  Huế–Hue;  rồi – already","box":2,"nr":1774112400000,"ord":13},{"id":"p6wm0af","deckId":"q5wnqjp","en":"Did you like Saigon?","vn":"Bạn có thích Sài Gòn không?","brk":"Bạn–you;  có–yes/no frame;   thích–like;  Sài Gòn–Saigon;  không–question marker","box":2,"nr":1774112400000,"ord":14},{"id":"gqxtk9y","deckId":"q5wnqjp","en":"No, not very much. Too busy and noisy.","vn":"Không, không thích lắm. Đông với ồn quá.","brk":"Không–no;  không–not;   thích–like;  lắm – much;  đông–crowded;  với–and;  ồn–noisy;  quá–too","box":2,"nr":1774112400000,"ord":15},{"id":"zt0tr52","deckId":"q5wnqjp","en":"Where have you been?","vn":"Dạo này bạn đi đâu thế?","brk":"Dạo này–recently/these days;  bạn–you;  đi–go;  đâu–where;  thế–sentence particle","box":1,"nr":1773848248117,"ord":16},{"id":"i2xlw7z","deckId":"q5wnqjp","en":"I stayed at my apartment today.","vn":"Hôm nay tôi ở căn hộ của tôi.","brk":"Hôm nay–today;  tôi–I;  ở–stay;  căn hộ–apartment;  của–of;  tôi–my","box":1,"nr":1773848248117,"ord":17},{"id":"wv8dvt9","deckId":"q5wnqjp","en":"I haven't seen you in a long time.","vn":"Lâu lắm rồi không gặp bạn.","brk":"Lâu lắm–very long time;  rồi–already;  không–not;  gặp–meet/see;  bạn–you","box":1,"nr":1773848248117,"ord":18},{"id":"gllmipj","deckId":"q5wnqjp","en":"Sorry, I have been busy.","vn":"Xin lỗi, dạo này tôi bận quá.","brk":"Xin lỗi–sorry;  dạo này–recently;  tôi–I;  bận–busy;  quá–very/too","box":1,"nr":1773848248117,"ord":19},{"id":"vx3qcdq","deckId":"q5wnqjp","en":"Do you know Michael?","vn":"Bạn có biết Michael không?","brk":"Bạn–you; có...không–[question]; biết–know","box":1,"nr":1773848248117,"ord":20},{"id":"34369fa","deckId":"q5wnqjp","en":"Yes, he is my friend.","vn":"Có, anh ấy là bạn tôi.","brk":"Có–yes; anh ấy–he; là–is; bạn–friend; tôi–my","box":1,"nr":1773848248117,"ord":21},{"id":"fsuqcs4","deckId":"q5wnqjp","en":"Nice to meet you.","vn":"Rất vui được gặp bạn.","brk":"Rất–very;  vui–happy;  được–be able to;  gặp–meet;  bạn–you","box":1,"nr":1773848248117,"ord":22},{"id":"4lkkv4x","deckId":"q5wnqjp","en":"Nice to meet you, too!","vn":"Tôi cũng rất vui được gặp bạn.","brk":"Tôi–I;  cũng–also;  rất–very;  vui–happy;  được–be able to;  gặp–meet;  bạn–you","box":1,"nr":1773848248117,"ord":23},{"id":"h5x8odx","deckId":"q5wnqjp","en":"Hope to see you again soon.","vn":"Hy vọng sớm gặp lại bạn.","brk":"Hy vọng–hope;  sớm–soon;  gặp lại–meet again;  bạn–you","box":1,"nr":1773848248117,"ord":24},{"id":"7dokj4d","deckId":"q5wnqjp","en":"Hope to see you again soon, too!","vn":"Tôi cũng hy vọng sớm gặp lại bạn.","brk":"Tôi–I;  cũng–also;  hy vọng–hope;  sớm–soon;  gặp lại–meet again;  bạn–you","box":1,"nr":1773848248117,"ord":25},{"id":"w6hptut","deckId":"q5wnqjp","en":"Goodbye!","vn":"Tạm biệt!","brk":"","box":1,"nr":1773848248117,"ord":26},{"id":"96rnz8k","deckId":"q5wnqjp","en":"See you tomorrow!","vn":"Hẹn gặp lại ngày mai!","brk":"Hẹn–scheduled/promised;  gặp lại–meet again;  bạn–you;  ngày mai–tomorrow","box":1,"nr":1773848248117,"ord":27},{"id":"tlnikms","deckId":"ou49lcv","en":"How are you?","vn":"Bạn khỏe không?","brk":"Bạn–you;  khỏe–well/healthy;  không–question marker","box":1,"nr":1773851011490,"ord":0},{"id":"09filzc","deckId":"ou49lcv","en":"I am fine, thank you.  And you?","vn":"Tôi khỏe, cảm ơn. Còn bạn thì sao?","brk":"Tôi–I;  khỏe–well;  cảm ơn–thank you;  bạn–you;  Còn–and/how about;  bạn–you","box":1,"nr":1773851011490,"ord":1},{"id":"bppmllo","deckId":"ou49lcv","en":"Do we know each other?","vn":"Chúng ta có quen nhau không?","brk":"Chúng ta–we; có–do; quen–know; nhau–each other; không–?","box":1,"nr":1773851011490,"ord":2},{"id":"27ck19h","deckId":"ou49lcv","en":"No, I don't think so.","vn":"Không, tôi không nghĩ vậy.","brk":"Không–no; tôi–I; không–not; nghĩ–think; vậy–so","box":1,"nr":1773851011490,"ord":3},{"id":"xcnrodr","deckId":"ou49lcv","en":"How old are you?","vn":"Bạn bao nhiêu tuổi rồi?","brk":"Bạn–you;  bao nhiêu–how many;  tuổi–years old;  rồi–already/now","box":1,"nr":1773851011490,"ord":4},{"id":"rrmtf9u","deckId":"ou49lcv","en":"I am sixty-seven years old.","vn":"Tôi sáu mươi bảy tuổi.","brk":"Tôi–I ;  sáu mươi–sixty;  bảy–seven;  tuổi–years old","box":1,"nr":1773851011490,"ord":5},{"id":"rngbwku","deckId":"ou49lcv","en":"Do you work here?","vn":"Bạn có làm việc ở đây không?","brk":"Bạn–you;  làm việc–work;  ở đây–here;  à–casual question marker","box":1,"nr":1773851011490,"ord":6},{"id":"ttwbvzk","deckId":"ou49lcv","en":"No, I am retired.","vn":"Không, Toi nghỉ hưu rồi.","brk":"Không–no;  Tôi–I;  nghỉ hưu–retire;  rồi–already","box":1,"nr":1773851011490,"ord":7},{"id":"bzhjkl0","deckId":"ou49lcv","en":"What was your profession?","vn":"Trước đây bạn làm nghề gì?","brk":"Trước đây–before;  bạn–you;  làm–do/work;  nghề–profession; gì – what","box":1,"nr":1773851011490,"ord":8},{"id":"70bkrjr","deckId":"ou49lcv","en":"I owned a construction company.","vn":"Toi có công ty xây dựng.","brk":"Tôi–I;  có–have/owned;  công ty–company;  xây dựng–construction","box":1,"nr":1773851011490,"ord":9},{"id":"w3ck76v","deckId":"ou49lcv","en":"Are you married?","vn":"Bạn có gia đình chưa?","brk":"Bạn–you;  có–have;  gia đình–family/married;  chưa–yet","box":1,"nr":1773851011490,"ord":10},{"id":"7abycts","deckId":"ou49lcv","en":"No, I am divorced.","vn":"Không, tôi đã ly hôn.","brk":"Không-No,  tôi-I  đã ly hôn-divorced.","box":1,"nr":1773851011490,"ord":11},{"id":"35g9lcl","deckId":"ou49lcv","en":"Do you have children?","vn":"Bạn có con không?","brk":"Bạn–you;  có–have;  con–children;  không–question marker","box":1,"nr":1773851011490,"ord":12},{"id":"04vqpnj","deckId":"ou49lcv","en":"Yes, I have four sons.","vn":"Có, Toi có bốn con trai.","brk":"Có–yes;  Tôi – I;  có–have;  bốn–four;  con trai –sons","box":1,"nr":1773851011490,"ord":13},{"id":"a4pj128","deckId":"ou49lcv","en":"Do you have grandchildren?","vn":"Bạn có cháu không?","brk":"Bạn–you;  có–have;  cháu–grandchildren;  không–question marker","box":1,"nr":1773851011490,"ord":14},{"id":"ipmuf7e","deckId":"ou49lcv","en":"Yes, I have twelve grandchildren.","vn":"Có, Toi có mười hai cháu.","brk":"Có–yes;  Tôi–I;  có–have;  mười hai–twelve;  cháu–grandchildren","box":1,"nr":1773851011490,"ord":15},{"id":"v0pcn46","deckId":"ou49lcv","en":"What area of the city do you live in?","vn":"Bạn ở khu nào trong thành phố?","brk":"Bạn–you;  ở–live/stay;  khu–area;  nào–which;  trong–in;  thành phố–city","box":1,"nr":1773851011490,"ord":16},{"id":"a62bhyb","deckId":"ou49lcv","en":"I live in My An, eight minutes from the beach.","vn":"Toi ở Mỹ An, cách biển khoảng tám phút.","brk":"Tôi–I;  ở–live/stay;  Mỹ An–My An;  cách–away from;  biển–beach;  khoảng–about;  tám–eight;  phút–minutes","box":1,"nr":1773851011490,"ord":17},{"id":"vs7u8bc","deckId":"ou49lcv","en":"Can we connect on Whatsapp or Zalo?","vn":"Chúng ta có thể kết nối qua Whatsapp hay Zalo không?","brk":"Chúng ta–we; có thể–can; kết nối–connect; qua–on; hay–or; không–question marker","box":1,"nr":1773851011490,"ord":18},{"id":"93jsias","deckId":"ou49lcv","en":"Yes, what is your phone number?","vn":"Vâng, số điện thoại của bạn là gì?","brk":"Vâng–yes; số điện thoại–phone number; của–of; bạn–you; là–is; gì–what","box":1,"nr":1773851011490,"ord":19},{"id":"9gp34v1","deckId":"ou49lcv","en":"Would you like to meet me for coffee?","vn":"Bạn muốn đi uống cà phê không?","brk":"Bạn–you;  có muốn–want;  đi uống–go drink;  cà phê–coffee;  với tôi–with me;  không–question marker","box":1,"nr":1773851011490,"ord":20},{"id":"up4r4sz","deckId":"ou49lcv","en":"Yes, that would be nice.","vn":"Vâng, thế thì tốt quá.","brk":"Vâng–yes;  thế thì–then/that;  tốt quá–very good/nice","box":1,"nr":1773851011490,"ord":21},{"id":"eud7okb","deckId":"ou49lcv","en":"Where would you like to meet?","vn":"Bạn muốn gặp ở đâu?","brk":"Bạn–you;  muốn–want;  gặp–meet;  ở đâu–where","box":1,"nr":1773851011490,"ord":22},{"id":"ev3w79o","deckId":"ou49lcv","en":"Can we meet at Highland coffee by the beach?","vn":"Chúng ta gặp ở Highland Coffee gần biển được không?","brk":"Chúng ta–we;  gặp–meet;  ở–at;  gần biển–near beach;  được không–is it okay","box":1,"nr":1773851011490,"ord":23},{"id":"ne2zxlc","deckId":"ou49lcv","en":"That place is too crowded and noisy.","vn":"Chỗ đó đông đúc và ồn ào quá.","brk":"Chỗ đó–that place;  đông đúc–crowded; và–and;  ồn ào–noisy;  quá–too/very","box":1,"nr":1773851011490,"ord":24},{"id":"zjktjnr","deckId":"ou49lcv","en":"Let's meet at Golo cafe.","vn":"Chúng ta gặp ở quán cà phê Golo nhé.","brk":"Chúng ta–we;  gặp–meet; ở–at; Golo cà phê–coffee shop; nhé–suggestion marker","box":1,"nr":1773851011490,"ord":25},{"id":"4ksw4zq","deckId":"ou49lcv","en":"Ok. Would you like to meet at ten o'clock?","vn":"Được. Bạn muốn gặp lúc mười giờ không?","brk":"Được–ok;  Bạn–you;  muốn–want;  gặp–meet;  lúc–at (time);  mười giờ–ten o'clock","box":1,"nr":1773851011490,"ord":26},{"id":"ldo1r68","deckId":"ou49lcv","en":"Yes, let's meet at ten. See you there!","vn":"Vâng, mười giờ gặp nhé. Hẹn gặp lại bạn ở đó!","brk":"Vâng–yes;  mười giờ–ten o'clock;  gặp–meet;  Hẹn gặp lại–see you again;  ở đó–there","box":1,"nr":1773851011490,"ord":27},{"id":"rinq7qv","deckId":"ou49lcv","en":"Do we know each other?","vn":"Chúng ta có quen nhau không?","brk":"Chúng ta–we; có–do; quen–know; nhau–each other; không–?","box":1,"nr":1773851011490,"ord":28},{"id":"kd30zwl","deckId":"ou49lcv","en":"No, I don't think so.","vn":"Không, tôi không nghĩ vậy.","brk":"Không–no; tôi–I; không–not; nghĩ–think; vậy–so","box":1,"nr":1773851011490,"ord":29},{"id":"ak8k3p4","deckId":"ou49lcv","en":"Were you at the night market last night?","vn":"Tối qua bạn có ở chợ đêm không?","brk":"Tối qua–last night; bạn–you; có–were; ở–at; chợ đêm–night market; không–?","box":1,"nr":1773851011490,"ord":30},{"id":"5ek9b1t","deckId":"ou49lcv","en":"Yes, I buy vegetables at the night market.","vn":"Vâng, tôi mua rau ở chợ đêm.","brk":"Vâng–yes; tôi–I; mua–buy; rau–vegetables; ở–at; chợ đêm–night market","box":1,"nr":1773851011490,"ord":31},{"id":"3i40yhk","deckId":"ou49lcv","en":"Do you want to come with me?","vn":"Bạn có muốn đi cùng tôi không?","brk":"Bạn–you; có muốn–want to; đi cùng–come with; tôi–me; không–?","box":1,"nr":1773851011490,"ord":32},{"id":"ro3yupr","deckId":"ou49lcv","en":"Yes, please wait for me.","vn":"Vâng, xin hãy đợi tôi.","brk":"Vâng–yes; xin hãy–please; đợi–wait for; tôi–me","box":1,"nr":1773851011490,"ord":33},{"id":"h3io3d1","deckId":"ou49lcv","en":"How much time do you need?","vn":"Bạn cần bao nhiêu thời gian?","brk":"Bạn–you; cần–need; bao nhiêu–how much; thời gian–time","box":1,"nr":1773851011490,"ord":34},{"id":"fdgx8gv","deckId":"ou49lcv","en":"I will be ready to go in 30 minutes.","vn":"Tôi sẽ sẵn sàng đi trong 30 phút.","brk":"Tôi–I; sẽ–will; sẵn sàng–ready; đi–go; trong–in; 30 phút–30 minutes","box":1,"nr":1773851011490,"ord":35},{"id":"gmbsoku","deckId":"ou49lcv","en":"Sorry for the delay.  Thank you for waiting.","vn":"Xin lỗi vì đã trễ.  Cảm ơn bạn đã đợi.","brk":"Xin lỗi–sorry; vì–for; đã trễ–being late.   Cảm ơn–thank you; bạn–you; đã đợi–waited","box":1,"nr":1773851011490,"ord":36},{"id":"6nwvm7x","deckId":"ou49lcv","en":"You're welcome / not a problem.","vn":"Không có gì.","brk":"Không có gì–no problem","box":1,"nr":1773851011490,"ord":37},{"id":"qr7ix7o","deckId":"1smanzk","en":"Do you like Vietnamese food?","vn":"Bạn có thích đồ ăn Việt không?","brk":"Bạn – you; có – yes/no frame; thích – like; đồ ăn – food; Việt – Vietnamese; không – question marker","box":1,"nr":1773851813849,"ord":0},{"id":"vke6yk1","deckId":"1smanzk","en":"Yes, what I have tasted I do like.","vn":"Có, Toi ăn thử rồi thấy thích.","brk":"Có – yes; mình – I; ăn thử – try tasting; rồi – already; thấy – feel/find; thích – like","box":1,"nr":1773851813849,"ord":1},{"id":"bs7r1sa","deckId":"1smanzk","en":"What foods have you eaten?","vn":"Bạn đã ăn những món gì rồi?","brk":"Bạn – you; đã – past marker; ăn – eat; những – plural marker; món – dishes; gì – what; rồi – already","box":1,"nr":1773851813849,"ord":2},{"id":"tq8l2mh","deckId":"1smanzk","en":"I have tried Pho, Bun Bo Hue and Bo Ne.","vn":"Toi ăn phở, bún bò Huế với bò né rồi.","brk":"Toi – I; ăn – eat; phở – pho; bún bò Huế – bun bo Hue; với – and; bò né – bo ne; rồi – already","box":1,"nr":1773851813849,"ord":3},{"id":"eekbkvp","deckId":"1smanzk","en":"Have you tried other Vietnamese foods?","vn":"Bạn ăn thử món Việt khác chưa?","brk":"Bạn – you; ăn thử – try; món Việt – Vietnamese dishes; khác – other; chưa – yet","box":1,"nr":1773851813849,"ord":4},{"id":"8uxwgzh","deckId":"1smanzk","en":"Yes, but I forgot the names.","vn":"Có, nhưng Toi quên tên rồi.","brk":"Có – yes; nhưng – but; Toi – I; quên – forget; tên – names; rồi – already*","box":1,"nr":1773851813849,"ord":5},{"id":"qifkxyq","deckId":"1smanzk","en":"Have you eaten yet?","vn":"Bạn ăn chưa?","brk":"Bạn–you;  ăn–eat;  chưa–yet","box":1,"nr":1773851813849,"ord":6},{"id":"o4d8z8z","deckId":"1smanzk","en":"Yes, I ate 2 hours ago.","vn":"Rồi, tôi ăn hai tiếng trước rồi.","brk":"Rồi–already;  tôi–I;  ăn–eat;  hai–two;  tiếng–hours;  trước–before/ago;  rồi–already","box":1,"nr":1773851813849,"ord":7},{"id":"xshq6hh","deckId":"1smanzk","en":"A little spicy.","vn":"Hơi cay.","brk":"Hơi–slightly;  cay–spicy","box":1,"nr":1773851813849,"ord":8},{"id":"ai8j2p4","deckId":"1smanzk","en":"Do you like spicy foods?","vn":"Bạn có thích đồ ăn cay không?","brk":"","box":1,"nr":1773851813849,"ord":9},{"id":"h7nfu47","deckId":"1smanzk","en":"Is it spicy?","vn":"Có cay không?","brk":"Có–(question marker);  cay–spicy;  không–not?/question particle","box":1,"nr":1773851813849,"ord":10},{"id":"q3458lo","deckId":"1smanzk","en":"Do you want more?","vn":"Bạn có muốn thêm không?","brk":"Bạn–you;  có–(question marker);  muốn–want;  thêm–more/add;  không–not?/question particle","box":1,"nr":1773851813849,"ord":11},{"id":"8iqv6mj","deckId":"1smanzk","en":"No, thank you, I am full.","vn":"Không, cảm ơn, tôi no rồi.","brk":"Không–no;  cảm ơn–thank you;  tôi–I;  no–full;  rồi–already/now","box":1,"nr":1773851813849,"ord":12},{"id":"ighybeh","deckId":"1smanzk","en":"How long will it take to make?","vn":"Làm mất bao lâu?","brk":"Làm–make;  mất–take (time);  bao lâu–how long","box":1,"nr":1773851813849,"ord":13},{"id":"q1c90u4","deckId":"1smanzk","en":"Not long, maybe 10 minutes.","vn":"Không lâu, chắc khoảng mười phút.","brk":"Không–not;  lâu–long;  chắc–maybe/probably;  khoảng–about/around;  mười–ten;  phút–minutes","box":1,"nr":1773851813849,"ord":14},{"id":"i0apviq","deckId":"1smanzk","en":"Where is the toilet?","vn":"Nhà vệ sinh ở đâu?","brk":"Nhà vệ sinh–toilet; ở đâu–where is","box":1,"nr":1773851813849,"ord":15},{"id":"3h87dvg","deckId":"1smanzk","en":"Straight ahead, then turn left.","vn":"Đi thẳng, rồi rẽ trái.","brk":"Đi thẳng–straight ahead; rồi–then; rẽ trái–turn left","box":1,"nr":1773851813849,"ord":16},{"id":"jj39caq","deckId":"1smanzk","en":"Hey (waiter/waitress), bill please!","vn":"Em ơi, tính tiền giúp anh/chị.","brk":"Em–younger person (server);  ơi–vocative particle;  tính tiền–calculate bill;  giúp–help;  anh/chị–older speaker (adjust as needed)","box":1,"nr":1773851813849,"ord":17},{"id":"a56i1w0","deckId":"1smanzk","en":"Yes, of course.","vn":"Vâng, tất nhiên rồi.","brk":"Vâng–yes (polite);  tất nhiên–of course;  rồi–already/emphasis","box":1,"nr":1773851813849,"ord":18},{"id":"9ltms4s","deckId":"1smanzk","en":"What is this?","vn":"Đây là gì?","brk":"Đây–this; là–is; gì–what","box":1,"nr":1773851813849,"ord":19},{"id":"ucik306","deckId":"1smanzk","en":"This is fish soup.","vn":"Đây là canh cá.","brk":"Đây–this; là–is; canh–soup; cá–fish","box":1,"nr":1773851813849,"ord":20},{"id":"yo9goze","deckId":"1smanzk","en":"How much does it cost?","vn":"Cái này giá bao nhiêu?","brk":"Cái này–this; giá–price; bao nhiêu–how much","box":1,"nr":1773851813849,"ord":21},{"id":"huzztdh","deckId":"1smanzk","en":"It is free.","vn":"Miễn phí.","brk":"Miễn phí–free of charge","box":1,"nr":1773851813849,"ord":22},{"id":"uh0k2qh","deckId":"1smanzk","en":"Do you accept credit cards?","vn":"Bạn có chấp nhận thẻ tín dụng không?","brk":"Bạn–you; có chấp nhận–accept; thẻ tín dụng–credit card; không–?","box":1,"nr":1773851813849,"ord":23},{"id":"y5qbp6s","deckId":"1smanzk","en":"No, only cash.","vn":"Không, chỉ tiền mặt thôi.","brk":"Không–no; chỉ–only; tiền mặt–cash; thôi–just","box":1,"nr":1773851813849,"ord":24},{"id":"53vezdm","deckId":"1smanzk","en":"How many do you want?","vn":"Bạn muốn bao nhiêu?","brk":"Bạn–you; muốn–want; bao nhiêu–how many","box":1,"nr":1773851813849,"ord":25},{"id":"potrccf","deckId":"1smanzk","en":"Give me 200 grams.","vn":"Cho tôi 200 gram.","brk":"Cho–give; tôi–me; 200 gram–200 grams","box":1,"nr":1773851813849,"ord":26},{"id":"7d9ai7n","deckId":"1smanzk","en":"Is this price for 1 kilogram?","vn":"Giá này cho 1 kilogram phải không?","brk":"Giá này–this price; cho–for; 1 kilogram–1 kg; phải không–right?","box":1,"nr":1773851813849,"ord":27},{"id":"lxypdx8","deckId":"1smanzk","en":"No, it is for 200 grams.","vn":"Không, giá này cho 200 gram.","brk":"Không–no; giá này–this price; cho–for; 200 gram–200 grams","box":1,"nr":1773851813849,"ord":28},{"id":"2k7ipu0","deckId":"1smanzk","en":"Do you have a larger size?","vn":"Bạn có size lớn hơn không?","brk":"Bạn–you; có–have; size lớn hơn–larger size; không–?","box":1,"nr":1773851813849,"ord":29},{"id":"mrh19oj","deckId":"1smanzk","en":"Yes, what size do you want?","vn":"Vâng, bạn muốn size nào?","brk":"Vâng–yes; bạn–you; muốn–want; size nào–what size","box":1,"nr":1773851813849,"ord":30}]};</script>
 </head>
 <body>
 
 <div id="mOverlay" onclick="if(event.target===this)closeMod()">
   <div id="mBox">
     <h2>Switch Deck</h2>
-    <div id="mList"><div class="mi on">📚 All Decks</div><div class="mi">Greetings   #1</div><div class="mi">Greetings  #2</div><div class="mi">Food/Restaurant/Market__#1</div></div>
+    <div id="mList"></div>
     <button id="mClose" onclick="closeMod()">Cancel</button>
   </div>
 </div>
@@ -203,22 +207,22 @@ textarea:focus{border-color:var(--acc);}
 </div>
 
 <div id="tabs">
-  <div class="tb" onclick="goTab('study')">Study</div>
+  <div class="tb on" onclick="goTab('study')">Study</div>
   <div class="tb" onclick="goTab('add')">Add</div>
   <div class="tb" onclick="goTab('decks')">Decks</div>
   <div class="tb" onclick="goTab('boxes')">Boxes</div>
-  <div class="tb on" onclick="goTab('settings')">Settings</div>
+  <div class="tb" onclick="goTab('settings')">Settings</div>
 </div>
 
 <!-- STUDY -->
-<div id="pn-study" class="pn">
+<div id="pn-study" class="pn on">
   <div id="study">
 
     <!-- Progress row -->
     <div id="topRow">
-      <div id="progTxt">0 / 125</div>
+      <div id="progTxt">0 / 0</div>
       <div id="progBar"><div id="progFill" style="width:0%"></div></div>
-      <div id="nxtInfo">Box <span>1</span> · Review <span>today</span></div>
+      <div id="nxtInfo"></div>
       <div id="deckTag"></div>
     </div>
 
@@ -241,17 +245,17 @@ textarea:focus{border-color:var(--acc);}
     <div id="cardWrap">
       <div id="card">
         <div class="cf" id="cf">
-          <div class="cnum" id="fnm">15</div>
-          <div class="cdot" id="fdot" style="background: rgb(255, 61, 87);"></div>
+          <div class="cnum" id="fnm"></div>
+          <div class="cdot" id="fdot"></div>
           <div class="clang" id="flng">VIETNAMESE</div>
-          <div class="cmain" id="ftxt">Toi ở gần đường Lê Quang Đạo với Đỗ Bá.</div>
+          <div class="cmain" id="ftxt">Add your first card →</div>
           <div class="cbrk" id="fbrk"></div>
           <div class="ctap">tap to flip</div>
         </div>
         <div class="cf" id="cb">
-          <div class="cnum" id="bnm">15</div>
+          <div class="cnum" id="bnm"></div>
           <div class="clang" id="blng">ENGLISH</div>
-          <div class="cmain" id="btxt">I live near Le Quang Dao and Do Ba street.</div>
+          <div class="cmain" id="btxt">Tap Add to begin</div>
           <div class="cbrk" id="bbrk"></div>
           <div class="ctap">tap to flip</div>
         </div>
@@ -259,13 +263,31 @@ textarea:focus{border-color:var(--acc);}
     </div>
 
     <!-- BUTTONS -->
-    <div class="btnRow">
-      <button id="flipBtn" onclick="doFlip()">👆 Flip Card (or tap card above)</button>
-      <button class="abt" id="wrongBtn" onclick="doWrong()">✗ Again</button>
+    <div class="btnRow" style="align-items:stretch;">
+      <div style="display:flex;flex-direction:column;gap:10px;flex:1;">
+        <div style="display:flex;gap:10px;">
+          <button id="tipsBtn" onclick="togTips()">📖 Tips</button>
+          <button id="skipBtn" onclick="doSkip()">⏭️ Skip</button>
+        </div>
+        <button id="speakBtn" onclick="doSpeak()">🔊 Listen</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;flex:1;">
+        <button class="abt" id="wrongBtn" onclick="doWrong()" style="flex:1;">✗ Again</button>
+        <button class="abt" id="rightBtn" onclick="doRight()">✓ Got It</button>
+      </div>
     </div>
-    <div class="btnRow">
-      <button id="speakBtn" onclick="doSpeak()">🔊 Listen</button>
-      <button class="abt" id="rightBtn" onclick="doRight()">✓ Got It</button>
+
+    <!-- TIPS PANEL -->
+    <div id="tipsPanel" style="display:none;width:100%;max-width:500px;background:rgba(255,215,0,.07);border:1px solid rgba(255,215,0,.25);border-radius:14px;padding:12px 14px;font-size:13px;line-height:1.7;color:#e0e0e0;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:1.5px;color:#ffd700;margin-bottom:6px;">📖 STUDY TIP</div>
+      <div id="tipsTxt">Loading tip...</div>
+    </div>
+
+    <!-- TIPS PANEL -->
+    <div id="tipsPanel" style="display:none;width:100%;max-width:500px;background:rgba(255,215,0,.07);border:1.5px solid rgba(255,215,0,.2);border-radius:var(--rad);padding:12px 14px;">
+      <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px;">📖 STUDY TIP</div>
+      <div id="tipsTxt" style="font-size:13px;color:#e0e0e0;line-height:1.7;"></div>
+      <div id="tipsAI" style="font-size:11px;color:#666;margin-top:8px;font-style:italic;"></div>
     </div>
 
     <!-- FUTURE SPACE -->
@@ -279,10 +301,10 @@ textarea:focus{border-color:var(--acc);}
   <div class="stitle">Add Cards</div>
   <div class="ssub">One card per line · Tab between columns · Paste from Google Sheets!</div>
   <div class="flbl">Deck name</div>
-  <input class="fi" type="text" id="deckInp" placeholder="e.g. Greetings 1, At the Market..." __gchrome_uniqueid="1">
+  <input class="fi" type="text" id="deckInp" placeholder="e.g. Greetings 1, At the Market...">
   <div class="flbl">Cards — Col A: English · Col B: Vietnamese · Col C: Breakdown (optional)</div>
   <textarea id="cardInp" placeholder="Hello	Xin chào	Xin–greeting; chào–hello
-Thank you	Cảm ơn	Cảm–feel; ơn–gratitude" __gchrome_uniqueid="2"></textarea>
+Thank you	Cảm ơn	Cảm–feel; ơn–gratitude"></textarea>
   <button class="bb bpri" onclick="doAdd()">＋ Add Cards to Deck</button>
   <button class="bb bsec" onclick="doSample()">📋 Load Sample Cards</button>
   <div class="hint">
@@ -299,10 +321,10 @@ Thank you	Cảm ơn	Cảm–feel; ơn–gratitude" __gchrome_uniqueid="2"></text
   <div class="stitle">My Decks</div>
   <div class="ssub">Organize cards into themed groups</div>
   <div class="ndrow">
-    <input type="text" id="ndInp" placeholder="New deck name..." __gchrome_uniqueid="3">
+    <input type="text" id="ndInp" placeholder="New deck name...">
     <button onclick="doNewDeck()">＋ Create</button>
   </div>
-  <div id="deckList"><div class="dkcard sel"><div class="dkinfo"><h3>📚 All Decks</h3><p>125 cards total</p></div></div><div class="dkcard"><div class="dkinfo" style="flex:1;cursor:pointer" onclick="setDeck('q5wnqjp')"><h3>Greetings   #1</h3><p>28 cards · <span style="color:var(--no)">12 due</span></p></div><button class="dkdel" onclick="event.stopPropagation();delDeck('q5wnqjp')">🗑</button></div><div class="dkcard"><div class="dkinfo" style="flex:1;cursor:pointer" onclick="setDeck('ou49lcv')"><h3>Greetings  #2</h3><p>38 cards · <span style="color:var(--no)">38 due</span></p></div><button class="dkdel" onclick="event.stopPropagation();delDeck('ou49lcv')">🗑</button></div><div class="dkcard"><div class="dkinfo" style="flex:1;cursor:pointer" onclick="setDeck('1smanzk')"><h3>Food/Restaurant/Market__#1</h3><p>31 cards · <span style="color:var(--no)">31 due</span></p></div><button class="dkdel" onclick="event.stopPropagation();delDeck('1smanzk')">🗑</button></div></div>
+  <div id="deckList"></div>
 </div>
 
 <!-- BOXES -->
@@ -311,12 +333,12 @@ Thank you	Cảm ơn	Cảm–feel; ơn–gratitude" __gchrome_uniqueid="2"></text
 </div>
 
 <!-- SETTINGS -->
-<div id="pn-settings" class="pn on">
+<div id="pn-settings" class="pn">
   <div class="sg">
     <h3>Display</h3>
     <div class="sr"><div><div class="sl">Breakdown on Front</div><div class="ss">Show below Vietnamese when on front</div></div><label class="tg"><input type="checkbox" id="sBF" onchange="renderCard()"><span class="ts"></span></label></div>
     <div class="sr"><div><div class="sl">Breakdown on Back</div><div class="ss">Show Vietnamese breakdown after flipping from English</div></div><label class="tg"><input type="checkbox" id="sBB" onchange="renderCard()"><span class="ts"></span></label></div>
-    <div class="sr"><div><div class="sl">Card Numbers (1 / 1A)</div><div class="ss">Q cards = 1,2,3 · A cards = 1A,2A,3A</div></div><label class="tg"><input type="checkbox" id="sNM" checked="" onchange="renderCard()"><span class="ts"></span></label></div>
+    <div class="sr"><div><div class="sl">Card Numbers (1 / 1A)</div><div class="ss">Q cards = 1,2,3 · A cards = 1A,2A,3A</div></div><label class="tg"><input type="checkbox" id="sNM" checked onchange="renderCard()"><span class="ts"></span></label></div>
     <div class="sr"><div><div class="sl">Auto-Speak</div><div class="ss">Speak front automatically when card loads</div></div><label class="tg"><input type="checkbox" id="sAS"><span class="ts"></span></label></div>
   </div>
   <div class="sg">
@@ -335,8 +357,8 @@ Thank you	Cảm ơn	Cảm–feel; ơn–gratitude" __gchrome_uniqueid="2"></text
     <h3>Open on iPhone — Scan QR Code</h3>
     <div class="qrsec">
       <p>On your Mac: open the app, go to Settings, scan this QR with your iPhone camera 📷</p>
-      <img id="qrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=190x190&amp;data=https%3A%2F%2Fgrandpa1959tim.github.io%2Fviet-cards%2F" alt="QR">
-      <div id="qrUrl">https://grandpa1959tim.github.io/viet-cards/</div>
+      <img id="qrImg" src="" alt="QR">
+      <div id="qrUrl"></div>
     </div>
   </div>
   <div class="sg">
@@ -345,7 +367,7 @@ Thank you	Cảm ơn	Cảm–feel; ơn–gratitude" __gchrome_uniqueid="2"></text
     <button class="bb bsec" onclick="doExport()" style="margin-bottom:8px">📤 Export JSON Backup</button>
     <button class="bb bsec" onclick="togglePasteBox()">📥 Import JSON Backup (Paste)</button>
     <div id="pasteBox" style="display:none;margin-top:10px;">
-      <textarea id="pasteInp" style="height:100px;font-size:11px;" placeholder="Paste your JSON backup text here..." __gchrome_uniqueid="4"></textarea>
+      <textarea id="pasteInp" style="height:100px;font-size:11px;" placeholder="Paste your JSON backup text here..."></textarea>
       <button class="bb bpri" onclick="doImportPaste()">✓ Import Pasted Data</button>
     </div>
   </div>
@@ -468,6 +490,8 @@ function renderCard(){
   // Next review
   var days=Math.max(0,Math.round((c.nr-Date.now())/86400000));
   document.getElementById('nxtInfo').innerHTML='Box <span>'+c.box+'</span> · Review <span>'+(days===0?'today':'in '+days+' day'+(days===1?'':'s'))+'</span>';
+  // Refresh tips panel if open
+  if(tipsOn)loadTip();
   // Mark chip
   var starred=c.starred||false;
   var mk=document.getElementById('chMark');
@@ -507,6 +531,112 @@ function updProg(){
 
 // ── ACTIONS ──
 function doFlip(){document.getElementById('card').classList.toggle('flip');}
+
+function doSkip(){
+  if(!Q.length)return;
+  // Move current card to end of queue without changing box or schedule
+  var idx=Q.splice(qp,1)[0];
+  Q.push(idx);
+  if(qp>=Q.length)qp=0;
+  toast('⏭️ Skipped');
+  renderCard();
+}
+
+var tipsOpen=false;
+function togTips(){
+  tipsOpen=!tipsOpen;
+  document.getElementById('tipsBtn').classList.toggle('on',tipsOpen);
+  var panel=document.getElementById('tipsPanel');
+  panel.style.display=tipsOpen?'block':'none';
+  if(tipsOpen)loadTip();
+}
+
+function loadTip(){
+  var c=curCard();
+  if(!c){document.getElementById('tipsTxt').textContent='No card loaded.';return;}
+
+  // Show notes from Column D first
+  if(c.note&&c.note.trim()){
+    document.getElementById('tipsTxt').innerHTML=c.note.replace(/💬/g,'<span style="color:var(--gold)">💬</span>');
+    document.getElementById('tipsAI').textContent='';
+    return;
+  }
+
+  // No notes — generate AI tip
+  document.getElementById('tipsTxt').textContent='Generating tip...';
+  document.getElementById('tipsAI').textContent='';
+
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:200,
+      messages:[{role:'user',content:'Give a single concise natural speech tip (2-3 sentences max) for a 67-year-old English speaker learning Northern Vietnamese. Card: English="'+c.en+'" Vietnamese="'+c.vn+'". Focus on pronunciation, tone, or natural usage. No intro phrases.'}]
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    var txt=d.content&&d.content[0]?d.content[0].text:'No tip available.';
+    document.getElementById('tipsTxt').textContent=txt;
+    document.getElementById('tipsAI').textContent='✨ AI generated tip';
+  })
+  .catch(function(){
+    document.getElementById('tipsTxt').textContent='Tip unavailable — check your connection.';
+  });
+}
+
+function doSkip(){
+  if(!Q.length)return;
+  // Move current card to end of queue without changing box or schedule
+  var idx=Q.splice(qp,1)[0];
+  Q.push(idx);
+  if(qp>=Q.length)qp=0;
+  toast('⏭️ Skipped');
+  renderCard();
+}
+
+var tipsOn=false;
+function togTips(){
+  tipsOn=!tipsOn;
+  document.getElementById('tipsBtn').classList.toggle('on',tipsOn);
+  var panel=document.getElementById('tipsPanel');
+  if(tipsOn){
+    panel.style.display='block';
+    loadTip();
+  }else{
+    panel.style.display='none';
+  }
+}
+
+function loadTip(){
+  var c=curCard();
+  if(!c){document.getElementById('tipsTxt').textContent='No card loaded.';return;}
+  // Show notes first if available
+  if(c.note&&c.note.trim()){
+    document.getElementById('tipsTxt').innerHTML=c.note.replace(/💬/g,'<span style="color:var(--gold)">💬</span>');
+    return;
+  }
+  // Otherwise generate AI tip
+  document.getElementById('tipsTxt').innerHTML='<span style="color:var(--muted)">Generating tip...</span>';
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:200,
+      messages:[{role:'user',content:'Give a single concise study tip (2-3 sentences max) for a 67-year-old English speaker learning Northern Vietnamese. The flashcard is: English: "'+c.en+'" | Vietnamese: "'+c.vn+'". Focus on pronunciation, grammar pattern, or natural usage. No intro phrase needed — start directly with the tip.'}]
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(d){
+    var tip=d.content&&d.content[0]&&d.content[0].text?d.content[0].text:'No tip available.';
+    document.getElementById('tipsTxt').innerHTML=tip;
+  })
+  .catch(function(){
+    document.getElementById('tipsTxt').textContent='Tip unavailable offline.';
+  });
+}
 
 function togStar(){
   var c=curCard();if(!c)return;
@@ -629,7 +759,7 @@ function doAdd(){
   lines.forEach(function(ln){
     var p=ln.split('\t');
     if(p.length>=2&&p[0].trim()&&p[1].trim()){
-      cards.push({id:rnd(),deckId:did,en:p[0].trim(),vn:p[1].trim(),brk:(p[2]||'').trim(),box:1,nr:Date.now(),ord:no++,starred:false});
+      cards.push({id:rnd(),deckId:did,en:p[0].trim(),vn:p[1].trim(),brk:(p[2]||'').trim(),note:(p[3]||'').trim(),box:1,nr:Date.now(),ord:no++,starred:false});
       added++;
     }
   });
@@ -885,6 +1015,5 @@ window.onload=function(){
   });
 };
 </script>
-
-
-</body></html>
+</body>
+</html>
