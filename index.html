@@ -456,43 +456,34 @@ function doSkip(){
   toast('Skipped');
 }
 
-function fmtTip(txt, vn){
-  if(!txt)return'';
-  // Extract Vietnamese words from the card breakdown for highlighting
-  var vnWords=[];
-  if(vn){
-    // Get all Vietnamese words/phrases from vn text (single words)
-    vn.split(/\s+/).forEach(function(w){if(w.length>1)vnWords.push(w);});
-  }
+function fmtTip(txt){
+  if(!txt)return '';
 
-  // Color scheme for different note markers:
-  // 💬 marker = usage tip (teal)
-  // Vietnamese words = gold
-  // Labels like "Very common", "Casual reply", "Note:", "Formal:", "Informal:" = accent colors
+  // Step 1: escape HTML special chars first
+  var s=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-  var result = txt
-    // Highlight 💬 marker
-    .replace(/💬/g,'<span style="color:var(--teal);font-weight:900">💬</span>')
-    // Highlight label patterns - "Word/phrase =" explanations
-    .replace(/([A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+(?:\s+[a-zà-ỹ]+)*)\s*=/g, function(match, word){
-      // Check if it looks like Vietnamese (has tone marks or common VN chars)
-      if(/[àáảãạăắặằẳẵâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ]/i.test(word)){
-        return '<b style="color:var(--gold);font-weight:900">'+word+'</b> =';
-      }
-      return match;
-    })
-    // Highlight section labels
-    .replace(/(Very common|Standard|Formal|Informal|Casual|Polite|Note|Important|Compare|Also|Literally|Example|Remember|Never|Always|Must|Do not|Avoid)/g,
-      '<span style="color:var(--acc);font-weight:800">$1</span>')
-    // Highlight quoted Vietnamese phrases in single quotes
-    .replace(/'([^']+)'/g, function(match, inner){
-      if(/[àáảãạăắặằẳẵâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ]/i.test(inner)){
-        return '"' + '<b style="color:var(--gold);font-weight:900">' + inner + '</b>' + '"';
-      }
-      return match;
-    });
+  // Step 2: highlight 💬 in teal
+  s=s.replace(/💬/g,'<span style="color:#00d4aa;font-weight:900">💬</span>');
 
-  return result;
+  // Step 3: highlight Vietnamese words (words containing VN tone marks) in gold
+  // Vietnamese chars regex
+  s=s.replace(/[\wÀ-ɏḀ-ỿ]+/g,function(word){
+    if(/[àáảãạăắặằẳẵâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵăươĐđ]/.test(word)){
+      return '<b style="color:#ffd700;font-weight:900">'+word+'</b>';
+    }
+    return word;
+  });
+
+  // Step 4: highlight key label words in orange
+  var labels=['Very common','Standard','Formal','Informal','Casual','Polite','Natural',
+    'Note','Important','Compare','Also','Literally','Example','Remember',
+    'Never','Always','Must','Do not','Avoid','Warning','Tip'];
+  labels.forEach(function(lb){
+    s=s.replace(new RegExp('('+lb+')','g'),
+      '<span style="color:#ff6b35;font-weight:800">$1</span>');
+  });
+
+  return s;
 }
 
 function refreshTip(){
