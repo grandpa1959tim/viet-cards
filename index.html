@@ -144,7 +144,7 @@ textarea:focus{border-color:var(--acc);}
 <div id="mOverlay" onclick="if(event.target===this)closeMod()">
   <div id="mBox">
     <h2>Switch Deck</h2>
-    <div id="mList"><div class="mi">All Decks</div><div class="mi on">Greetings__#1</div><div class="mi">Greetings__#2</div><div class="mi">Food_Market_Restaurant__ #1</div></div>
+    <div id="mList"><div class="mi on">All Decks</div><div class="mi">Greetings__#1</div><div class="mi">Greetings__#2</div><div class="mi">Food_Market_Restaurant__ #1</div></div>
     <button id="mClose" onclick="closeMod()">Cancel</button>
   </div>
 </div>
@@ -156,7 +156,7 @@ textarea:focus{border-color:var(--acc);}
     <span style="font-size:10px;color:#666">F</span>
     <span id="spdLbl" style="font-size:11px;color:#666;font-weight:700;min-width:24px">0.9</span>
   </div>
-  <div id="deckBtn" onclick="openMod()">Greetings__#1 ▼</div>
+  <div id="deckBtn" onclick="openMod()">All Decks ▼</div>
 </div>
 <div id="tabs">
   <div class="tb" onclick="goTab('study')">Study</div>
@@ -168,15 +168,15 @@ textarea:focus{border-color:var(--acc);}
 <div id="pn-study" class="pn">
   <div id="study">
     <div id="topRow">
-      <div id="progTxt">0 / 30</div>
+      <div id="progTxt">0 / 126</div>
       <div id="progBar"><div id="progFill" style="width:0%"></div></div>
       <div id="nxtInfo">Box <span>1</span> <span>Due today</span></div>
-      <div id="deckTag">Greetings__#1</div>
+      <div id="deckTag"></div>
     </div>
     <div id="chips">
-      <div class="ch on" id="chVN" onclick="setFront('vn')">🏥 Viet</div>
-      <div class="ch" id="chEN" onclick="setFront('en')">🇬🇧 English</div>
-      <div class="ch" id="chBrk" onclick="togBreak()">🔍 Breakdown</div>
+      <div class="ch" id="chVN" onclick="setFront('vn')">🏥 Viet</div>
+      <div class="ch on" id="chEN" onclick="setFront('en')">🇬🇧 English</div>
+      <div class="ch on" id="chBrk" onclick="togBreak()">🔍 Breakdown</div>
     </div>
     <div id="chips2">
       <div class="ch2" id="chDel" onclick="doDelete()">🗑</div>
@@ -186,36 +186,36 @@ textarea:focus{border-color:var(--acc);}
     </div>
     <div id="banner">📦 Box 1 cards only</div>
     <div id="cardWrap">
-      <div id="card" class="">
+      <div id="card">
         <div class="cf" id="cf">
-          <div class="cnum" id="fnm">9</div>
+          <div class="cnum" id="fnm">15</div>
           <div class="cdot" id="fdot" style="background: rgb(255, 61, 87);"></div>
-          <div class="clang" id="flng">VIETNAMESE</div>
-          <div class="cmain" id="ftxt">Dạo này bạn đi đâu thế?</div>
+          <div class="clang" id="flng">ENGLISH</div>
+          <div class="cmain" id="ftxt">I live near Le Quang Dao and Do Ba street.</div>
           <div class="cbrk" id="fbrk"></div>
           <div class="ctap">tap to flip</div>
         </div>
         <div class="cf" id="cb">
-          <div class="cnum" id="bnm">9</div>
-          <div class="clang" id="blng">ENGLISH</div>
-          <div class="cmain" id="btxt">Where have you been?</div>
-          <div class="cbrk" id="bbrk"></div>
+          <div class="cnum" id="bnm">15</div>
+          <div class="clang" id="blng">VIETNAMESE</div>
+          <div class="cmain" id="btxt">Toi ở gần đường Lê Quang Đạo với Đỗ Bá.</div>
+          <div class="cbrk" id="bbrk"><b style="color:#ffd700;font-weight:900">Toi</b> <span style="color:#e0e0e0">I</span><span style="display:inline-block;width:18px"></span><b style="color:#ffd700;font-weight:900">ở</b> <span style="color:#e0e0e0">live/stay</span><span style="display:inline-block;width:18px"></span><b style="color:#ffd700;font-weight:900">gần</b> <span style="color:#e0e0e0">near</span><span style="display:inline-block;width:18px"></span><b style="color:#ffd700;font-weight:900">đường</b> <span style="color:#e0e0e0">street</span><span style="display:inline-block;width:18px"></span><b style="color:#ffd700;font-weight:900">Lê Quang Đạo</b> <span style="color:#e0e0e0">Le Quang Dao</span><span style="display:inline-block;width:18px"></span><b style="color:#ffd700;font-weight:900">với</b> <span style="color:#e0e0e0">and</span><span style="display:inline-block;width:18px"></span><b style="color:#ffd700;font-weight:900">Đỗ Bá</b> <span style="color:#e0e0e0">Do Ba</span></div>
           <div class="ctap">tap to flip</div>
         </div>
       </div>
     </div>
     <div class="btnRow">
       <button id="skipBtn" onclick="doSkip()">⏭ Skip</button>
-      <button id="tipsBtn" onclick="togTips()" class="on">📖 Tips</button>
+      <button id="tipsBtn" onclick="togTips()">📖 Tips</button>
       <button class="abt" id="wrongBtn" onclick="doWrong()">✗ Again</button>
     </div>
     <div class="btnRow">
       <button id="speakBtn" onclick="doSpeak()">🔊 Listen</button>
       <button class="abt" id="rightBtn" onclick="doRight()">✓ Got It</button>
     </div>
-    <div id="tipsPanel" style="display: block;">
+    <div id="tipsPanel">
       <div id="tipsLbl">📖 STUDY TIP</div>
-      <div id="tipsTxt"><span style="color:#00d4aa;font-weight:900">💬</span> Very natural Northern phrasing. <b style="color:#ffd700;font-weight:900">thế</b> softens the question — like "so?" in English. <b style="color:#ffd700;font-weight:900">dạo</b> <b style="color:#ffd700;font-weight:900">này</b> = "lately" — very common filler.</div>
+      <div id="tipsTxt"></div>
     </div>
     <div id="futureSpace"></div>
   </div>
@@ -242,7 +242,7 @@ textarea:focus{border-color:var(--acc);}
     <input type="text" id="ndInp" class="fi" placeholder="New deck name..." style="margin-top:0">
     <button class="bb bpri" onclick="doNewDeck()" style="margin-top:0;width:auto;padding:0 16px">+ Create</button>
   </div>
-  <div id="deckList"><div class="dkcard"><div class="dkinfo"><h3>All Decks</h3><p>126 cards total</p></div></div><div class="dkcard sel"><div class="dkinfo" style="flex:1;cursor:pointer"><h3>Greetings__#1</h3><p>30 cards - <span style="color:var(--no)">14 due</span></p></div><button class="dkdel">Delete</button></div><div class="dkcard"><div class="dkinfo" style="flex:1;cursor:pointer"><h3>Greetings__#2</h3><p>36 cards - <span style="color:var(--no)">34 due</span></p></div><button class="dkdel">Delete</button></div><div class="dkcard"><div class="dkinfo" style="flex:1;cursor:pointer"><h3>Food_Market_Restaurant__ #1</h3><p>32 cards - <span style="color:var(--no)">32 due</span></p></div><button class="dkdel">Delete</button></div></div>
+  <div id="deckList"><div class="dkcard sel"><div class="dkinfo"><h3>All Decks</h3><p>126 cards total</p></div></div><div class="dkcard"><div class="dkinfo" style="flex:1;cursor:pointer"><h3>Greetings__#1</h3><p>30 cards - <span style="color:var(--no)">14 due</span></p></div><button class="dkdel">Delete</button></div><div class="dkcard"><div class="dkinfo" style="flex:1;cursor:pointer"><h3>Greetings__#2</h3><p>36 cards - <span style="color:var(--no)">34 due</span></p></div><button class="dkdel">Delete</button></div><div class="dkcard"><div class="dkinfo" style="flex:1;cursor:pointer"><h3>Food_Market_Restaurant__ #1</h3><p>32 cards - <span style="color:var(--no)">32 due</span></p></div><button class="dkdel">Delete</button></div></div>
 </div>
 <div id="pn-boxes" class="pn">
   <div id="boxGrid"></div>
@@ -290,7 +290,7 @@ textarea:focus{border-color:var(--acc);}
     <button class="dngr" onclick="doNuke()">Delete All Cards and Decks</button>
   </div>
 </div>
-<div id="toast" class="">Skipped</div>
+<div id="toast"></div>
 <div id="toastBig"></div>
 <script>
 var BD=[0,1,2,4,8,16];
