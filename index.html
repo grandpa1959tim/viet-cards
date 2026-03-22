@@ -269,7 +269,7 @@ textarea:focus{border-color:var(--acc);}
 <div id="toast"></div>
 <div id="toastBig"></div>
 <script>
-alert("Script is running!");
+try{
 var BD=[0,1,2,4,8,16];var SK='vc4';
 var decks=[],cards=[],actDeck=null,Q=[],qp=0,front='vn',brkOn=false,studyOn=false,loopOn=false,tipsOn=false;
 function saveData(){try{localStorage.setItem(SK,JSON.stringify({decks:decks,cards:cards}));}catch(e){toast('Storage full!');}}
@@ -779,6 +779,7 @@ window.onload=function(){
     if(e.code==='ArrowRight')doRight();if(e.code==='ArrowLeft')doWrong();if(e.code==='KeyS')doSpeak();
   });
 };
+}catch(err){alert("CRASH: "+err.message);}
 </script>
 </body>
 </html>
