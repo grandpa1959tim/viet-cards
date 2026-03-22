@@ -156,6 +156,7 @@ textarea:focus{border-color:var(--acc);}
 <div id="tabs">
   <div class="tb on" onclick="goTab('study')">Study</div>
   <div class="tb" onclick="goTab('add')">Add</div>
+  <div class="tb" onclick="goTab('search')" style="font-size:16px;">&#128269;</div>
   <div class="tb" onclick="goTab('decks')">Decks</div>
   <div class="tb" onclick="goTab('boxes')">Boxes</div>
   <div class="tb" onclick="goTab('settings')">Settings</div>
@@ -220,6 +221,12 @@ textarea:focus{border-color:var(--acc);}
     </div>
     <div id="futureSpace"></div>
   </div>
+</div>
+<div id="pn-search" class="pn">
+  <div class="stitle">Search Cards</div>
+  <div class="ssub">Search across all your decks</div>
+  <input class="fi" type="text" id="searchInp" placeholder="Type Vietnamese, English or any word..." oninput="doSearch()" style="margin-bottom:12px;">
+  <div id="searchResults" style="display:flex;flex-direction:column;gap:8px;"></div>
 </div>
 <div id="pn-add" class="pn">
   <div class="stitle">Add Cards</div>
@@ -601,7 +608,7 @@ function renderBoxes(){
 }
 
 function goTab(t){
-  document.querySelectorAll('.tb').forEach(function(el,i){el.classList.toggle('on',['study','add','decks','boxes','settings'][i]===t);});
+  document.querySelectorAll('.tb').forEach(function(el,i){el.classList.toggle('on',['study','add','search','decks','boxes','settings'][i]===t);});
   document.querySelectorAll('.pn').forEach(function(el){el.classList.remove('on');});
   document.getElementById('pn-'+t).classList.add('on');
   if(t==='boxes')renderBoxes();if(t==='decks')renderDecks();if(t==='settings')drawQR();
@@ -636,6 +643,46 @@ function doSaveHTML(){
 var _tt=null,_tb=null;
 function toast(m){var el=document.getElementById('toast');el.textContent=m;el.classList.add('on');if(_tt)clearTimeout(_tt);_tt=setTimeout(function(){el.classList.remove('on');},2800);}
 function toastBig(m){var el=document.getElementById('toastBig');el.textContent=m;el.classList.add('on');if(_tb)clearTimeout(_tb);_tb=setTimeout(function(){el.classList.remove('on');},3500);}
+
+function doSearch(){
+  var q=document.getElementById('searchInp').value.trim().toLowerCase();
+  var res=document.getElementById('searchResults');
+  res.innerHTML='';
+  if(q.length<2){res.innerHTML='<div style="color:#666;font-size:13px;">Type at least 2 characters...</div>';return;}
+  var matches=cards.filter(function(c){
+    return c.en.toLowerCase().indexOf(q)!==-1||c.vn.toLowerCase().indexOf(q)!==-1||
+           c.brk.toLowerCase().indexOf(q)!==-1||c.note.toLowerCase().indexOf(q)!==-1;
+  });
+  if(!matches.length){res.innerHTML='<div style="color:#666;font-size:13px;">No cards found for "'+q+'"</div>';return;}
+  var bc=['','#ff3d57','#ff8c00','#ffd700','#00c853','#00d4aa'];
+  matches.slice(0,20).forEach(function(c){
+    var dk=decks.find(function(d){return d.id===c.deckId;});
+    var div=document.createElement('div');
+    div.style.cssText='background:var(--sur);border:1.5px solid var(--brd);border-radius:var(--rad);padding:12px 14px;cursor:pointer;';
+    div.innerHTML='<div style="display:flex;justify-content:space-between;margin-bottom:4px;">'
+      +'<span style="font-size:11px;color:var(--acc);font-weight:800;">'+(dk?dk.name:'')+'</span>'
+      +'<span style="width:9px;height:9px;border-radius:50%;background:'+(bc[c.box]||'#666')+';display:inline-block;margin-top:2px;"></span>'
+      +'</div>'
+      +'<div style="font-size:15px;font-weight:800;color:#ffd700;">'+c.vn+'</div>'
+      +'<div style="font-size:13px;color:#ccc;margin-top:2px;">'+c.en+'</div>';
+    div.onclick=(function(ca){return function(){
+      actDeck=ca.deckId;
+      var name=(decks.find(function(d){return d.id===ca.deckId;})||{name:'All'}).name;
+      document.getElementById('deckBtn').textContent=name+' ▼';
+      rebuildQ();
+      var qi=Q.indexOf(cards.indexOf(ca));
+      if(qi!==-1)qp=qi;
+      goTab('study');renderCard();
+    };})(c);
+    res.appendChild(div);
+  });
+  if(matches.length>20){
+    var more=document.createElement('div');
+    more.style.cssText='color:#666;font-size:12px;text-align:center;padding:8px;';
+    more.textContent='Showing 20 of '+matches.length+' — type more to narrow down';
+    res.appendChild(more);
+  }
+}
 
 window.onload=function(){
   if(window.__ED__&&window.__ED__.cards&&window.__ED__.cards.length){
