@@ -154,7 +154,7 @@ textarea:focus{border-color:var(--acc);}
 <div id="tabs">
   <div class="tb on" onclick="goTab('study')">Study</div>
   <div class="tb" onclick="goTab('add')">Add</div>
-  <div class="tb" onclick="goTab('search')">&#128269;</div>
+  <div class="tb" onclick="goTab('search')" style="font-size:16px;">&#128269;</div>
   <div class="tb" onclick="goTab('decks')">Decks</div>
   <div class="tb" onclick="goTab('boxes')">Boxes</div>
   <div class="tb" onclick="goTab('settings')">Settings</div>
@@ -721,7 +721,8 @@ function showGramSection(c){
 
 window.onload=function(){
   if(window.__ED__&&(window.__ED__.cards||[]).length){
-    // Always prefer embedded data - it's the most up to date
+    // Always use embedded data and clear any stale localStorage
+    localStorage.removeItem(SK);
     decks=window.__ED__.decks||[];
     cards=(window.__ED__.cards||[]).map(norm);
     saveData();
