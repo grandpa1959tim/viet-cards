@@ -203,12 +203,6 @@ textarea:focus{border-color:var(--acc);}
     <div id="futureSpace"></div>
   </div>
 </div>
-<div id="pn-search" class="pn">
-  <div class="stitle">Search Cards</div>
-  <div class="ssub">Search across all your cards</div>
-  <input class="fi" type="text" id="searchInp" placeholder="Search Vietnamese, English or breakdown..." oninput="doSearch()">
-  <div id="searchResults" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
-</div>
 <div id="pn-add" class="pn">
   <div class="stitle">Add Cards</div>
   <div class="ssub">One card per line · Tab between columns · Paste from Google Sheets!</div>
@@ -219,6 +213,12 @@ textarea:focus{border-color:var(--acc);}
   <button class="bb bpri" onclick="doAdd()">+ Add Cards to Deck</button>
   <button class="bb bsec" onclick="doSample()">Load Sample Cards</button>
   <div class="hint"><div class="hl">GOOGLE SHEETS TIP</div>Col A=English, Col B=Vietnamese, Col C=Breakdown, Col D=Notes<br>Select ALL 4 columns, Copy, Paste here.</div>
+</div>
+<div id="pn-search" class="pn">
+  <div class="stitle">Search Cards</div>
+  <div class="ssub">Search across all your cards</div>
+  <input class="fi" type="text" id="searchInp" placeholder="Search Vietnamese, English or breakdown..." oninput="doSearch()">
+  <div id="searchResults" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;"></div>
 </div>
 <div id="pn-decks" class="pn">
   <div class="stitle">My Decks</div>
