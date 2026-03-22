@@ -476,6 +476,13 @@ function getGramForCard(c){
 }
 
 function doFlip(){document.getElementById('card').classList.toggle('flip');}
+
+function autoExport(){
+  try{
+    var backup=JSON.stringify({decks:decks,cards:cards,exported:Date.now()});
+    localStorage.setItem('vc4_autobak',backup);
+  }catch(e){}
+}
 function doSkip(){if(!Q.length)return;var idx=Q.splice(qp,1)[0];Q.push(idx);if(qp>=Q.length)qp=0;renderCard();toast('Skipped');}
 
 function doRight(){
@@ -483,14 +490,14 @@ function doRight(){
   var nb=Math.min(5,c.box+1);sched(c,nb);saveData();
   var nq=(qp+1)%Math.max(1,Q.length);
   if(nq===0&&Q.length>0){setTimeout(function(){toastBig(loopOn?'Loop complete!':'Deck complete!');},400);}
-  qp=nq;renderCard();toast('Box '+nb+' - Next in '+BD[nb]+'d');
+  qp=nq;renderCard();toast('Box '+nb+' - Next in '+BD[nb]+'d');autoExport();
 }
 
 function doWrong(){
   var c=curCard();if(!c)return;
   if(!loopOn)sched(c,1);saveData();
   var idx=Q.splice(qp,1)[0];Q.push(idx);if(qp>=Q.length)qp=0;
-  renderCard();toast(loopOn?'Moved to end':'Back to Box 1');
+  renderCard();toast(loopOn?'Moved to end':'Back to Box 1');autoExport();
 }
 
 function doDelete(){
