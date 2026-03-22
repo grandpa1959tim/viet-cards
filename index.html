@@ -395,6 +395,12 @@ function updProg(){
   document.getElementById('progFill').style.width=t?(Math.round(d/t*100)+'%'):'0%';
   var dk=actDeck?decks.find(function(x){return x.id===actDeck;}):null;
   document.getElementById('deckTag').textContent=dk?dk.name:'';
+  // Due today count
+  var pool=vis();
+  var due=pool.filter(function(c){return isDue(c);}).length;
+  var dueEl=document.getElementById('dueCount');
+  if(due>0){dueEl.textContent=due+' due';dueEl.style.display='';}
+  else{dueEl.textContent='';dueEl.style.display='none';}
 }
 function doFlip(){document.getElementById('card').classList.toggle('flip');}
 function doSkip(){if(!Q.length)return;var idx=Q.splice(qp,1)[0];Q.push(idx);if(qp>=Q.length)qp=0;renderCard();toast('Skipped');}
