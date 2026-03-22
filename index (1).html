@@ -518,8 +518,13 @@ function doNewDeck(){
   decks.push({id:rnd(),name:n,ca:Date.now()});saveData();renderDecks();document.getElementById('ndInp').value='';toast('Deck created');
 }
 function setDeck(id){
-  actDeck=id;var name=id===null?'All Decks':(decks.find(function(d){return d.id===id;})||{name:'?'}).name;
-  document.getElementById('deckBtn').textContent=name+' \u25bc';rebuildQ();renderCard();renderDecks();closeMod();
+  actDeck=id;
+  var name=id===null?'All Decks':(decks.find(function(d){return d.id===id;})||{name:'?'}).name;
+  document.getElementById('deckBtn').textContent=name+' ▼';
+  rebuildQ();
+  toast(name+' - '+Q.length+' cards');
+  renderCard();renderDecks();closeMod();
+  goTab('study');
 }
 function delDeck(id){
   if(!confirm('Delete this deck and all its cards?'))return;
@@ -528,15 +533,38 @@ function delDeck(id){
 }
 function renderDecks(){
   var el=document.getElementById('deckList');el.innerHTML='';
-  var all=document.createElement('div');all.className='dkcard'+(actDeck===null?' sel':'');
-  all.innerHTML='<div class="dkinfo"><h3>All Decks</h3><p>'+cards.length+' cards total</p></div>';
-  all.onclick=function(){setDeck(null);};el.appendChild(all);
+  // All Decks row
+  var all=document.createElement('div');
+  all.className='dkcard'+(actDeck===null?' sel':'');
+  all.style.cursor='pointer';
+  var allInfo=document.createElement('div');allInfo.className='dkinfo';
+  allInfo.innerHTML='<h3>All Decks</h3><p>'+cards.length+' cards total</p>';
+  all.appendChild(allInfo);
+  all.onclick=function(){setDeck(null);};
+  el.appendChild(all);
+  // Each deck row
   decks.forEach(function(dk){
-    var dc=cards.filter(function(c){return c.deckId===dk.id;});var due=dc.filter(function(c){return isDue(c);}).length;
-    var div=document.createElement('div');div.className='dkcard'+(actDeck===dk.id?' sel':'');var dkId=dk.id;
-    div.innerHTML='<div class="dkinfo" style="flex:1;cursor:pointer"><h3>'+dk.name+'</h3><p>'+dc.length+' cards'+(due?' - <span style="color:var(--no)">'+due+' due</span>':'')+'</p></div><button class="dkdel">Delete</button>';
-    div.querySelector('.dkinfo').onclick=function(){setDeck(dkId);};div.querySelector('.dkdel').onclick=function(){delDeck(dkId);};el.appendChild(div);
-  });renderMod();
+    var dc=cards.filter(function(c){return c.deckId===dk.id;});
+    var due=dc.filter(function(c){return isDue(c);}).length;
+    var dkId=dk.id;
+    var row=document.createElement('div');
+    row.className='dkcard'+(actDeck===dkId?' sel':'');
+    row.style.cssText='display:flex;align-items:center;justify-content:space-between;cursor:pointer;';
+    // Info section
+    var info=document.createElement('div');
+    info.className='dkinfo';
+    info.style.flex='1';
+    info.innerHTML='<h3>'+dk.name+'</h3><p>'+dc.length+' cards'+(due?' - <span style="color:var(--no)">'+due+' due</span>':'')+'</p>';
+    info.onclick=function(e){e.stopPropagation();setDeck(dkId);};
+    // Delete button
+    var del=document.createElement('button');
+    del.className='dkdel';del.textContent='Delete';
+    del.onclick=function(e){e.stopPropagation();delDeck(dkId);};
+    row.appendChild(info);row.appendChild(del);
+    row.onclick=function(){setDeck(dkId);};
+    el.appendChild(row);
+  });
+  renderMod();
 }
 function renderMod(){
   var el=document.getElementById('mList');el.innerHTML='';
