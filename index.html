@@ -145,12 +145,6 @@ textarea:focus{border-color:var(--acc);}
 </div>
 <div id="hdr">
   <div id="logo">VIET<span>CARDS</span></div>
-  <div id="hdrSpd">
-    <span style="font-size:10px;color:#666">S</span>
-    <input type="range" id="spd" min="0.4" max="1.2" step="0.1" value="0.9" oninput="document.getElementById('spdLbl').textContent=parseFloat(this.value).toFixed(1)">
-    <span style="font-size:10px;color:#666">F</span>
-    <span id="spdLbl" style="font-size:11px;color:#666;font-weight:700;min-width:24px">0.9</span>
-  </div>
   <div id="hdrSpd" style="display:flex;align-items:center;gap:4px;flex:1;padding:0 8px;">
     <span style="font-size:10px;color:#666">S</span>
     <input type="range" id="spd" min="0.4" max="1.2" step="0.1" value="0.9" oninput="document.getElementById('spdLbl').textContent=parseFloat(this.value).toFixed(1)" style="flex:1;accent-color:var(--acc);height:4px;cursor:pointer;">
