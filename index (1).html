@@ -724,8 +724,10 @@ window.onload=function(){
   if(window.__ED__&&(window.__ED__.cards||[]).length){
     decks=window.__ED__.decks||[];
     cards=(window.__ED__.cards||[]).map(function(c,i){return norm(c,i);});
+    setTimeout(function(){toast('Loaded '+cards.length+' cards, '+decks.length+' decks from embed');},500);
   }else{
     loadData();
+    setTimeout(function(){toast('Loaded '+cards.length+' cards from localStorage');},500);
   }
   rebuildQ();renderCard();renderDecks();
   var card=document.getElementById('card');var sx=0,sy=0,mv=false,tapping=false;
