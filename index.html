@@ -293,23 +293,28 @@ textarea:focus{border-color:var(--acc);}
 
 <script>
 var GRAM=[
-{word:"rồi",eng:"already / completed",triggers:["roi","rồi"],note:"At END = done. At START = Yes/already. Rồi at start + rồi at end is natural!"},
-{word:"chưa",eng:"yet / have you yet?",triggers:["chua","chưa"],note:"At end = have you done it yet? Answer: Rồi (yes) or Chưa (not yet). Very common Northern greeting!"},
-{word:"và vs với",eng:"and (listing) vs with (together)",triggers:["và","với","va","voi"],note:"và = and (listing things). Nhật và Philippines = Japan AND Philippines. với = with/together. Tôi đi với bạn = I go WITH you. Never swap them!"},
-{word:"ở vs tại",eng:"at/in (casual) vs at (formal)",triggers:["ở","tại","o","tai"],note:"ở = casual at/in/live — everyday speech. tại = formal at — writing or formal speech. tại sao = why. Use ở in conversation always."},
-{word:"biết vs hiểu",eng:"know vs understand",triggers:["biết","hiểu","biet","hieu"],note:"biết = know a fact or person. Tôi biết anh ấy (I know him). hiểu = understand/comprehend. Tôi hiểu rồi (I understand now)."},
-{word:"thích vs yêu",eng:"like vs love",triggers:["thích","yêu","thich","yeu"],note:"thích = like (food, activities). Tôi thích cà phê. yêu = love (romantic). Tôi yêu bạn. Do not use yêu casually — it implies romance!"},
-{word:"đi vs đến",eng:"go vs arrive",triggers:["đi","đến","di","den"],note:"đi = go (the journey). Tôi đi chợ (I am going to market). đến = arrive/reach. Tôi đến chợ rồi (I arrived). Journey vs destination."},
-{word:"được",eng:"can / okay / permitted",triggers:["được","duoc"],note:"được không? = is it okay? Được rồi = OK. Before verb = allowed to. After verb = successfully done. One of the most versatile words!"},
-{word:"nhé",eng:"okay? / shall we?",triggers:["nhé","nhe"],note:"At end = friendly suggestion. Gặp lúc 10 giờ nhé! = Let's meet at 10, okay? Makes sentences warmer. Very common in Northern conversation."},
-{word:"những",eng:"plural marker / all that",triggers:["những","nhung"],note:"Before nouns = makes plural. những món = dishes. Before gì = all that. những gì = everything that. Often dropped — not required."},
-{word:"gì",eng:"what (question AND statement)",triggers:["gì","gi"],note:"Questions: Bạn muốn gì? = What do you want? Statements: những gì tôi thích = what I like. không có gì = you're welcome!"},
-{word:"đã",eng:"past tense marker",triggers:["đã","da"],note:"Before verb = already happened. Tôi đã ăn (I ate already). Often combined with rồi: Tôi đã ăn rồi. Can be dropped in casual speech."},
-{word:"sẽ",eng:"future tense marker",triggers:["sẽ","se"],note:"Before verb = will happen. Tôi sẽ đến (I will come). Often dropped when context is clear. Very flexible in spoken Vietnamese."},
-{word:"cũng",eng:"also / too",triggers:["cũng","cung"],note:"ALWAYS before the verb. Tôi cũng thích = I also like it. Never at end of sentence like English 'too'."},
-{word:"lắm",eng:"very (intensifier)",triggers:["lắm","lam"],note:"ALWAYS after the adjective. Tốt lắm = Very good! Compare: rất comes BEFORE (rất tốt). Both work but lắm is more emphatic."},
-{word:"ơi",eng:"hey / vocative particle",triggers:["ơi","oi"],note:"After name/title to get attention. Em ơi! = Hey (younger)! Anh ơi! = Hey (older male)! Very natural — NOT rude in Vietnamese."},
-{word:"mấy vs bao nhiêu",eng:"how many (small) vs how much/many",triggers:["mấy","bao nhiêu","may","bao nhieu"],note:"mấy = how many (small number under 10). bao nhiêu = how many/much (any amount, prices). Use bao nhiêu for prices at market."}
+{word:"rồi",eng:"already / completed",triggers:["rồi"],note:"At END = done. At START = Yes/already. Tôi ăn rồi (I ate already). Rồi at start + rồi at end is perfectly natural — not redundant!"},
+{word:"chưa",eng:"yet / have you yet?",triggers:["chưa"],note:"At end = have you done it yet? Answer Rồi (yes) or Chưa (not yet). Bạn ăn chưa? = Have you eaten? Very common Northern greeting!"},
+{word:"và vs với",eng:"and (listing) vs with (together)",triggers:["và","với"],note:"và = and (listing equal things). Nhật và Philippines = Japan AND Philippines (two destinations listed). với = with/together. Tôi đi với bạn = I go WITH you. NEVER swap them — the meaning changes completely!"},
+{word:"ở",eng:"at / in / live / stay",triggers:["ở"],note:"ở does three jobs: LIVE (Tôi ở Đà Nẵng), AT a place (ở đây = here), BE LOCATED. ở đâu = where? Compare: đến = go TO somewhere. từ = FROM somewhere."},
+{word:"đã",eng:"past tense marker",triggers:["đã"],note:"Before verb = already happened. Tôi đã ăn (I already ate). Often combined with rồi: Tôi đã ăn rồi. Can be dropped in casual speech — context implies past tense."},
+{word:"sẽ",eng:"future tense marker",triggers:["sẽ"],note:"Before verb = will happen. Tôi sẽ đến (I will come). Often dropped when context is clear. Very flexible — Vietnamese often implies future without sẽ."},
+{word:"đang",eng:"currently happening (right now)",triggers:["đang"],note:"Before verb = happening RIGHT NOW. Tôi đang ăn (I am eating). No need for am/is/are — just add đang. Northern speakers use this more than Southern."},
+{word:"được",eng:"can / okay / successfully done",triggers:["được"],note:"được không? = is it okay? Được rồi = OK/agreed. Before verb = allowed to do. After verb = successfully done. One of the most versatile words in Vietnamese!"},
+{word:"nhé",eng:"okay? / shall we? (friendly closer)",triggers:["nhé"],note:"At end = friendly suggestion or confirmation. Gặp lúc 10 giờ nhé! = Let's meet at 10, okay? Makes sentences warmer and less direct. Very common in Northern speech."},
+{word:"những",eng:"plural marker / all that",triggers:["những"],note:"Before nouns = makes plural. những món = dishes (plural). Before gì = everything that. những gì = all that / everything that. Not required — context often implies plural."},
+{word:"gì",eng:"what (question AND statement)",triggers:["gì"],note:"In questions: Bạn muốn gì? = What do you want? In statements: những gì tôi thích = what I like. không có gì = nothing / you're welcome! Same word does both jobs."},
+{word:"biết vs hiểu",eng:"know (fact) vs understand",triggers:["biết","hiểu"],note:"biết = know a fact or know someone by name. Tôi biết anh ấy (I know him). hiểu = understand/comprehend deeply. Tôi hiểu rồi (I understand now). Hiểu không? = Do you understand?"},
+{word:"thích vs yêu",eng:"like vs love",triggers:["thích","yêu"],note:"thích = like (food, activities, things). Tôi thích cà phê (I like coffee). yêu = love (romantic or very deep). Tôi yêu bạn (I love you). Never use yêu casually — it implies romantic love!"},
+{word:"đi vs đến",eng:"go (journey) vs arrive (destination)",triggers:["đến","đi"],note:"đi = the act of going. Tôi đi chợ (I am going to market). đến = arrive/reach a place. Tôi đến chợ rồi (I arrived at market). đi = focus on journey. đến = focus on destination."},
+{word:"cũng",eng:"also / too (always before verb)",triggers:["cũng"],note:"ALWAYS before the verb — opposite of English 'too' at end! Tôi cũng thích = I also like it. Cũng được = That's fine too. Subject + cũng + verb is the only correct order."},
+{word:"lắm",eng:"very / a lot (always after adjective)",triggers:["lắm"],note:"ALWAYS after the adjective/verb — opposite of English! Tốt lắm = Very good! Thích lắm = Like it a lot! Compare: rất comes BEFORE (rất tốt). Both work but lắm is more emphatic and colloquial."},
+{word:"ơi",eng:"hey! (vocative — calling someone)",triggers:["ơi"],note:"After name or title to get attention politely. Em ơi! = Hey (to younger person)! Anh ơi! = Hey (to older male)! Very natural and NOT rude — it is the normal Vietnamese way to call someone."},
+{word:"thì",eng:"then / as for / topic marker",triggers:["thì"],note:"Links topic to comment: Còn bạn thì sao? = And as for you, how is it? In conditions: Nếu...thì = If...then. Adds flow and emphasis — sometimes hard to translate but very common in Northern speech."},
+{word:"mà",eng:"but / yet / emphasis marker",triggers:["mà"],note:"Soft contrast: Tôi muốn đi mà trời mưa (I want to go but it's raining). Can show mild impatience: Biết rồi mà! = I already know! (slightly exasperated). Very colloquial Northern usage."},
+{word:"hay",eng:"or (in questions) / interesting",triggers:["hay"],note:"hay = OR in yes/no questions. Bạn muốn trà hay cà phê? (Tea or coffee?) hoặc = OR in statements. hay also means interesting/good: Hay quá! = How interesting! Two different meanings — context makes it clear."},
+{word:"cho",eng:"give / for / so that",triggers:["cho"],note:"cho tôi = give me. cho bạn = for you. cho + verb = so that / in order to. Cho tôi biết = Let me know (literally 'give me know'). One of the most useful and flexible words in Vietnamese!"},
+{word:"quá",eng:"too / very (always at end)",triggers:["quá"],note:"ALWAYS at the END of the sentence for emphasis. Tốt quá! = Great! (very good). Đông quá = Too crowded. Compare: rất comes before (rất tốt). quá is stronger and more exclamatory than rất."}
 ];
 
 var BD=[0,1,2,4,8,16];
@@ -412,7 +417,7 @@ function fmtBrk(t){
 function fmtTip(txt){
   if(!txt)return '';
   var vnRe=/[\u00e0\u00e1\u1ea3\u00e3\u1ea1\u0103\u1eaf\u1eb7\u1eb1\u1eb3\u1eb5\u00e2\u1ea5\u1ea7\u1ea9\u1eab\u1ead\u0111\u00e8\u00e9\u1ebb\u1ebd\u1eb9\u00ea\u1ebf\u1ec1\u1ec3\u1ec5\u1ec7\u00ec\u00ed\u1ec9\u0129\u1ecb\u00f2\u00f3\u1ecf\u00f5\u1ecd\u00f4\u1ed1\u1ed3\u1ed5\u1ed7\u1ed9\u01a1\u1edb\u1edd\u1edf\u1ee1\u1ee3\u00f9\u00fa\u1ee7\u0169\u1ee5\u01b0\u1ee9\u1eeb\u1eed\u1eef\u1ef1\u1ef3\u00fd\u1ef7\u1ef9\u1ef5\u0103\u01b0\u01a1\u0110\u0111\u1ea0\u1ea2\u1ea4\u1ea6\u1ea8\u1eaa\u1eac\u1eae\u1eb0\u1eb2\u1eb4\u1eb6]/;
-  var vnWords={khong:1,ban:1,con:1,co:1,mot:1,hai:1,ba:1,roi:1,chua:1,la:1,va:1,hay:1,nhu:1,khi:1,thi:1,ma:1,vi:1,de:1,cho:1,den:1,tu:1,voi:1,trong:1,ngoai:1,tren:1,duoi:1,sau:1,truoc:1,qua:1,rat:1,lam:1,nhieu:1,cung:1,moi:1,chi:1,neu:1,nhung:1,gi:1,nao:1,dau:1,sao:1,nen:1,da:1,se:1,dang:1,duoc:1,phai:1,muon:1,can:1,biet:1,thich:1,an:1,uong:1,di:1,den:1,ve:1,ra:1,vao:1,nhau:1,minh:1,anh:1,chi:1,em:1,ong:1,chu:1,toi:1,ho:1,khoe:1,no:1};
+  var vnWords={khong:1,ban:1,con:1,co:1,mot:1,hai:1,ba:1,bon:1,nam:1,sau:1,bay:1,tam:1,chin:1,muoi:1,roi:1,chua:1,la:1,va:1,hay:1,nhu:1,khi:1,thi:1,ma:1,vi:1,de:1,cho:1,den:1,tu:1,voi:1,trong:1,ngoai:1,tren:1,duoi:1,sau:1,truoc:1,ben:1,qua:1,rat:1,lam:1,nhieu:1,it:1,cung:1,deu:1,moi:1,ca:1,chi:1,neu:1,nhung:1,gi:1,nao:1,dau:1,bao:1,sao:1,tai:1,boi:1,nen:1,van:1,da:1,se:1,dang:1,bi:1,duoc:1,phai:1,muon:1,can:1,biet:1,hieu:1,nho:1,quen:1,thich:1,yeu:1,an:1,uong:1,ngu:1,di:1,den:1,ve:1,ra:1,vao:1,len:1,xuong:1,qua:1,lai:1,chung:1,rieng:1,nhau:1,minh:1,ta:1,anh:1,chi:1,em:1,ong:1,ba:1,chu:1,co:1,toi:1,ban:1,ho:1,no:1,day:1,do:1,kia:1,nay:1,noi:1,chon:1,viec:1,ngay:1,gio:1,phut:1,thang:1,tuan:1,tat:1,nhien:1,dung:1,sai:1,tot:1,xau:1,lon:1,nho:1,cao:1,thap:1,nhanh:1,cham:1,cu:1,khoe:1,no:1,doi:1,vang:1,ung:1,biet:1,noi:1,nghe:1,thay:1,biet:1,hoc:1,day:1,lam:1,mua:1,ban:1,cho:1,duoc:1,mat:1,co:1,muon:1,can:1,nen:1,phai:1,hay:1,khi:1,neu:1,vi:1,ma:1,thi:1,nhu:1,nhung:1,cung:1,deu:1,chi:1,rat:1,qua:1,lam:1,nhieu:1,it:1,toan:1,het:1,trong:1,ngoai:1,giua:1,tren:1,duoi:1,truoc:1,sau:1,ben:1,canh:1,gan:1,xa:1,day:1,do:1,kia:1,nay:1,nao:1,gi:1,ai:1,bao:1,may:1,sao:1,dau:1,bao:1};
   var s=txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   s=s.replace(/\uD83D\uDCAC/g,'<span style="color:#00d4aa;font-weight:900">\uD83D\uDCAC</span>');
   s=s.replace(/([^\s<>&]+)/g,function(word){
@@ -460,15 +465,22 @@ function showGramSection(c){
 }
 
 function getGramForCard(c){
-  var text=(c.en+' '+c.vn+' '+c.brk+' '+c.note).toLowerCase();
+  // Only match against Vietnamese text and breakdown - not English or notes
+  var vnText=' '+c.vn.toLowerCase()+' ';
+  var brkText=' '+c.brk.toLowerCase()+' ';
+  // Strip punctuation for matching
+  var clean=function(s){return s.replace(/[.,!?;:()"'\[\]]/g,' ');};
+  var vn=clean(vnText);
+  var brk=clean(brkText);
   var matches=[],seen={};
   GRAM.forEach(function(g){
     if(seen[g.word])return;
     var found=false;
     (g.triggers||[g.word]).forEach(function(t){
       if(found)return;
-      var tl=t.toLowerCase();
-      if(text.indexOf(tl)!==-1)found=true;
+      var tl=' '+t.toLowerCase()+' ';
+      // Strict: must be surrounded by spaces (word boundary)
+      if(vn.indexOf(tl)!==-1||brk.indexOf(tl)!==-1)found=true;
     });
     if(found){matches.push(g);seen[g.word]=true;}
   });
