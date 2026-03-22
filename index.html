@@ -269,11 +269,12 @@ textarea:focus{border-color:var(--acc);}
 <div id="toast"></div>
 <div id="toastBig"></div>
 <script>
+alert("Script is running!");
 var BD=[0,1,2,4,8,16];var SK='vc4';
 var decks=[],cards=[],actDeck=null,Q=[],qp=0,front='vn',brkOn=false,studyOn=false,loopOn=false,tipsOn=false;
 function saveData(){try{localStorage.setItem(SK,JSON.stringify({decks:decks,cards:cards}));}catch(e){toast('Storage full!');}}
 function loadData(){
-  try{var r=localStorage.getItem(SK);if(!r)return;var d=JSON.parse(r);decks=d.decks||[];cards=(d.cards||[]).map(function(c,i){return norm(c,i);});}catch(e){decks=[];cards=[];}
+  try{var r=localStorage.getItem(SK);if(!r)return;var d=JSON.parse(r);decks=d.decks||[];cards=(d.cards||[]).map(function(c,i){return norm(c,i);});}catch(e){decks=[];cards=[];} 
 }
 function norm(c,i){
   return{id:c.id||rnd(),deckId:c.deckId||null,en:c.en||'',vn:c.vn||'',brk:c.brk||c.break||'',note:c.note||'',
@@ -748,14 +749,19 @@ function showGramSection(c){
 }
 
 window.onload=function(){
-  // Load embedded data if available, otherwise localStorage
+  // Always load from embedded data, clear any conflicting localStorage
   if(window.__ED__&&(window.__ED__.cards||[]).length){
+    try{localStorage.removeItem(SK);}catch(e){}
     decks=window.__ED__.decks||[];
     cards=(window.__ED__.cards||[]).map(function(c,i){return norm(c,i);});
-    setTimeout(function(){toast('Loaded '+cards.length+' cards, '+decks.length+' decks from embed');},500);
+    saveData();
   }else{
     loadData();
-    setTimeout(function(){toast('Loaded '+cards.length+' cards from localStorage');},500);
+  }
+  // Force first deck as default if All Decks shows nothing
+  if(decks.length>0&&actDeck===null){
+    actDeck=decks[0].id;
+    document.getElementById('deckBtn').textContent=decks[0].name+' ▼';
   }
   rebuildQ();renderCard();renderDecks();
   var card=document.getElementById('card');var sx=0,sy=0,mv=false,tapping=false;
