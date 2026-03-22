@@ -64,6 +64,7 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 #tipsBtn{background:rgba(255,215,0,.1);border:1.5px solid rgba(255,215,0,.3);color:var(--gold);}
 #tipsBtn.on{background:rgba(255,215,0,.25);border-color:var(--gold);}
 #speakBtn{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);color:var(--teal);}
+#backBtn{background:rgba(255,255,255,.05);border:1.5px solid var(--brd);color:#888;}
 .abt{flex:1;height:var(--tap);border:none;border-radius:var(--rad);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;}
 #wrongBtn{background:linear-gradient(135deg,#8b0000,var(--no));color:#fff;box-shadow:0 5px 18px rgba(255,61,87,.3);}
 #rightBtn{background:linear-gradient(135deg,#006400,var(--ok));color:#fff;box-shadow:0 5px 18px rgba(0,200,83,.3);}
@@ -208,6 +209,7 @@ textarea:focus{border-color:var(--acc);}
     </div>
     <div class="btnRow">
       <button id="speakBtn" onclick="doSpeak()">&#128266; Listen</button>
+      <button id="backBtn" class="abt" onclick="doBack()">&#9664; Back</button>
       <button class="abt" id="rightBtn" onclick="doRight()">&#10003; Got It</button>
     </div>
     <div id="tipsPanel">
@@ -496,6 +498,11 @@ function autoExport(){
   }catch(e){}
 }
 function doSkip(){if(!Q.length)return;var idx=Q.splice(qp,1)[0];Q.push(idx);if(qp>=Q.length)qp=0;renderCard();toast('Skipped');}
+function doBack(){
+  if(!Q.length)return;
+  qp=qp>0?qp-1:Q.length-1;
+  renderCard();toast('Back');
+}
 
 function doRight(){
   var c=curCard();if(!c)return;
