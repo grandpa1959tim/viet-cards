@@ -778,11 +778,10 @@ function renderTones(){
     var accented=t.accent(activeVowel);
     var cell=document.createElement('div');
     cell.style.cssText='background:'+t.color+'15;border:1.5px solid '+t.color+'44;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;';
-    cell.setAttribute('aria-label', accented);
-    cell.innerHTML=
-      '<div aria-hidden="true" style="font-size:36px;font-weight:900;color:'+t.color+';line-height:1.2;">'+accented+'</div>'
-      +'<div aria-hidden="true" style="font-size:11px;font-weight:800;color:'+t.color+';margin-top:4px;">'+t.name+'</div>'
-      +'<div aria-hidden="true" style="font-size:10px;color:#888;margin-top:2px;">'+t.desc+'</div>';
+    cell.setAttribute('aria-hidden','true');
+    cell.setAttribute('role','presentation');
+    cell.innerHTML='<div style="font-size:40px;font-weight:900;color:'+t.color+';line-height:1.2;">'+accented+'</div>'
+      +'<div style="font-size:10px;color:#888;margin-top:4px;">'+t.desc+'</div>';
     cell.onclick=(function(word){return function(){speakTone(word);};})(accented);
     row.appendChild(cell);
   });
@@ -804,8 +803,11 @@ function renderTones(){
 
 
 function speakTone(word){
-  var u=new SpeechSynthesisUtterance(word);
+  // Force only the first character to prevent any concatenation
+  var clean=word.trim().split('').slice(0,3).join('');
+  var u=new SpeechSynthesisUtterance(clean);
   u.lang='vi-VN';u.rate=0.65;
+  u.text=clean;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
 }
