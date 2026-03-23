@@ -807,7 +807,6 @@ function speakTone(word, tone){
   u.lang='vi-VN';u.rate=0.65;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
-  toast(word+' — '+(tone?tone.name:''));
 }
 
 
