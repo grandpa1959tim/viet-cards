@@ -161,6 +161,7 @@ textarea:focus{border-color:var(--acc);}
   <div class="tb" onclick="goTab('decks')">Decks</div>
   <div class="tb" onclick="goTab('boxes')">Boxes</div>
   <div class="tb" onclick="goTab('settings')">Settings</div>
+  <div class="tb" onclick="goTab('tones')">Tones</div>
 </div>
 <div id="pn-study" class="pn on">
   <div id="study">
@@ -252,6 +253,7 @@ textarea:focus{border-color:var(--acc);}
 </div>
 <div id="pn-boxes" class="pn"><div id="boxGrid"></div></div>
 <div id="pn-settings" class="pn">
+
   <div class="sg">
     <h3>Display</h3>
     <div class="sr"><div><div class="sl">Breakdown on Vietnamese Side</div></div><label class="tg"><input type="checkbox" id="sBF" onchange="renderCard()"><span class="ts"></span></label></div>
@@ -290,7 +292,22 @@ textarea:focus{border-color:var(--acc);}
     <button class="dngr" onclick="doNuke()">Delete All Cards and Decks</button>
   </div>
 </div>
-<div id="toast"></div>
+<div id="pn-tones" class="pn">
+  <div class="stitle">Vietnamese Tones</div>
+  <div class="ssub">Each vowel shown with all 6 tones · Tap any syllable to hear it</div>
+
+  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;" id="vowelBtns"></div>
+  <div id="toneVowelGrid"></div>
+
+  <div style="margin-top:14px;background:rgba(255,215,0,.07);border:1.5px solid rgba(255,215,0,.2);border-radius:14px;padding:14px;">
+    <div style="font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px;">&#127911; TONE GUIDE</div>
+    <div style="display:flex;flex-direction:column;gap:4px;" id="toneLegend"></div>
+    <button onclick="speakAllTones()" style="margin-top:12px;width:100%;height:48px;background:rgba(0,212,170,.15);border:1.5px solid rgba(0,212,170,.3);border-radius:14px;color:var(--teal);font-family:Nunito,sans-serif;font-size:14px;font-weight:800;cursor:pointer;">
+      &#128266; Play All 6 Tones for Selected Vowel
+    </button>
+  </div>
+</div>
+<div id="toast"></div><div id="toast"></div>
 <div id="toastBig"></div>
 
 <script>
@@ -537,7 +554,9 @@ function doSpeak(){
   var fl=document.getElementById('card').classList.contains('flip');
   var vn=(front==='vn')!==fl;
   var u=new SpeechSynthesisUtterance(vn?c.vn:c.en);
-  u.lang=vn?'vi-VN':'en-US';u.rate=parseFloat(document.getElementById('spd').value);
+  u.lang=vn?'vi-VN':'en-US';
+  u.rate=parseFloat(document.getElementById('spd').value);
+  if(vn&&selectedVoice)u.voice=selectedVoice;
   speechSynthesis.cancel();speechSynthesis.speak(u);
 }
 
@@ -575,7 +594,10 @@ function setDeck(id){
   actDeck=id;
   var name=id===null?'All Decks':(decks.find(function(d){return d.id===id;})||{name:'?'}).name;
   document.getElementById('deckBtn').textContent=name+' \u25bc';
-  rebuildQ();renderCard();renderDecks();closeMod();
+  rebuildQ();renderCard();renderDecks();
+  // Load voices when available
+  speechSynthesis.onvoiceschanged=loadVoices;
+  setTimeout(loadVoices,300);closeMod();
   goTab('study');
 }
 
@@ -634,10 +656,10 @@ function renderBoxes(){
 }
 
 function goTab(t){
-  document.querySelectorAll('.tb').forEach(function(el,i){el.classList.toggle('on',['study','add','search','decks','boxes','settings'][i]===t);});
+  document.querySelectorAll('.tb').forEach(function(el,i){el.classList.toggle('on',['study','add','search','decks','boxes','settings','tones'][i]===t);});
   document.querySelectorAll('.pn').forEach(function(el){el.classList.remove('on');});
   document.getElementById('pn-'+t).classList.add('on');
-  if(t==='boxes')renderBoxes();if(t==='decks')renderDecks();if(t==='settings')drawQR();
+  if(t==='boxes')renderBoxes();if(t==='decks')renderDecks();if(t==='settings')drawQR();if(t==='tones')renderTones();
 }
 
 function drawQR(){var url=location.href.split('?')[0];document.getElementById('qrUrl').textContent=url;document.getElementById('qrImg').src='https://api.qrserver.com/v1/create-qr-code/?size=190x190&data='+encodeURIComponent(url);}
@@ -710,29 +732,130 @@ function doSearch(){
   }
 }
 
+
+var TONES=[
+  {name:"Ngang",mark:"",desc:"Level — flat",color:"#aaaaaa",accent:function(v){return v;}},
+  {name:"Sắc",mark:"́",desc:"Rising — sharp",color:"#ff6b35",accent:function(v){
+    var m={"a":"á","ă":"ắ","â":"ấ","e":"é","ê":"ế","i":"í","o":"ó","ô":"ố","ơ":"ớ","u":"ú","ư":"ứ"};return m[v]||v;
+  }},
+  {name:"Huyền",mark:"̀",desc:"Falling — grave",color:"#4a90d9",accent:function(v){
+    var m={"a":"à","ă":"ằ","â":"ầ","e":"è","ê":"ề","i":"ì","o":"ò","ô":"ồ","ơ":"ờ","u":"ù","ư":"ừ"};return m[v]||v;
+  }},
+  {name:"Hỏi",mark:"̉",desc:"Dipping — question",color:"#ffd700",accent:function(v){
+    var m={"a":"ả","ă":"ẳ","â":"ẩ","e":"ẻ","ê":"ể","i":"ỉ","o":"ỏ","ô":"ổ","ơ":"ở","u":"ủ","ư":"ử"};return m[v]||v;
+  }},
+  {name:"Ngã",mark:"̃",desc:"Broken — tumbling",color:"#00d4aa",accent:function(v){
+    var m={"a":"ã","ă":"ẵ","â":"ẫ","e":"ẽ","ê":"ễ","i":"ĩ","o":"õ","ô":"ỗ","ơ":"ỡ","u":"ũ","ư":"ữ"};return m[v]||v;
+  }},
+  {name:"Nặng",mark:"̣",desc:"Heavy — dropping",color:"#ff3d57",accent:function(v){
+    var m={"a":"ạ","ă":"ặ","â":"ậ","e":"ẹ","ê":"ệ","i":"ị","o":"ọ","ô":"ộ","ơ":"ợ","u":"ụ","ư":"ự"};return m[v]||v;
+  }}
+];
+
+var VOWELS=["a","ă","â","e","ê","i","o","ô","ơ","u","ư"];
+var activeVowel="a";
+
+
+function renderTones(){
+  // Render vowel selector buttons
+  var vb=document.getElementById('vowelBtns');
+  if(!vb)return;
+  vb.innerHTML='';
+  VOWELS.forEach(function(v){
+    var btn=document.createElement('button');
+    btn.style.cssText='padding:8px 14px;border-radius:10px;font-family:Nunito,sans-serif;font-size:18px;font-weight:900;cursor:pointer;border:2px solid '+(v===activeVowel?'var(--acc)':'var(--brd)')+';background:'+(v===activeVowel?'rgba(255,107,53,.2)':'var(--sur)')+';color:'+(v===activeVowel?'var(--acc)':'#ccc')+';';
+    btn.textContent=v;
+    btn.onclick=(function(vowel){return function(){activeVowel=vowel;renderTones();};})(v);
+    vb.appendChild(btn);
+  });
+
+  // Render tone grid for selected vowel
+  var g=document.getElementById('toneVowelGrid');
+  g.innerHTML='';
+  var row=document.createElement('div');
+  row.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;';
+  TONES.forEach(function(t,i){
+    var accented=t.accent(activeVowel);
+    var cell=document.createElement('div');
+    cell.style.cssText='background:'+t.color+'15;border:1.5px solid '+t.color+'44;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;';
+    cell.innerHTML=
+      '<div style="font-size:36px;font-weight:900;color:'+t.color+';line-height:1.2;">'+accented+'</div>'
+      +'<div style="font-size:11px;font-weight:800;color:'+t.color+';margin-top:4px;">'+t.name+'</div>'
+      +'<div style="font-size:10px;color:#888;margin-top:2px;">'+t.desc+'</div>';
+    cell.onclick=(function(word,tone){return function(){speakTone(word,tone);};})(accented,t);
+    row.appendChild(cell);
+  });
+  g.appendChild(row);
+
+  // Render legend
+  var leg=document.getElementById('toneLegend');
+  if(leg){
+    leg.innerHTML='';
+    TONES.forEach(function(t){
+      var item=document.createElement('div');
+      item.style.cssText='display:flex;align-items:center;gap:8px;font-size:12px;color:#ccc;';
+      item.innerHTML='<span style="width:10px;height:10px;border-radius:50%;background:'+t.color+';display:inline-block;flex-shrink:0;"></span>'
+        +'<b style="color:'+t.color+';">'+t.name+'</b> — '+t.desc;
+      leg.appendChild(item);
+    });
+  }
+}
+
+
+function speakTone(word, tone){
+  var u=new SpeechSynthesisUtterance(word);
+  u.lang='vi-VN';u.rate=0.65;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+  toast(word+' — '+(tone?tone.name:''));
+}
+
+
+function speakAllTones(){
+  var i=0;
+  var cells=document.getElementById('toneVowelGrid').querySelectorAll('div > div');
+  function next(){
+    if(i>=TONES.length)return;
+    var t=TONES[i];
+    var word=t.accent(activeVowel);
+    // Highlight
+    var rows=document.getElementById('toneVowelGrid').firstChild;
+    if(rows){
+      for(var j=0;j<rows.children.length;j++){
+        rows.children[j].style.borderWidth=j===i?'2.5px':'1.5px';
+      }
+    }
+    var u=new SpeechSynthesisUtterance(word);
+    u.lang='vi-VN';u.rate=0.65;
+    u.onend=function(){i++;setTimeout(next,900);};
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+    i++;
+  }
+  next();
+}
+
+
 window.onload=function(){
   if(window.__ED__&&window.__ED__.cards&&window.__ED__.cards.length){
     decks=window.__ED__.decks||[];
     cards=window.__ED__.cards.map(norm);
-    // Restore saved position from localStorage
-    try{
-      var saved=localStorage.getItem(SK);
-      if(saved){var sd=JSON.parse(saved);if(sd.actDeck)actDeck=sd.actDeck;if(sd.qp)qp=sd.qp;}
-    }catch(e){}
+    try{var saved=localStorage.getItem(SK);if(saved){var sd=JSON.parse(saved);if(sd.actDeck)actDeck=sd.actDeck;if(sd.qp)qp=sd.qp;}}catch(e){}
   }else{
     loadData();
     try{var sd2=JSON.parse(localStorage.getItem(SK)||'{}');if(sd2.actDeck)actDeck=sd2.actDeck;if(sd2.qp)qp=sd2.qp;}catch(e){}
   }
-  if(!actDeck&&decks.length>0){
-    actDeck=decks[0].id;
-  }
+  if(!actDeck&&decks.length>0){actDeck=decks[0].id;}
   if(actDeck){
     var dn=(decks.find(function(d){return d.id===actDeck;})||{name:'All Decks'}).name;
-    document.getElementById('deckBtn').textContent=dn+' \u25bc';
+    document.getElementById('deckBtn').textContent=dn+' ▼';
   }
   rebuildQ();
   if(qp>=Q.length)qp=0;
   renderCard();renderDecks();
+  // Load voices when available
+  speechSynthesis.onvoiceschanged=loadVoices;
+  setTimeout(loadVoices,300);
   var card=document.getElementById('card');var sx=0,sy=0,mv=false,tapping=false;
   card.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY;mv=false;tapping=true;},{passive:true});
   card.addEventListener('touchmove',function(e){if(Math.abs(e.touches[0].clientX-sx)>10||Math.abs(e.touches[0].clientY-sy)>10){mv=true;tapping=false;}},{passive:true});
@@ -748,7 +871,6 @@ window.onload=function(){
     if(e.code==='ArrowRight')doRight();if(e.code==='ArrowLeft')doWrong();if(e.code==='KeyS')doSpeak();
   });
 };
-
 </script>
 </body>
 </html>
