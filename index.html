@@ -553,7 +553,6 @@ function doSpeak(){
   var u=new SpeechSynthesisUtterance(vn?c.vn:c.en);
   u.lang=vn?'vi-VN':'en-US';
   u.rate=parseFloat(document.getElementById('spd').value);
-  if(vn&&selectedVoice)u.voice=selectedVoice;
   speechSynthesis.cancel();speechSynthesis.speak(u);
 }
 
