@@ -780,8 +780,7 @@ function renderTones(){
     cell.style.cssText='background:'+t.color+'15;border:1.5px solid '+t.color+'44;border-radius:12px;padding:12px 8px;text-align:center;cursor:pointer;';
     cell.setAttribute('aria-hidden','true');
     cell.setAttribute('role','presentation');
-    cell.innerHTML='<div style="font-size:40px;font-weight:900;color:'+t.color+';line-height:1.2;">'+accented+'</div>'
-      +'<div style="font-size:10px;color:#888;margin-top:4px;">'+t.desc+'</div>';
+    cell.innerHTML='<div style="font-size:40px;font-weight:900;color:'+t.color+';line-height:1.4;">'+accented+'</div>';
     cell.onclick=(function(word){return function(){speakTone(word);};})(accented);
     row.appendChild(cell);
   });
