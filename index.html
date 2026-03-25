@@ -139,8 +139,23 @@ textarea:focus{border-color:var(--acc);}
 ::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px;}
 </style>
+<link rel="manifest" href="data:application/json,{
+  %22name%22:%22VietCards%22,
+  %22short_name%22:%22VietCards%22,
+  %22start_url%22:%22./%22,
+  %22display%22:%22standalone%22,
+  %22background_color%22:%22%230d0d0d%22,
+  %22theme_color%22:%22%23ff6b35%22,
+  %22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='40' fill='%23ff6b35'/%3E%3Ctext x='96' y='140' font-family='Georgia' font-size='120' font-weight='bold' fill='white' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22}]
+}">
+
+<style>
+#offlineBanner{display:none;position:fixed;top:0;left:0;right:0;background:#ff3d57;color:#fff;text-align:center;padding:6px;font-size:12px;font-weight:800;z-index:9999;}
+</style>
 </head>
 <body>
+<div id="offlineBanner">📵 Offline — using cached version</div>
+
 <div id="mOverlay" onclick="if(event.target===this)closeMod()">
   <div id="mBox"><h2>Switch Deck</h2><div id="mList"></div><button id="mClose" onclick="closeMod()">Cancel</button></div>
 </div>
@@ -847,5 +862,23 @@ window.onload=function(){
   });
 };
 </script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg){console.log('SW registered:', reg.scope);})
+      .catch(function(e){console.log('SW failed:', e);});
+  });
+}
+</script>
+
+
+<script>
+window.addEventListener('online', function(){document.getElementById('offlineBanner').style.display='none';});
+window.addEventListener('offline', function(){document.getElementById('offlineBanner').style.display='block';});
+if(!navigator.onLine){document.getElementById('offlineBanner').style.display='block';}
+</script>
+
 </body>
 </html>
