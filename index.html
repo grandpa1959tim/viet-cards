@@ -55,12 +55,10 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 .cnum{position:absolute;top:9px;left:12px;font-size:14px;font-weight:800;color:#00cfff;letter-spacing:1px;}
 .cdot{position:absolute;top:11px;right:12px;width:9px;height:9px;border-radius:50%;}
 .clang{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#555;}
-.cmain{font-size:var(--card-size,clamp(19px,5vw,32px));font-weight:800;text-align:center;line-height:1.3;}
-.vc-word{cursor:pointer;border-radius:4px;padding:0 2px;transition:background .1s;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
-.vc-word:hover{background:rgba(255,215,0,.15);}
-.vc-word.vc-hl{background:rgba(255,200,0,.6);color:#1a1a1a;border-radius:4px;padding:1px 3px;}
-.vc-phrase{border-bottom:2px dotted rgba(255,215,0,.4);}
-.vc-punct{color:inherit;}
+.cmain{font-size:var(--card-size,clamp(19px,5vw,32px));font-weight:800;text-align:center;line-height:1.3;word-spacing:4px;}
+.vc-word{cursor:pointer;border-radius:4px;padding:1px 2px;transition:background .1s;-webkit-tap-highlight-color:transparent;}
+.vc-word:active,.vc-word:hover{background:rgba(255,215,0,.15);}
+.vc-word.vc-hl{background:rgba(255,200,0,.55);color:#111;border-radius:4px;}
 .cbrk{font-size:clamp(13px,3.5vw,17px);color:var(--teal);text-align:center;line-height:2.0;}
 .ctap{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;pointer-events:none;}
 .btnRow{display:flex;gap:8px;width:100%;max-width:500px;}
@@ -166,7 +164,7 @@ textarea:focus{border-color:var(--acc);}
 </div>
 <div id="hdr">
   <div id="logo">VIET<span>CARDS</span></div>
-  <button id="fontBtn" onclick="cycleFont()" style="background:rgba(57,255,20,.15);border:1.5px solid #39ff14;border-radius:8px;font-size:13px;font-weight:800;color:#39ff14;cursor:pointer;padding:3px 8px;font-family:'Nunito',sans-serif;">A</button>
+  <button id="fontBtn" onclick="cycleFont()" style="background:rgba(57,255,20,.12);border:1.5px solid #39ff14;border-radius:8px;font-size:13px;font-weight:800;color:#39ff14;cursor:pointer;padding:3px 8px;font-family:'Nunito',sans-serif;">A</button>
   <div id="hdrSpd" style="display:flex;align-items:center;gap:4px;flex:1;padding:0 8px;">
     <span style="font-size:10px;color:#666">S</span>
     <input type="range" id="spd" min="0.4" max="1.2" step="0.1" value="0.9" oninput="document.getElementById('spdLbl').textContent=parseFloat(this.value).toFixed(1)" style="flex:1;accent-color:var(--acc);height:4px;cursor:pointer;">
@@ -237,7 +235,7 @@ textarea:focus{border-color:var(--acc);}
     <div id="tipsPanel">
       <div id="tipsLbl">&#128214; STUDY TIP</div>
       <div id="tipsTxt"></div>
-      <div id="genTipRow" style="display:none;margin-top:8px;text-align:center;"><button id="genTipBtn" onclick="generateTip()" style="background:rgba(255,107,53,.15);border:1.5px solid #ff6b35;border-radius:99px;color:#ff6b35;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;padding:6px 16px;cursor:pointer;">Generate Tip with AI</button><div id="genTipStatus" style="font-size:11px;color:#666;margin-top:4px;"></div></div>
+      <div id="genTipRow" style="display:none;margin-top:8px;text-align:center;"><button id="genTipBtn" onclick="genTip()" style="background:rgba(255,107,53,.12);border:1.5px solid #ff6b35;border-radius:99px;color:#ff6b35;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;padding:5px 14px;cursor:pointer;">Generate Tip with AI</button><div id="genTipStatus" style="font-size:10px;color:#666;margin-top:3px;"></div></div>
       <div id="gramSect">
         <div id="gramLbl">&#128221; GRAMMAR NOTE</div>
         <div id="gramTxt"></div>
@@ -267,8 +265,8 @@ textarea:focus{border-color:var(--acc);}
 <div id="pn-decks" class="pn">
   <div class="stitle">My Decks</div>
   <div class="ssub">Tap a deck to study it</div>
-  <button onclick="copyForAI()" style="width:100%;background:rgba(255,107,53,.15);border:1.5px solid #ff6b35;border-radius:12px;color:#ff6b35;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;padding:10px;cursor:pointer;margin:8px 0 4px;">Copy deck words for VietListen AI</button>
-  <div id="copyAIStatus" style="font-size:11px;color:#666;text-align:center;min-height:16px;margin-bottom:4px;"></div>
+  <button onclick="copyForAI()" style="width:100%;background:rgba(255,107,53,.12);border:1.5px solid #ff6b35;border-radius:10px;color:#ff6b35;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;padding:8px;cursor:pointer;margin:8px 0 4px;">Copy deck words for VietListen AI</button>
+  <div id="copyAIStatus" style="font-size:11px;color:#666;text-align:center;min-height:14px;margin-bottom:4px;"></div>
   <div style="display:flex;gap:8px;margin-bottom:14px;">
     <input type="text" id="ndInp" class="fi" placeholder="New deck name..." style="margin-top:0">
     <button class="bb bpri" onclick="doNewDeck()" style="margin-top:0;width:auto;padding:0 16px">+ Create</button>
@@ -363,7 +361,7 @@ var GRAM=[
 ];
 
 var BD=[0,1,2,4,8,16,
-{word:"thỉnh thoảng / đôi khi",eng:"sometimes",triggers:["thỉnh thoảng","đôi khi"],note:"Both mean sometimes. thỉnh thoảng = sometimes (most common). đôi khi = from time to time (slightly more formal). Example: Thỉnh thoảng tôi đi chợ = I sometimes go to the market."}];
+{word:"thỉnh thoảng / đôi khi",eng:"sometimes",triggers:["thỉnh thoảng","đôi khi"],note:"Both mean sometimes. thỉnh thoảng = sometimes (most common in northern speech). đôi khi = from time to time. Example: Thỉnh thoảng tôi đi chợ = I sometimes go to the market."}];
 var SK='vc4';
 var decks=[],cards=[],actDeck=null,Q=[],qp=0,front='vn',brkOn=false,studyOn=false,loopOn=false,tipsOn=false,dueBox=1;
 
@@ -430,17 +428,12 @@ function renderCard(){
   var isVN=front==='vn';
   document.getElementById('flng').textContent=isVN?'VIETNAMESE':'ENGLISH';
   document.getElementById('blng').textContent=isVN?'ENGLISH':'VIETNAMESE';
-  // Vietnamese side: wrap words in clickable spans
-  var vnText=isVN?c.vn:c.en;
-  var enText=isVN?c.en:c.vn;
-  var vnIsViet=isVN;
-  // Render front as tappable words if Vietnamese
-  if(vnIsViet){
-    document.getElementById('ftxt').innerHTML=makeWordSpans(vnText,'vi-VN',c.brk);
+  if(isVN){
+    document.getElementById('ftxt').innerHTML=makeWordSpans(c.vn,c.brk);
   }else{
-    document.getElementById('ftxt').textContent=vnText;
+    document.getElementById('ftxt').textContent=c.en;
   }
-  document.getElementById('btxt').textContent=enText;
+  document.getElementById('btxt').textContent=isVN?c.en:c.vn;
   document.getElementById('card').classList.remove('flip');
   if(document.getElementById('sNM').checked){
     var dk=vis().slice().sort(function(a,b){return a.ord-b.ord;});
@@ -467,25 +460,69 @@ function fmtBrk(t){
     if(di>0){
       var viet=p.substring(0,di).trim();
       var eng=p.substring(di+1).trim();
-      return '<b style="color:#ffd700;font-weight:900;cursor:pointer;" onclick="speakWord(this,event)" data-word="'+viet.replace(/"/g,'&quot;')+'">'+viet+'</b> <span style="color:#e0e0e0">'+eng+'</span>';
+      return '<b style="color:#ffd700;font-weight:900;cursor:pointer;" onclick="_wTap=true;vcSpeak(\''+viet.replace(/\'/g,"\\'")+'\')" >'+viet+'</b>'
+        +' <span style="color:#e0e0e0">'+eng+'</span>';
     }
     return'<span style="color:#e0e0e0">'+p+'</span>';
   }).filter(Boolean).join('<span style="display:inline-block;width:18px"></span>');
 }
 
-function speakWord(el, event){
-  // Prevent card flip
-  _wordTapped=true;
-  if(event){event.stopPropagation();}
-  var word=typeof el==='string'?el:(el.dataset?el.dataset.word:el.textContent);
+// Parse breakdown into phrase list for sentence word grouping
+function getBrkPhrases(brk){
+  if(!brk)return[];
+  return brk.split(';').map(function(p){
+    p=p.trim();
+    var di=p.indexOf('\u2013');if(di===-1)di=p.indexOf('-');
+    return di>0?p.substring(0,di).trim():'';
+  }).filter(Boolean);
+}
+
+// Wrap Vietnamese sentence words in tappable spans, grouping by breakdown phrases
+function makeWordSpans(text, brk){
+  var phrases=getBrkPhrases(brk||'');
+  phrases.sort(function(a,b){return b.length-a.length;}); // longest first
+  var result='';
+  var pos=0;
+  while(pos<text.length){
+    var ch=text[pos];
+    if(/\s/.test(ch)){result+=ch;pos++;continue;}
+    if(/[,\.!?:;"'\u2013\-\/]/.test(ch)){result+=ch;pos++;continue;}
+    // Try matching a breakdown phrase
+    var lc=text.slice(pos).toLowerCase();
+    var matched=false;
+    for(var pi=0;pi<phrases.length;pi++){
+      var ph=phrases[pi].toLowerCase();
+      if(ph&&lc.startsWith(ph)){
+        var after=text[pos+ph.length]||'';
+        if(!after||/[\s,\.!?]/.test(after)){
+          var orig=text.slice(pos,pos+ph.length);
+          result+='<span class="vc-word" data-word="'+orig.replace(/"/g,'&quot;')+'" onclick="_wTap=true;vcSpeak(this.dataset.word)" >'+orig+'</span>';
+          pos+=ph.length;matched=true;break;
+        }
+      }
+    }
+    if(!matched){
+      var end=pos;
+      while(end<text.length&&!/[\s,\.!?:;"'\u2013\-\/]/.test(text[end]))end++;
+      var word=text.slice(pos,end);
+      result+='<span class="vc-word" data-word="'+word.replace(/"/g,'&quot;')+'" onclick="_wTap=true;vcSpeak(this.dataset.word)" >'+word+'</span>';
+      pos=end;
+    }
+  }
+  return result;
+}
+
+// Speak Vietnamese word/phrase
+function vcSpeak(word){
   if(!word)return;
   speechSynthesis.cancel();
   setTimeout(function(){
     var u=new SpeechSynthesisUtterance(word);
-    u.lang='vi-VN';u.rate=parseFloat(document.getElementById('spd').value||'0.8');
+    u.lang='vi-VN';
+    u.rate=parseFloat(document.getElementById('spd').value||'0.8');
     var voices=speechSynthesis.getVoices();
-    var match=voices.find(function(v){return v.lang==='vi-VN';})||voices.find(function(v){return v.lang.startsWith('vi');});
-    if(match)u.voice=match;
+    var v=voices.find(function(v){return v.lang==='vi-VN';})||voices.find(function(v){return v.lang.startsWith('vi');});
+    if(v)u.voice=v;
     speechSynthesis.speak(u);
   },80);
 }
@@ -562,11 +599,8 @@ function getGramForCard(c){
   return matches;
 }
 
-var _wordTapped=false;
-function doFlip(){
-  if(_wordTapped){_wordTapped=false;return;}
-  document.getElementById('card').classList.toggle('flip');
-}
+var _wTap=false;
+function doFlip(){if(_wTap){_wTap=false;return;}document.getElementById('card').classList.toggle('flip');}
 
 function autoExport(){
   try{
@@ -609,73 +643,6 @@ function doDelete(){
   }
 }
 
-// Parse breakdown into ordered phrase list: ["Chúng ta","có thể","kết nối",...]
-function getBrkPhrases(brk){
-  if(!brk)return[];
-  // Return ONLY the exact phrases defined in the breakdown — no auto-pairing
-  return brk.split(';').map(function(p){
-    p=p.trim();
-    var di=p.indexOf('\u2013');if(di===-1)di=p.indexOf('-');
-    return di>0?p.substring(0,di).trim():'';
-  }).filter(Boolean);
-}
-
-// Build tappable word spans, grouping breakdown phrases as single units
-function makeWordSpans(text, lang, brk){
-  var phrases=getBrkPhrases(brk||'');
-  // Sort by length descending so longer phrases match first
-  phrases.sort(function(a,b){return b.length-a.length;});
-
-  // Try to match phrases greedily from left to right
-  var result='';
-  var remaining=text;
-  var pos=0;
-  var used=[];
-
-  while(pos<text.length){
-    var ch=text[pos];
-    // Skip whitespace
-    if(/\s/.test(ch)){result+=ch;pos++;continue;}
-    // Skip punctuation
-    if(/[,\.!?:;'"'""\-–\/]/.test(ch)){result+='<span class="vc-punct">'+ch+'</span>';pos++;continue;}
-
-    // Try to match a breakdown phrase starting here
-    var matched=false;
-    var lowerRest=text.slice(pos).toLowerCase();
-    for(var pi=0;pi<phrases.length;pi++){
-      var ph=phrases[pi];
-      if(lowerRest.startsWith(ph)){
-        // Check it ends at a word boundary
-        var after=text[pos+ph.length]||'';
-        if(!after||/[\s,\.!?:;'"'""\-–\/]/.test(after)){
-          var original=text.slice(pos,pos+ph.length);
-          var safe=original.replace(/"/g,'&quot;');
-          result+='<span class="vc-word vc-phrase" data-word="'+safe+'" onclick="speakWord(this,event)">'+original+'</span>';
-          pos+=ph.length;
-          matched=true;
-          break;
-        }
-      }
-    }
-    if(!matched){
-      // Single word fallback
-      var end=pos;
-      while(end<text.length&&!/[\s,\.!?:;'"'""\-–\/]/.test(text[end]))end++;
-      var word=text.slice(pos,end);
-      var safe=word.replace(/"/g,'&quot;');
-      result+='<span class="vc-word" data-word="'+safe+'" onclick="speakWord(this,event)">'+word+'</span>';
-      pos=end;
-    }
-  }
-  return result;
-}
-
-// Highlight a word span during playback
-var _vcSpeakSpans=[];
-function clearWordHL(){
-  _vcSpeakSpans.forEach(function(s){s.classList.remove('vc-hl');});
-}
-
 function doSpeak(){
   var c=curCard();if(!c)return;
   var fl=document.getElementById('card').classList.contains('flip');
@@ -684,36 +651,27 @@ function doSpeak(){
   var u=new SpeechSynthesisUtterance(text);
   u.lang=vn?'vi-VN':'en-US';
   u.rate=parseFloat(document.getElementById('spd').value);
-  // Word boundary highlighting
-  clearWordHL();
-  _vcSpeakSpans=Array.from(document.querySelectorAll('#ftxt .vc-word, #btxt .vc-word'));
-  var wordIdx=0;
-  // Build char position map for spans
-  var _spanMap=[];
-  var _charPos=0;
-  var _fullText=text;
-  _vcSpeakSpans.forEach(function(s){
-    var w=s.dataset.word||s.textContent||'';
-    var idx=_fullText.indexOf(w,_charPos);
-    if(idx>=0){_spanMap.push({span:s,start:idx,end:idx+w.length});_charPos=idx+w.length;}
-  });
-
+  // Build span position map for highlighting
+  var spans=Array.from(document.querySelectorAll('#ftxt .vc-word'));
+  var spanMap=[];
+  if(spans.length&&vn){
+    var cp=0;
+    spans.forEach(function(s){
+      var w=s.textContent||'';
+      var idx=text.indexOf(w,cp);
+      if(idx>=0){spanMap.push({s:s,from:idx,to:idx+w.length});cp=idx+w.length;}
+    });
+  }
   u.onboundary=function(e){
     if(e.name!=='word')return;
-    clearWordHL();
-    for(var i=0;i<_spanMap.length;i++){
-      if(e.charIndex>=_spanMap[i].start&&e.charIndex<_spanMap[i].end||(i===_spanMap.length-1&&e.charIndex>=_spanMap[i].start)){
-        _spanMap[i].span.classList.add('vc-hl');
-        break;
-      }
-      // Also highlight if charIndex lands within a multi-word phrase span
-      if(e.charIndex>=_spanMap[i].start&&e.charIndex<=_spanMap[i].end){
-        _spanMap[i].span.classList.add('vc-hl');
-        break;
+    spans.forEach(function(s){s.classList.remove('vc-hl');});
+    for(var i=0;i<spanMap.length;i++){
+      if(e.charIndex>=spanMap[i].from&&e.charIndex<spanMap[i].to){
+        spanMap[i].s.classList.add('vc-hl');break;
       }
     }
   };
-  u.onend=function(){clearWordHL();};
+  u.onend=function(){spans.forEach(function(s){s.classList.remove('vc-hl');});};
   speechSynthesis.cancel();
   setTimeout(function(){speechSynthesis.speak(u);},50);
 }
@@ -796,66 +754,61 @@ function closeMod(){document.getElementById('mOverlay').classList.remove('on');}
 
 function renderBoxes(){
   var cl=['','#ff3d57','#ff8c00','#ffd700','#00c853','#00d4aa'];
-  var boxNames=['','Daily','Every 2d','Every 4d','Every 8d','Mastered'];
-  var g=document.getElementById('boxGrid');g.innerHTML='';
-
-  // Show deck name at top
-  var dn=actDeck?(decks.find(function(d){return d.id===actDeck;})||{name:'All Decks'}).name:'All Decks';
-  var header=document.createElement('div');
-  header.style.cssText='text-align:center;font-size:13px;font-weight:800;color:var(--gold);margin-bottom:12px;padding:7px;background:rgba(255,215,0,.08);border-radius:10px;border:1px solid rgba(255,215,0,.2);';
-  header.textContent='Deck: '+dn;
-  g.appendChild(header);
-
+  var bxNames=['','Daily','2 days','4 days','8 days','Mastered'];
+  var g=document.getElementById('boxGrid');
+  g.innerHTML='';
   var pool=vis();
-  var totalDue=0;
+  var dn=actDeck?(decks.find(function(d){return d.id===actDeck;})||{name:'All Decks'}).name:'All Decks';
+
+  // Compact deck name header
+  var hdr=document.createElement('div');
+  hdr.style.cssText='font-size:12px;font-weight:800;color:var(--gold);text-align:center;padding:4px 0 10px;';
+  hdr.textContent=dn;
+  g.appendChild(hdr);
+
   for(var b=1;b<=5;b++){
     var bc=pool.filter(function(c){return c.box===b;});
     var due=bc.filter(function(c){return isDue(c);}).length;
-    totalDue+=due;
-    if(!bc.length)continue;
 
-    var div=document.createElement('div');
-    div.className='bxcard';
-    div.style.cssText='border:1.5px solid '+cl[b]+'55;border-radius:12px;margin-bottom:10px;overflow:hidden;';
+    var box=document.createElement('div');
+    box.className='bxcard';
+    box.style.cssText='margin-bottom:6px;border-color:'+cl[b]+'44;';
 
-    // Box header row
-    var hdr=document.createElement('div');
-    hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:'+cl[b]+'18;';
-    hdr.innerHTML=
-      '<div style="display:flex;align-items:center;gap:8px;">'
-        +'<div style="width:10px;height:10px;border-radius:50%;background:'+cl[b]+';flex-shrink:0;"></div>'
-        +'<span style="font-size:13px;font-weight:800;color:'+cl[b]+';">Box '+b+' — '+boxNames[b]+'</span>'
+    // Single-line compact header
+    var bh=document.createElement('div');
+    bh.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:'+cl[b]+'10;';
+    bh.innerHTML=
+      '<div style="display:flex;align-items:center;gap:5px;">'
+        +'<div style="width:7px;height:7px;border-radius:50%;background:'+cl[b]+';flex-shrink:0;"></div>'
+        +'<span style="font-size:12px;font-weight:800;color:'+cl[b]+';">Box '+b+'</span>'
+        +'<span style="font-size:10px;color:#555;font-weight:600;">'+bxNames[b]+'</span>'
       +'</div>'
-      +'<div style="display:flex;align-items:center;gap:8px;">'
-        +(due?'<span style="background:rgba(255,61,87,.2);border:1px solid #ff3d57;border-radius:99px;padding:2px 10px;font-size:11px;font-weight:800;color:#ff3d57;">'+due+' due</span>':'')
-        +'<span style="font-size:11px;color:#555;font-weight:700;">'+bc.length+' cards</span>'
+      +'<div style="display:flex;align-items:center;gap:5px;">'
+        +(due?'<span style="font-size:10px;font-weight:800;color:#ff3d57;">'+due+' due</span>':'')
+        +'<span style="font-size:10px;color:#444;font-weight:600;">'+bc.length+'</span>'
       +'</div>';
-    div.appendChild(hdr);
+    box.appendChild(bh);
 
-    // Card pills
-    var items=document.createElement('div');
-    items.style.cssText='padding:8px 10px;display:flex;flex-direction:column;gap:4px;';
-    bc.slice().sort(function(a,z){return a.ord-z.ord;}).forEach(function(card){
-      var pill=document.createElement('div');
-      var d=isDue(card);
-      var daysLeft=d?0:Math.ceil((card.nr-Date.now())/86400000);
-      pill.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-radius:8px;cursor:pointer;background:'+(d?'rgba(255,61,87,.08)':'transparent')+';';
-      pill.innerHTML=
-        '<span style="font-size:12px;font-weight:700;color:#f5f5f0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+card.vn+'</span>'
-        +'<span style="flex-shrink:0;margin-left:8px;font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;'+(d?'background:rgba(255,61,87,.2);color:#ff3d57;border:1px solid #ff3d57;':'color:#555;')+'">'+( d?'DUE':'+'+daysLeft+'d')+'</span>';
-      pill.onclick=(function(ca){return function(){var qi=Q.indexOf(cards.indexOf(ca));if(qi!==-1)qp=qi;goTab('study');renderCard();};})(card);
-      items.appendChild(pill);
-    });
-    div.appendChild(items);
-    g.appendChild(div);
-  }
-
-  // Summary footer
-  if(totalDue>0){
-    var footer=document.createElement('div');
-    footer.style.cssText='text-align:center;font-size:12px;font-weight:800;color:#ff3d57;padding:8px;';
-    footer.textContent=totalDue+' card'+(totalDue===1?'':' s')+' due today';
-    g.appendChild(footer);
+    if(bc.length){
+      var items=document.createElement('div');
+      items.style.cssText='padding:3px 8px 5px;max-height:80px;overflow-y:auto;';
+      bc.slice().sort(function(a,z){return a.ord-z.ord;}).forEach(function(card){
+        var pill=document.createElement('div');
+        var d=isDue(card);
+        var days=d?0:Math.ceil((card.nr-Date.now())/86400000);
+        pill.className='bxpill';
+        pill.style.background=d?'rgba(255,61,87,.06)':'transparent';
+        pill.innerHTML=
+          '<span style="font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#ddd;">'+card.vn+'</span>'
+          +'<span style="font-size:9px;font-weight:800;margin-left:6px;flex-shrink:0;color:'+(d?'#ff3d57':'#444')+'">'+(d?'DUE':'+'+days+'d')+'</span>';
+        pill.onclick=(function(ca){return function(){
+          var qi=Q.indexOf(cards.indexOf(ca));if(qi!==-1)qp=qi;goTab('study');renderCard();
+        };})(card);
+        items.appendChild(pill);
+      });
+      box.appendChild(items);
+    }
+    g.appendChild(box);
   }
 }
 
@@ -1020,53 +973,56 @@ function speakAllTones(){
 
 
 // FONT SIZE
-var VC_FONT_SIZES=['clamp(14px,4vw,20px)','clamp(19px,5vw,32px)','clamp(24px,6.5vw,40px)'];
-var vcFontIdx=1;
+var VC_FONT=['clamp(14px,4vw,20px)','clamp(19px,5vw,32px)','clamp(24px,6.5vw,40px)'];
+var vcFI=1;
 function cycleFont(){
-  vcFontIdx=(vcFontIdx+1)%VC_FONT_SIZES.length;
-  document.documentElement.style.setProperty('--card-size',VC_FONT_SIZES[vcFontIdx]);
-  var btn=document.getElementById('fontBtn');
-  if(btn)btn.textContent=['A-','A','A+'][vcFontIdx];
-  try{localStorage.setItem('vc4_font',vcFontIdx);}catch(e){}
+  vcFI=(vcFI+1)%VC_FONT.length;
+  document.documentElement.style.setProperty('--card-size',VC_FONT[vcFI]);
+  var b=document.getElementById('fontBtn');
+  if(b)b.textContent=['A-','A','A+'][vcFI];
+  try{localStorage.setItem('vc4_font',vcFI);}catch(e){}
 }
 function loadFont(){
   try{
     var f=localStorage.getItem('vc4_font');
-    if(f!==null){vcFontIdx=parseInt(f);document.documentElement.style.setProperty('--card-size',VC_FONT_SIZES[vcFontIdx]);var btn=document.getElementById('fontBtn');if(btn)btn.textContent=['A-','A','A+'][vcFontIdx];}
+    if(f!==null){vcFI=parseInt(f);document.documentElement.style.setProperty('--card-size',VC_FONT[vcFI]);var b=document.getElementById('fontBtn');if(b)b.textContent=['A-','A','A+'][vcFI];}
   }catch(e){}
 }
 
-// COPY WORDS FOR AI STORY
+// COPY DECK WORDS FOR AI STORY
 function copyForAI(){
   var pool=vis();
-  if(!pool.length){var s=document.getElementById('copyAIStatus');if(s)s.textContent='No cards in current deck';return;}
+  if(!pool.length){var s=document.getElementById('copyAIStatus');if(s)s.textContent='No cards in deck';return;}
   var dn=actDeck?(decks.find(function(d){return d.id===actDeck;})||{name:'My Deck'}).name:'All Decks';
   var phrases=pool.map(function(c){return c.vn;}).filter(Boolean).slice(0,20);
-  var text='Create a short beginner Vietnamese listening story using these phrases from my "'+dn+'" deck.\nUse casual northern Vietnamese (Hanoi style). 10-15 sentences.\nInclude a full word breakdown and usage tip for each sentence.\n\nKey phrases to use:\n'+phrases.join('\n');
+  var text='Create a short beginner Vietnamese listening story using these phrases from my "'+dn+'" deck.\nUse casual northern Vietnamese (Hanoi style). 10-15 sentences.\nInclude full word breakdown and usage tip for each sentence.\n\nKey phrases:\n'+phrases.join('\n');
   var s=document.getElementById('copyAIStatus');
   function done(){if(s){s.textContent='Copied! Paste into VietListen AI tab.';setTimeout(function(){s.textContent='';},3000);}}
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done).catch(function(){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done();});}
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(done).catch(function(){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done();});}
   else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done();}
 }
 
 // GENERATE TIP WITH AI
-async function generateTip(){
+async function genTip(){
   var c=curCard();if(!c)return;
   var btn=document.getElementById('genTipBtn');
-  var status=document.getElementById('genTipStatus');
-  btn.disabled=true;btn.textContent='Generating...';if(status)status.textContent='';
-  var prompt='Vietnamese: '+c.vn+' | English: '+c.en+(c.brk?' | Breakdown: '+c.brk:'');
-  var sys='You are a Vietnamese language teacher for a beginner adult in Da Nang learning northern casual Vietnamese. Write ONE concise study tip (2-3 sentences) for this flashcard. Focus on pronunciation, usage, or cultural context. No preamble.';
+  var st=document.getElementById('genTipStatus');
+  btn.disabled=true;btn.textContent='Generating...';if(st)st.textContent='';
   try{
-    var resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:250,system:sys,messages:[{role:'user',content:prompt}]})});
-    var data=await resp.json();
-    if(data.error)throw new Error(data.error.message);
-    var tip=data.content.map(function(b){return b.text||'';}).join('').trim().replace(/\*\*(.*?)\*\*/g,'$1');
+    var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':'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','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:250,
+        system:'Vietnamese language teacher for beginner adult in Da Nang. Write ONE concise 2-3 sentence study tip for this flashcard. Focus on pronunciation, usage, or cultural context. No preamble.',
+        messages:[{role:'user',content:'Vietnamese: '+c.vn+' | English: '+c.en+(c.brk?' | Breakdown: '+c.brk:'')}]})
+    });
+    var d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    var tip=d.content.map(function(b){return b.text||'';}).join('').trim().replace(/\*\*(.*?)\*\*/g,'$1');
     c.note=tip;saveData();
     document.getElementById('tipsTxt').innerHTML=fmtTip(tip);
     document.getElementById('genTipRow').style.display='none';
     toast('Tip saved!');
-  }catch(e){if(status)status.textContent='Error: '+e.message;}
+  }catch(e){if(st)st.textContent='Error: '+e.message;}
   btn.disabled=false;btn.textContent='Generate Tip with AI';
 }
 
@@ -1118,6 +1074,25 @@ window.onload=function(){
     if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){if(dx<0)doWrong();else doRight();}tapping=false;
   },{passive:false});
   card.addEventListener('click',doFlip);
+  // iOS touch delegation for word tapping
+  card.addEventListener('touchend', function(e){
+    var el=e.target;
+    while(el&&el!==card){
+      if(el.classList&&el.classList.contains('vc-word')){
+        e.preventDefault();
+        e.stopPropagation();
+        _wTap=true;
+        var word=el.dataset?el.dataset.word||el.textContent:el.textContent;
+        // Remove any inline quotes that might have been HTML-encoded
+        word=word.replace(/&quot;/g,'"');
+        vcSpeak(word);
+        el.classList.add('vc-hl');
+        setTimeout(function(){el.classList.remove('vc-hl');},400);
+        return;
+      }
+      el=el.parentNode;
+    }
+  },{passive:false});
   document.addEventListener('keydown',function(e){
     if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
     if(e.code==='Space'||e.code==='ArrowDown'){e.preventDefault();doFlip();}
