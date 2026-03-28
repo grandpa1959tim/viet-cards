@@ -185,11 +185,19 @@ textarea:focus{border-color:var(--acc);}
 <div id="pn-study" class="pn on">
   <div id="study">
     <div id="topRow">
-      <div id="progTxt">0 / 0</div>
-      <div id="progBar"><div id="progFill" style="width:0%"></div></div>
-      <div id="nxtInfo"></div>
-      <div id="dueCount"></div>
-      <div id="deckTag"></div>
+      <div id="studyInfo" style="width:100%;display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div id="deckTag" style="font-size:12px;font-weight:800;color:var(--acc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%;"></div>
+          <div id="progTxt" style="font-size:12px;color:#666;font-weight:700;white-space:nowrap;"></div>
+        </div>
+        <div id="progBar" style="width:100%;height:4px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;">
+          <div id="progFill" style="width:0%;height:100%;background:linear-gradient(90deg,var(--acc),var(--gold));border-radius:99px;transition:width .3s;"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div id="nxtInfo" style="font-size:11px;color:#555;font-weight:700;"></div>
+          <div id="dueCount" style="font-size:11px;font-weight:800;color:var(--no);display:none;"></div>
+        </div>
+      </div>
     </div>
     <div id="chips">
       <div class="ch on" id="chVN" onclick="setFront('vn')">&#127973; Viet</div>
@@ -357,11 +365,11 @@ var GRAM=[
 {word:"được không?",eng:"is it okay? / can we? (permission)",triggers:["được không","duoc khong"],note:"được không at END = asking permission or agreement. Chúng ta gặp ở đây được không? = Can we meet here? Compare: được after a verb = successfully/able to. Tôi được gặp bạn = I get to meet you. Same word, two very different jobs!"},
 {word:"là (to be)",eng:"is/are — only required noun+là+noun",triggers:["là"],note:"Vietnamese drops là constantly! Subject + adjective = NO là needed. Anh ấy cao (He is tall) ✅. Trời đẹp (The weather is nice) ✅. But noun + là + noun REQUIRES là: Anh ấy là bác sĩ (He is a doctor) ✅. Drop là there and it sounds wrong."},
 {word:"của tôi vs tôi",eng:"my (explicit) vs my (casual)",triggers:["của tôi","cua toi"],note:"của tôi = my (explicit). bạn của tôi = my friend. In casual speech của is dropped constantly: bạn tôi = my friend ✅ sounds more natural. Both are correct — bạn tôi is warmer and more conversational."},
-{word:"cùng vs với",eng:"together with vs accompanied by",triggers:["cùng tôi","với tôi","cung toi","voi toi"],note:"With me = cùng tôi (together) or với tôi (accompanied by). Đi cùng tôi = come with me (side by side). Đi với tôi = go with me (accompaniment). Both natural — cùng emphasizes togetherness, với emphasizes company."}
+{word:"cùng vs với",eng:"together with vs accompanied by",triggers:["cùng tôi","với tôi","cung toi","voi toi"],note:"With me = cùng tôi (together) or với tôi (accompanied by). Đi cùng tôi = come with me (side by side). Đi với tôi = go with me (accompaniment). Both natural — cùng emphasizes togetherness, với emphasizes company."},
+{word:"thỉnh thoảng / đôi khi",eng:"sometimes",triggers:["thỉnh thoảng","đôi khi"],note:"Both mean sometimes. thỉnh thoảng = sometimes (most common in northern speech). đôi khi = from time to time. Example: Thỉnh thoảng tôi đi chợ = I sometimes go to the market."}
 ];
 
-var BD=[0,1,2,4,8,16,
-{word:"thỉnh thoảng / đôi khi",eng:"sometimes",triggers:["thỉnh thoảng","đôi khi"],note:"Both mean sometimes. thỉnh thoảng = sometimes (most common in northern speech). đôi khi = from time to time. Example: Thỉnh thoảng tôi đi chợ = I sometimes go to the market."}];
+var BD=[0,1,2,4,8,16];
 var SK='vc4';
 var decks=[],cards=[],actDeck=null,Q=[],qp=0,front='vn',brkOn=false,studyOn=false,loopOn=false,tipsOn=false,dueBox=1;
 
@@ -404,13 +412,13 @@ function updDueBtn(){
 
 function updProg(){
   var t=Q.length,d=Math.min(qp,t);
-  document.getElementById('progTxt').textContent=d+' / '+t;
+  document.getElementById('progTxt').textContent='Card '+d+' of '+t;
   document.getElementById('progFill').style.width=t?(Math.round(d/t*100)+'%'):'0%';
   var dk=actDeck?decks.find(function(x){return x.id===actDeck;}):null;
-  document.getElementById('deckTag').textContent=dk?dk.name:'';
+  document.getElementById('deckTag').textContent=dk?dk.name:'All Decks';
   var due=vis().filter(function(c){return isDue(c);}).length;
   var dueEl=document.getElementById('dueCount');
-  if(due>0){dueEl.textContent=due+' due';dueEl.style.display='';}
+  if(due>0){dueEl.textContent=due+' cards due';dueEl.style.display='';}
   else{dueEl.textContent='';dueEl.style.display='none';}
 }
 
@@ -448,7 +456,7 @@ function renderCard(){
   else{document.getElementById('fbrk').innerHTML='';document.getElementById('bbrk').innerHTML=(brkEnabled&&c.brk)?fmtBrk(c.brk):'';}
   var mk=document.getElementById('chMark');mk.textContent=c.starred?'Marked':'Mark';mk.classList.toggle('on',c.starred);
   var days=Math.max(0,Math.round((c.nr-Date.now())/86400000));
-  document.getElementById('nxtInfo').innerHTML='Box <span>'+c.box+'</span> <span>'+(days===0?'Due today':'In '+days+'d')+'</span>';
+  document.getElementById('nxtInfo').innerHTML='<span style="color:var(--gold)">Box '+c.box+'</span>&nbsp;&nbsp;'+(days===0?'<span style="color:#00c853;">Due today</span>':'<span style="color:#555;">Next in '+days+' day'+(days===1?'':'s')+'</span>');
   if(document.getElementById('sAS').checked)setTimeout(doSpeak,300);
   if(tipsOn)refreshTip();
 }
@@ -1069,21 +1077,13 @@ window.onload=function(){
   card.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY;mv=false;tapping=true;},{passive:true});
   card.addEventListener('touchmove',function(e){if(Math.abs(e.touches[0].clientX-sx)>10||Math.abs(e.touches[0].clientY-sy)>10){mv=true;tapping=false;}},{passive:true});
   card.addEventListener('touchend',function(e){
-    e.preventDefault();var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
-    if(!mv&&tapping){doFlip();return;}
-    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){if(dx<0)doWrong();else doRight();}tapping=false;
-  },{passive:false});
-  card.addEventListener('click',doFlip);
-  // iOS touch delegation for word tapping
-  card.addEventListener('touchend', function(e){
+    // Check if word span was tapped first
     var el=e.target;
     while(el&&el!==card){
       if(el.classList&&el.classList.contains('vc-word')){
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault();e.stopPropagation();
         _wTap=true;
-        var word=el.dataset?el.dataset.word||el.textContent:el.textContent;
-        // Remove any inline quotes that might have been HTML-encoded
+        var word=(el.dataset&&el.dataset.word)?el.dataset.word:el.textContent;
         word=word.replace(/&quot;/g,'"');
         vcSpeak(word);
         el.classList.add('vc-hl');
@@ -1092,7 +1092,17 @@ window.onload=function(){
       }
       el=el.parentNode;
     }
+    // Normal flip/swipe
+    e.preventDefault();
+    var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+    if(!mv&&tapping){doFlip();return;}
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){if(dx<0)doWrong();else doRight();}
+    tapping=false;
   },{passive:false});
+  card.addEventListener('click',function(e){
+    if(e.target&&e.target.classList&&e.target.classList.contains('vc-word'))return;
+    doFlip();
+  });
   document.addEventListener('keydown',function(e){
     if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
     if(e.code==='Space'||e.code==='ArrowDown'){e.preventDefault();doFlip();}
