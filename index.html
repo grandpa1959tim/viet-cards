@@ -57,8 +57,15 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 .clang{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#555;}
 .cmain{font-size:var(--card-size,clamp(19px,5vw,32px));font-weight:800;text-align:center;line-height:1.3;word-spacing:4px;}
 .vc-word{cursor:pointer;border-radius:4px;padding:1px 2px;transition:background .1s;-webkit-tap-highlight-color:transparent;}
+.vc-word.past-marker{color:#64b5f6 !important;background:rgba(30,100,200,.3) !important;border-radius:3px;padding:0 3px;font-weight:900 !important;}
+.vc-word.future-marker{color:#81c784 !important;background:rgba(30,160,60,.3) !important;border-radius:3px;padding:0 3px;font-weight:900 !important;}
+.vc-word.plural-marker{color:#ce93d8 !important;background:rgba(150,50,200,.3) !important;border-radius:3px;padding:0 3px;font-weight:900 !important;}
 .vc-word:active,.vc-word:hover{background:rgba(255,215,0,.15);}
 .vc-word.vc-hl{background:rgba(255,200,0,.55);color:#111;border-radius:4px;}
+.vc-eng{font-size:clamp(11px,3vw,15px);color:#666;text-align:center;line-height:1.6;margin-top:4px;display:none;}
+.vc-eng.on{display:block;}
+.eWord{display:inline;transition:color .15s;}
+.eWord.hl{color:#00d4aa;font-weight:800;}
 .cbrk{font-size:clamp(13px,3.5vw,17px);color:var(--teal);text-align:center;line-height:2.0;}
 .ctap{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;pointer-events:none;}
 .btnRow{display:flex;gap:8px;width:100%;max-width:500px;}
@@ -167,7 +174,7 @@ textarea:focus{border-color:var(--acc);}
   <button id="fontBtn" onclick="cycleFont()" style="background:rgba(57,255,20,.12);border:1.5px solid #39ff14;border-radius:8px;font-size:13px;font-weight:800;color:#39ff14;cursor:pointer;padding:3px 8px;font-family:'Nunito',sans-serif;">A</button>
   <div id="hdrSpd" style="display:flex;align-items:center;gap:4px;flex:1;padding:0 8px;">
     <span style="font-size:10px;color:#666">S</span>
-    <input type="range" id="spd" min="0.4" max="1.2" step="0.1" value="0.9" oninput="document.getElementById('spdLbl').textContent=parseFloat(this.value).toFixed(1)" style="flex:1;accent-color:var(--acc);height:4px;cursor:pointer;">
+    <input type="range" id="spd" min="0.1" max="1.2" step="0.05" value="0.9" oninput="document.getElementById('spdLbl').textContent=parseFloat(this.value).toFixed(1)" style="flex:1;accent-color:var(--acc);height:4px;cursor:pointer;">
     <span style="font-size:10px;color:#666">F</span>
     <span id="spdLbl" style="font-size:11px;color:#666;font-weight:700;min-width:24px">0.9</span>
   </div>
@@ -186,17 +193,18 @@ textarea:focus{border-color:var(--acc);}
   <div id="study">
     <div id="topRow">
       <div id="studyInfo" style="width:100%;display:flex;flex-direction:column;gap:4px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div id="deckTag" style="font-size:12px;font-weight:800;color:var(--acc);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%;"></div>
-          <div id="progTxt" style="font-size:12px;color:#666;font-weight:700;white-space:nowrap;"></div>
-        </div>
+        <!-- Single info line: DeckName  Box N  (X due today) -->
+        <div id="studyLine" style="font-size:13px;font-weight:800;color:var(--teal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+        <!-- Progress bar -->
         <div id="progBar" style="width:100%;height:4px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;">
           <div id="progFill" style="width:0%;height:100%;background:linear-gradient(90deg,var(--acc),var(--gold));border-radius:99px;transition:width .3s;"></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;">
-          <div id="nxtInfo" style="font-size:11px;color:#555;font-weight:700;"></div>
-          <div id="dueCount" style="font-size:11px;font-weight:800;color:var(--no);display:none;"></div>
-        </div>
+        <!-- Card count -->
+        <div id="progTxt" style="font-size:11px;color:#555;font-weight:700;text-align:right;"></div>
+        <!-- Keep these hidden for compatibility -->
+        <div id="nxtInfo" style="display:none;"></div>
+        <div id="dueCount" style="display:none;"></div>
+        <div id="deckTag" style="display:none;"></div>
       </div>
     </div>
     <div id="chips">
@@ -218,6 +226,7 @@ textarea:focus{border-color:var(--acc);}
           <div class="cdot" id="fdot"></div>
           <div class="clang" id="flng">VIETNAMESE</div>
           <div class="cmain" id="ftxt">Add your first card</div>
+          <div class="vc-eng" id="feng"></div>
           <div class="cbrk" id="fbrk"></div>
           <div class="ctap">tap to flip</div>
         </div>
@@ -237,6 +246,7 @@ textarea:focus{border-color:var(--acc);}
     </div>
     <div class="btnRow">
       <button id="backBtn" onclick="doBack()">&#9664; Back</button>
+      <button id="engToggleBtn" onclick="togEngLine()" style="flex:1;height:var(--tap);border-radius:var(--rad);font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;background:rgba(0,212,170,.1);border:1.5px solid rgba(0,212,170,.25);color:#555;">EN</button>
       <button id="speakBtn" onclick="doSpeak()">&#128266; Listen</button>
       <button class="abt" id="rightBtn" onclick="doRight()">&#10003; Got It</button>
     </div>
@@ -405,9 +415,10 @@ function updDueBtn(){
   var btn=document.getElementById('chBox1');
   if(!studyOn){btn.innerHTML='&#128230; Due';return;}
   var pool=vis();
-  var boxes=[];for(var b=1;b<=5;b++){if(pool.filter(function(c){return c.box===b&&isDue(c);}).length>0)boxes.push(b);}
-  if(boxes.length===0){btn.innerHTML='&#128230; Due &#10003;';}
-  else{btn.innerHTML='&#128230; Due #'+dueBox;}
+  var due=pool.filter(function(c){return c.box===dueBox&&isDue(c);}).length;
+  var totalDue=pool.filter(function(c){return isDue(c);}).length;
+  if(totalDue===0){btn.innerHTML='&#128230; &#10003;';}
+  else{btn.innerHTML='&#128230; '+due;}
 }
 
 function updProg(){
@@ -415,11 +426,20 @@ function updProg(){
   document.getElementById('progTxt').textContent='Card '+d+' of '+t;
   document.getElementById('progFill').style.width=t?(Math.round(d/t*100)+'%'):'0%';
   var dk=actDeck?decks.find(function(x){return x.id===actDeck;}):null;
-  document.getElementById('deckTag').textContent=dk?dk.name:'All Decks';
-  var due=vis().filter(function(c){return isDue(c);}).length;
-  var dueEl=document.getElementById('dueCount');
-  if(due>0){dueEl.textContent=due+' cards due';dueEl.style.display='';}
-  else{dueEl.textContent='';dueEl.style.display='none';}
+  var deckName=dk?dk.name:'All Decks';
+  var c=curCard();
+  var boxNum=c?c.box:(studyOn?dueBox:1);
+  // Due count for CURRENT box only
+  var boxDue=vis().filter(function(x){return x.box===boxNum&&isDue(x);}).length;
+  var line=document.getElementById('studyLine');
+  if(line){
+    var dueStr=boxDue>0
+      ?'  (<span style="color:#c62828;font-weight:900;">'+boxDue+'</span> due today)'
+      :'';
+    line.innerHTML='<span style="color:var(--teal);">'+deckName+'</span>'
+      +'  <span style="color:var(--teal);">Box '+boxNum+'</span>'
+      +dueStr;
+  }
 }
 
 function renderCard(){
@@ -438,8 +458,12 @@ function renderCard(){
   document.getElementById('blng').textContent=isVN?'ENGLISH':'VIETNAMESE';
   if(isVN){
     document.getElementById('ftxt').innerHTML=makeWordSpans(c.vn,c.brk);
+    // Build English line with eWord spans
+    document.getElementById('feng').innerHTML=makeEngWordSpans(c.en);
+    document.getElementById('feng').classList.toggle('on',vcEngOn);
   }else{
     document.getElementById('ftxt').textContent=c.en;
+    document.getElementById('feng').innerHTML='';
   }
   document.getElementById('btxt').textContent=isVN?c.en:c.vn;
   document.getElementById('card').classList.remove('flip');
@@ -456,7 +480,8 @@ function renderCard(){
   else{document.getElementById('fbrk').innerHTML='';document.getElementById('bbrk').innerHTML=(brkEnabled&&c.brk)?fmtBrk(c.brk):'';}
   var mk=document.getElementById('chMark');mk.textContent=c.starred?'Marked':'Mark';mk.classList.toggle('on',c.starred);
   var days=Math.max(0,Math.round((c.nr-Date.now())/86400000));
-  document.getElementById('nxtInfo').innerHTML='<span style="color:var(--gold)">Box '+c.box+'</span>&nbsp;&nbsp;'+(days===0?'<span style="color:#00c853;">Due today</span>':'<span style="color:#555;">Next in '+days+' day'+(days===1?'':'s')+'</span>');
+  // nxtInfo now shown in studyLine
+  updProg(); // refresh to show current box
   if(document.getElementById('sAS').checked)setTimeout(doSpeak,300);
   if(tipsOn)refreshTip();
 }
@@ -486,16 +511,30 @@ function getBrkPhrases(brk){
 }
 
 // Wrap Vietnamese sentence words in tappable spans, grouping by breakdown phrases
+function getMarkerClass(text){
+  // Check if text starts with a tense/plural marker word
+  var PAST_M=['đã','vừa'],FUT_M=['sẽ','sắp'],PLU_M=['những','các','mọi'];
+  var first=text.toLowerCase().split(/\s/)[0].replace(/[,\.!?]/g,'');
+  if(PAST_M.indexOf(first)>=0)return' past-marker';
+  if(FUT_M.indexOf(first)>=0)return' future-marker';
+  if(PLU_M.indexOf(first)>=0)return' plural-marker';
+  // Also check if the whole phrase IS a marker
+  var whole=text.toLowerCase().trim();
+  if(PAST_M.indexOf(whole)>=0)return' past-marker';
+  if(FUT_M.indexOf(whole)>=0)return' future-marker';
+  if(PLU_M.indexOf(whole)>=0)return' plural-marker';
+  return'';
+}
+
 function makeWordSpans(text, brk){
   var phrases=getBrkPhrases(brk||'');
-  phrases.sort(function(a,b){return b.length-a.length;}); // longest first
+  phrases.sort(function(a,b){return b.length-a.length;});
   var result='';
   var pos=0;
   while(pos<text.length){
     var ch=text[pos];
     if(/\s/.test(ch)){result+=ch;pos++;continue;}
     if(/[,\.!?:;"'\u2013\-\/]/.test(ch)){result+=ch;pos++;continue;}
-    // Try matching a breakdown phrase
     var lc=text.slice(pos).toLowerCase();
     var matched=false;
     for(var pi=0;pi<phrases.length;pi++){
@@ -504,7 +543,8 @@ function makeWordSpans(text, brk){
         var after=text[pos+ph.length]||'';
         if(!after||/[\s,\.!?]/.test(after)){
           var orig=text.slice(pos,pos+ph.length);
-          result+='<span class="vc-word" data-word="'+orig.replace(/"/g,'&quot;')+'" onclick="_wTap=true;vcSpeak(this.dataset.word)" >'+orig+'</span>';
+          var mCls=getMarkerClass(orig);
+          result+='<span class="vc-word'+mCls+'" data-word="'+orig.replace(/"/g,'&quot;')+'" onclick="_wTap=true;vcSpeak(this.dataset.word)">'+orig+'</span>';
           pos+=ph.length;matched=true;break;
         }
       }
@@ -513,7 +553,8 @@ function makeWordSpans(text, brk){
       var end=pos;
       while(end<text.length&&!/[\s,\.!?:;"'\u2013\-\/]/.test(text[end]))end++;
       var word=text.slice(pos,end);
-      result+='<span class="vc-word" data-word="'+word.replace(/"/g,'&quot;')+'" onclick="_wTap=true;vcSpeak(this.dataset.word)" >'+word+'</span>';
+      var mCls=getMarkerClass(word);
+      result+='<span class="vc-word'+mCls+'" data-word="'+word.replace(/"/g,'&quot;')+'" onclick="_wTap=true;vcSpeak(this.dataset.word)">'+word+'</span>';
       pos=end;
     }
   }
@@ -523,6 +564,33 @@ function makeWordSpans(text, brk){
 // Speak Vietnamese word/phrase
 function vcSpeak(word){
   if(!word)return;
+  // Highlight corresponding English word if EN is on
+  if(vcEngOn){
+    document.querySelectorAll('#feng .eWord.hl').forEach(function(el){el.classList.remove('hl');});
+    // Find which viet span was tapped, use engWordMap
+    var spans=Array.from(document.querySelectorAll('#ftxt .vc-word'));
+    var tapIdx=-1;
+    var wl=word.toLowerCase().trim();
+    for(var i=0;i<spans.length;i++){
+      var sw=(spans[i].dataset.word||spans[i].textContent).toLowerCase().trim();
+      if(sw===wl){tapIdx=i;break;}
+    }
+    if(tapIdx>=0){
+      var c=curCard();
+      if(c&&c.brk){
+        var ewm=buildEngWordMap(c.brk,c.vn,c.en);
+        var ewEls=Array.from(document.querySelectorAll('#feng .eWord'));
+        var mapped=ewm[tapIdx];
+        if(mapped&&mapped.length){
+          mapped.forEach(function(ei){if(ewEls[ei])ewEls[ei].classList.add('hl');});
+          // Clear after 1.5s
+          setTimeout(function(){
+            document.querySelectorAll('#feng .eWord.hl').forEach(function(el){el.classList.remove('hl');});
+          },1500);
+        }
+      }
+    }
+  }
   speechSynthesis.cancel();
   setTimeout(function(){
     var u=new SpeechSynthesisUtterance(word);
@@ -659,27 +727,57 @@ function doSpeak(){
   var u=new SpeechSynthesisUtterance(text);
   u.lang=vn?'vi-VN':'en-US';
   u.rate=parseFloat(document.getElementById('spd').value);
-  // Build span position map for highlighting
+
+  // Vietnamese word spans + sequential position map
   var spans=Array.from(document.querySelectorAll('#ftxt .vc-word'));
   var spanMap=[];
+  var engWordMap={};
   if(spans.length&&vn){
     var cp=0;
     spans.forEach(function(s){
-      var w=s.textContent||'';
+      var w=s.dataset.word||s.textContent||'';
       var idx=text.indexOf(w,cp);
       if(idx>=0){spanMap.push({s:s,from:idx,to:idx+w.length});cp=idx+w.length;}
     });
+    // Build English word map from breakdown
+    if(vcEngOn && c.brk){
+      engWordMap=buildEngWordMap(c.brk,c.vn,c.en);
+    }
   }
+
   u.onboundary=function(e){
     if(e.name!=='word')return;
+    // Clear Vietnamese highlights
     spans.forEach(function(s){s.classList.remove('vc-hl');});
+    // Clear English highlights
+    document.querySelectorAll('#feng .eWord.hl').forEach(function(el){el.classList.remove('hl');});
+
+    // Find matching viet span
+    var best=-1;
     for(var i=0;i<spanMap.length;i++){
-      if(e.charIndex>=spanMap[i].from&&e.charIndex<spanMap[i].to){
-        spanMap[i].s.classList.add('vc-hl');break;
+      if(e.charIndex>=spanMap[i].from&&e.charIndex<spanMap[i].to){best=i;break;}
+    }
+    if(best>=0){
+      spanMap[best].s.classList.add('vc-hl');
+      // Highlight English if toggle on
+      if(vcEngOn){
+        var ewEls=Array.from(document.querySelectorAll('#feng .eWord'));
+        var mapped=engWordMap[best];
+        if(mapped&&mapped.length){
+          mapped.forEach(function(ei){if(ewEls[ei])ewEls[ei].classList.add('hl');});
+        } else if(ewEls.length){
+          // Fallback: proportional
+          var ratio=spanMap.length>1?best/(spanMap.length-1):0;
+          var ei=Math.min(Math.round(ratio*(ewEls.length-1)),ewEls.length-1);
+          if(ewEls[ei])ewEls[ei].classList.add('hl');
+        }
       }
     }
   };
-  u.onend=function(){spans.forEach(function(s){s.classList.remove('vc-hl');});};
+  u.onend=function(){
+    spans.forEach(function(s){s.classList.remove('vc-hl');});
+    document.querySelectorAll('#feng .eWord.hl').forEach(function(el){el.classList.remove('hl');});
+  };
   speechSynthesis.cancel();
   setTimeout(function(){speechSynthesis.speak(u);},50);
 }
@@ -723,6 +821,16 @@ function setDeck(id){
   goTab('study');
 }
 
+function resetDeck(id){
+  if(!confirm('Reset all cards in this deck back to Box 1?'))return;
+  var count=0;
+  cards.forEach(function(c){
+    if(c.deckId===id){c.box=1;c.nr=Date.now();count++;}
+  });
+  saveData();rebuildQ();renderCard();renderBoxes();
+  toast('Reset '+count+' cards to Box 1');
+}
+
 function delDeck(id){
   if(!confirm('Delete deck and all its cards?'))return;
   decks=decks.filter(function(d){return d.id!==id;});cards=cards.filter(function(c){return c.deckId!==id;});
@@ -744,7 +852,10 @@ function renderDecks(){
     info.innerHTML='<h3>'+dk.name+'</h3><p>'+dc.length+' cards'+(due?' - <span style="color:var(--no)">'+due+' due</span>':'')+'</p>';
     var del=document.createElement('button');del.className='dkdel';del.textContent='Delete';
     del.onclick=function(e){e.stopPropagation();delDeck(dkId);};
-    row.appendChild(info);row.appendChild(del);
+    var rst=document.createElement('button');rst.className='dkdel';rst.textContent='Reset';
+    rst.style.color='#ff8c00';rst.style.borderColor='rgba(255,140,0,.3)';
+    rst.onclick=(function(id){return function(e){e.stopPropagation();resetDeck(id);};})(dkId);
+    row.appendChild(info);row.appendChild(rst);row.appendChild(del);
     row.onclick=function(){setDeck(dkId);};
     el.appendChild(row);
   });
@@ -1032,6 +1143,100 @@ async function genTip(){
     toast('Tip saved!');
   }catch(e){if(st)st.textContent='Error: '+e.message;}
   btn.disabled=false;btn.textContent='Generate Tip with AI';
+}
+
+
+// ── ENGLISH TRANSLATION LINE ─────────────────────────────────────────────────
+var vcEngOn = false;
+
+function togEngLine(){
+  vcEngOn = !vcEngOn;
+  var btn = document.getElementById('engToggleBtn');
+  var eng = document.getElementById('feng');
+  if(vcEngOn){
+    btn.style.color = 'var(--teal)';
+    btn.style.borderColor = 'var(--teal)';
+    btn.style.background = 'rgba(0,212,170,.2)';
+    if(eng) eng.classList.add('on');
+  } else {
+    btn.style.color = '#555';
+    btn.style.borderColor = 'rgba(0,212,170,.25)';
+    btn.style.background = 'rgba(0,212,170,.1)';
+    if(eng) eng.classList.remove('on');
+  }
+}
+
+function makeEngWordSpans(text){
+  if(!text) return '';
+  return text.split(/(\s+|[,\.!?;:'"()\-])/).map(function(tok){
+    if(!tok) return '';
+    if(/^\s+$/.test(tok)) return tok;
+    if(/^[,\.!?;:'"()\-]+$/.test(tok)) return tok;
+    return '<span class="eWord">'+tok+'</span>';
+  }).join('');
+}
+
+// Build engWordMap from brk: maps viet span index → english eWord indices
+function buildEngWordMap(brk, vietText, engText){
+  var map = {};
+  if(!brk || !vietText || !engText) return map;
+  var brkPairs = brk.split(';').map(function(p){ // VietCards uses ; separator
+    p = p.trim();
+    var di = p.indexOf('\u2013'); if(di===-1) di = p.indexOf('-');
+    return di>0 ? {viet: p.slice(0,di).trim(), eng: p.slice(di+1).trim()} : null;
+  }).filter(Boolean);
+  // Also try | separator (some cards use it)
+  if(brkPairs.length <= 1){
+    brkPairs = brk.split('|').map(function(p){
+      p = p.trim();
+      var di = p.indexOf('\u2013'); if(di===-1) di = p.indexOf('-');
+      return di>0 ? {viet: p.slice(0,di).trim(), eng: p.slice(di+1).trim()} : null;
+    }).filter(Boolean);
+  }
+
+  var ewEls = Array.from(document.querySelectorAll('#feng .eWord'));
+  if(!ewEls.length) return map;
+
+  // Get viet word spans
+  var vietSpans = Array.from(document.querySelectorAll('#ftxt .vc-word'));
+
+  brkPairs.forEach(function(pair){
+    // Find viet span index
+    var vIdx = -1;
+    var vietLower = pair.viet.toLowerCase();
+    var searchFrom = 0;
+    for(var i=0;i<vietSpans.length;i++){
+      var sw = (vietSpans[i].dataset.word||vietSpans[i].textContent).toLowerCase().trim();
+      if(sw === vietLower && i >= searchFrom){vIdx = i; searchFrom = i+1; break;}
+    }
+    if(vIdx < 0) return;
+
+    // Find English word(s) in eWord spans
+    var engTokens = pair.eng.toLowerCase().split(/\s+/).map(function(t){
+      return t.replace(/[^a-z\u00c0-\u024f]/gi,'');
+    }).filter(Boolean);
+
+    var matchedIdx = [];
+    // Find first matching token position sequentially
+    var startPos = -1;
+    for(var ei=0; ei<ewEls.length; ei++){
+      var ewText = ewEls[ei].textContent.toLowerCase().replace(/[^a-z\u00c0-\u024f]/gi,'');
+      if(ewText === engTokens[0]){startPos = ei; break;}
+    }
+    if(startPos >= 0){
+      for(var ti=0; ti<engTokens.length; ti++){
+        if(ewEls[startPos+ti]) matchedIdx.push(startPos+ti);
+      }
+    } else {
+      // Fallback: any matching word
+      ewEls.forEach(function(ew,ei){
+        var ewText = ew.textContent.toLowerCase().replace(/[^a-z\u00c0-\u024f]/gi,'');
+        if(engTokens.some(function(tok){return tok===ewText;})) matchedIdx.push(ei);
+      });
+    }
+    if(matchedIdx.length) map[vIdx] = matchedIdx;
+  });
+  return map;
 }
 
 window.onload=function(){
