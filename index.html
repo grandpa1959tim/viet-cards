@@ -49,6 +49,7 @@ html,body{height:100%;background:#0d0d0d;color:#f5f5f0;font-family:'Nunito',sans
 #card{width:100%;aspect-ratio:16/9;border-radius:var(--rad);position:relative;cursor:pointer;-webkit-tap-highlight-color:rgba(255,255,255,.1);}
 .cf{position:absolute;inset:0;border-radius:var(--rad);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;gap:7px;transition:opacity .2s;}
 #cf{background:linear-gradient(145deg,#1a2a1a,#0d1a0d);border:1px solid rgba(0,212,170,.15);box-shadow:0 16px 50px rgba(0,0,0,.6);opacity:1;z-index:2;}
+.review-active #cf{border-color:rgba(138,43,226,.4) !important;}
 #cb{background:linear-gradient(145deg,#1a1a2e,#0d0d1a);border:1px solid rgba(255,107,53,.15);box-shadow:0 16px 50px rgba(0,0,0,.6);opacity:0;z-index:1;}
 #card.flip #cf{opacity:0;z-index:1;}
 #card.flip #cb{opacity:1;z-index:2;}
@@ -215,10 +216,12 @@ textarea:focus{border-color:var(--acc);}
     <div id="chips2">
       <div class="ch2" id="chDel" onclick="doDelete()">&#128465;</div>
       <div class="ch2" id="chBox1" onclick="togStudy()">&#128230; Due</div>
+      <div class="ch2" id="chReview" onclick="togReview()" style="background:rgba(138,43,226,.15);border-color:rgba(138,43,226,.4);color:#b47eed;">&#128214; Review</div>
       <div class="ch2" id="chLoop" onclick="togLoop()">&#11088; Loop</div>
       <div class="ch2" id="chMark" onclick="togStar()">&#9745; Mark</div>
     </div>
     <div id="banner">&#128230; Due cards only</div>
+    <div id="reviewBanner" style="display:none;background:rgba(138,43,226,.15);border:1px solid rgba(138,43,226,.4);border-radius:10px;padding:6px 14px;font-size:12px;font-weight:800;color:#b47eed;text-align:center;width:100%;max-width:500px;">&#128214; Review mode — no progress saved</div>
     <div id="cardWrap">
       <div id="card">
         <div class="cf" id="cf">
@@ -693,17 +696,28 @@ function doBack(){
 
 function doRight(){
   var c=curCard();if(!c)return;
+  if(reviewOn){
+    // Review mode: just advance, no box changes
+    var nq=(qp+1)%Math.max(1,Q.length);
+    if(nq===0){setTimeout(function(){toastBig('Review complete!');},400);}
+    qp=nq;renderCard();return;
+  }
   var nb=Math.min(5,c.box+1);sched(c,nb);saveData();
   var nq=(qp+1)%Math.max(1,Q.length);
-  if(nq===0&&Q.length>1){setTimeout(function(){toastBig(loopOn?'Loop complete!':'Session complete!');},400);}
-  qp=nq;renderCard();toast('Box '+nb+' - Next in '+BD[nb]+'d');autoExport();
+  if(nq===0&&Q.length>1){setTimeout(function(){toastBig('Session complete!');},400);}
+  qp=nq;renderCard();updDueBtn();toast('Box '+nb+' - Next in '+BD[nb]+'d');autoExport();
 }
 
 function doWrong(){
   var c=curCard();if(!c)return;
+  if(reviewOn){
+    // Review mode: move to end of queue but don't change box
+    var idx=Q.splice(qp,1)[0];Q.push(idx);if(qp>=Q.length)qp=0;
+    renderCard();toast('Moved to end');return;
+  }
   if(!loopOn)sched(c,1);saveData();
   var idx=Q.splice(qp,1)[0];Q.push(idx);if(qp>=Q.length)qp=0;
-  renderCard();toast(loopOn?'Moved to end':'Back to Box 1');autoExport();
+  renderCard();updDueBtn();toast(loopOn?'Moved to end':'Back to Box 1');autoExport();
 }
 
 function doDelete(){
@@ -786,6 +800,45 @@ function setFront(f){front=f;document.getElementById('chVN').classList.toggle('o
 function togBreak(){brkOn=!brkOn;document.getElementById('chBrk').classList.toggle('on',brkOn);document.getElementById('sBF').checked=brkOn;renderCard();}
 function togStudy(){studyOn=!studyOn;document.getElementById('chBox1').classList.toggle('on',studyOn);document.getElementById('banner').classList.toggle('on',studyOn);if(studyOn){dueBox=1;updDueBtn();}rebuildQ();renderCard();}
 function togStar(){var c=curCard();if(!c)return;c.starred=!c.starred;saveData();var mk=document.getElementById('chMark');mk.textContent=c.starred?'Marked':'Mark';mk.classList.toggle('on',c.starred);toast(c.starred?'Marked':'Unmarked');}
+var reviewOn = false;
+
+function togReview(){
+  // Turn off other modes
+  if(studyOn){ studyOn=false; document.getElementById('chBox1').classList.remove('on'); document.getElementById('banner').classList.remove('on'); }
+  if(loopOn){ loopOn=false; document.getElementById('chLoop').classList.remove('on'); }
+
+  reviewOn = !reviewOn;
+  var btn = document.getElementById('chReview');
+  var banner = document.getElementById('reviewBanner');
+  var card = document.getElementById('card');
+  var study = document.getElementById('study');
+
+  if(reviewOn){
+    btn.classList.add('on');
+    btn.style.background = 'rgba(138,43,226,.35)';
+    btn.style.borderColor = '#b47eed';
+    btn.style.color = '#b47eed';
+    if(banner) banner.style.display = 'block';
+    if(study) study.classList.add('review-active');
+    // Build queue: all cards in deck, sorted by order
+    var pool = vis().slice().sort(function(a,b){return a.ord-b.ord;});
+    Q = pool.map(function(c){return cards.indexOf(c);});
+    qp = 0;
+    renderCard();
+    toast('Review: '+Q.length+' cards');
+  } else {
+    btn.classList.remove('on');
+    btn.style.background = 'rgba(138,43,226,.15)';
+    btn.style.borderColor = 'rgba(138,43,226,.4)';
+    btn.style.color = '#b47eed';
+    if(banner) banner.style.display = 'none';
+    if(study) study.classList.remove('review-active');
+    rebuildQ(); renderCard();
+    toast('Review off');
+  }
+  updDueBtn();
+}
+
 function togLoop(){
   var starred=cards.filter(function(c){return c.starred;});
   if(!loopOn&&starred.length===0){toast('No starred cards');return;}
@@ -1180,58 +1233,77 @@ function makeEngWordSpans(text){
 function buildEngWordMap(brk, vietText, engText){
   var map = {};
   if(!brk || !vietText || !engText) return map;
-  var brkPairs = brk.split(';').map(function(p){ // VietCards uses ; separator
+
+  // Parse brk — handle both semicolon (;) and pipe (|) separators
+  // and both en-dash (–) and hyphen (-) dividers
+  function parsePair(p){
     p = p.trim();
-    var di = p.indexOf('\u2013'); if(di===-1) di = p.indexOf('-');
-    return di>0 ? {viet: p.slice(0,di).trim(), eng: p.slice(di+1).trim()} : null;
-  }).filter(Boolean);
-  // Also try | separator (some cards use it)
-  if(brkPairs.length <= 1){
-    brkPairs = brk.split('|').map(function(p){
-      p = p.trim();
-      var di = p.indexOf('\u2013'); if(di===-1) di = p.indexOf('-');
-      return di>0 ? {viet: p.slice(0,di).trim(), eng: p.slice(di+1).trim()} : null;
-    }).filter(Boolean);
+    // Try en-dash first, then regular hyphen
+    var di = p.indexOf('–');
+    if(di === -1) di = p.indexOf('—'); // em-dash
+    if(di === -1){
+      // Find hyphen that is surrounded by word chars (not a hyphenated word)
+      var m = p.match(/^([^\-]+?)\s*-\s*(.+)$/);
+      if(m) return {viet: m[1].trim(), eng: m[2].trim()};
+      return null;
+    }
+    return di > 0 ? {viet: p.slice(0,di).trim(), eng: p.slice(di+1).trim()} : null;
   }
+
+  var brkPairs = [];
+  // Try semicolon separator first (most VietCards use this)
+  var parts = brk.split(';');
+  if(parts.length > 1){
+    brkPairs = parts.map(parsePair).filter(Boolean);
+  }
+  // Try pipe separator
+  if(brkPairs.length <= 1){
+    parts = brk.split('|');
+    if(parts.length > 1){
+      brkPairs = parts.map(parsePair).filter(Boolean);
+    }
+  }
+
+  if(!brkPairs.length) return map;
 
   var ewEls = Array.from(document.querySelectorAll('#feng .eWord'));
   if(!ewEls.length) return map;
 
-  // Get viet word spans
   var vietSpans = Array.from(document.querySelectorAll('#ftxt .vc-word'));
 
+  // Sequential search to handle duplicate viet words
+  var searchFrom = 0;
   brkPairs.forEach(function(pair){
-    // Find viet span index
-    var vIdx = -1;
     var vietLower = pair.viet.toLowerCase();
-    var searchFrom = 0;
-    for(var i=0;i<vietSpans.length;i++){
-      var sw = (vietSpans[i].dataset.word||vietSpans[i].textContent).toLowerCase().trim();
-      if(sw === vietLower && i >= searchFrom){vIdx = i; searchFrom = i+1; break;}
+    var vIdx = -1;
+    for(var i = searchFrom; i < vietSpans.length; i++){
+      var sw = (vietSpans[i].dataset.word || vietSpans[i].textContent).toLowerCase().trim();
+      if(sw === vietLower){ vIdx = i; searchFrom = i + 1; break; }
     }
     if(vIdx < 0) return;
 
-    // Find English word(s) in eWord spans
     var engTokens = pair.eng.toLowerCase().split(/\s+/).map(function(t){
-      return t.replace(/[^a-z\u00c0-\u024f]/gi,'');
+      return t.replace(/[^a-zÀ-ɏ0-9]/gi,'');
     }).filter(Boolean);
+    if(!engTokens.length) return;
+
+    // Find sequential run of matching English words
+    var startPos = -1;
+    for(var ei = 0; ei < ewEls.length; ei++){
+      var ewText = ewEls[ei].textContent.toLowerCase().replace(/[^a-zÀ-ɏ0-9]/gi,'');
+      if(ewText === engTokens[0]){ startPos = ei; break; }
+    }
 
     var matchedIdx = [];
-    // Find first matching token position sequentially
-    var startPos = -1;
-    for(var ei=0; ei<ewEls.length; ei++){
-      var ewText = ewEls[ei].textContent.toLowerCase().replace(/[^a-z\u00c0-\u024f]/gi,'');
-      if(ewText === engTokens[0]){startPos = ei; break;}
-    }
     if(startPos >= 0){
-      for(var ti=0; ti<engTokens.length; ti++){
-        if(ewEls[startPos+ti]) matchedIdx.push(startPos+ti);
+      for(var ti = 0; ti < engTokens.length; ti++){
+        if(startPos + ti < ewEls.length) matchedIdx.push(startPos + ti);
       }
     } else {
-      // Fallback: any matching word
-      ewEls.forEach(function(ew,ei){
-        var ewText = ew.textContent.toLowerCase().replace(/[^a-z\u00c0-\u024f]/gi,'');
-        if(engTokens.some(function(tok){return tok===ewText;})) matchedIdx.push(ei);
+      // Fallback: any token match
+      ewEls.forEach(function(ew, ei){
+        var ewT = ew.textContent.toLowerCase().replace(/[^a-zÀ-ɏ0-9]/gi,'');
+        if(engTokens.indexOf(ewT) >= 0) matchedIdx.push(ei);
       });
     }
     if(matchedIdx.length) map[vIdx] = matchedIdx;
