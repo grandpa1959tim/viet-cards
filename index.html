@@ -1318,15 +1318,22 @@ window.onload=function(){
     // User has saved data — load it, preserving all their additions
     loadData();
     try{var sd3=JSON.parse(localStorage.getItem(SK)||'{}');if(sd3.actDeck)actDeck=sd3.actDeck;if(sd3.qp)qp=sd3.qp;}catch(e){}
-    // Always merge any NEW embedded decks/cards that don't exist in saved data yet
+    // Merge any new embedded decks/cards by BOTH id and deck name
     if(window.__ED__&&window.__ED__.cards&&window.__ED__.cards.length){
       var existingIds=cards.map(function(c){return c.id;});
-      var newCards=window.__ED__.cards.filter(function(c){return existingIds.indexOf(c.id)<0;});
-      var existingDeckIds=decks.map(function(d){return d.id;});
-      var newDecks=(window.__ED__.decks||[]).filter(function(d){return existingDeckIds.indexOf(d.id)<0;});
-      if(newCards.length){cards=cards.concat(newCards.map(norm));}
-      if(newDecks.length){decks=decks.concat(newDecks);}
-      if(newCards.length||newDecks.length){saveData();}
+      var existingDeckNames=decks.map(function(d){return d.name;});
+      var newDecks=(window.__ED__.decks||[]).filter(function(d){
+        return existingDeckNames.indexOf(d.name)<0;
+      });
+      if(newDecks.length){
+        decks=decks.concat(newDecks);
+        var newDeckIds=newDecks.map(function(d){return d.id;});
+        var newCards=window.__ED__.cards.filter(function(c){
+          return newDeckIds.indexOf(c.deckId)>=0 && existingIds.indexOf(c.id)<0;
+        });
+        if(newCards.length){cards=cards.concat(newCards.map(norm));}
+        saveData();
+      }
     }
   }else{
     // No saved data — load from embedded data for first run
