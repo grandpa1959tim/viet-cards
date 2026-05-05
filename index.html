@@ -1048,9 +1048,17 @@ function saveMarkedWords(){
   try{localStorage.setItem(MWK, JSON.stringify(markedWords));}catch(e){}
 }
 function isWordMarked(word){
+  // Marked status is per-card, but we check by word+deck so a word marked in 
+  // one deck doesn't show ALL stars filled across decks.
   if(!word)return false;
   var key=word.toLowerCase().trim();
-  return markedWords.some(function(m){return m.vn.toLowerCase().trim()===key;});
+  var c=curCard();
+  var curDeckId=c?c.deckId:null;
+  return markedWords.some(function(m){
+    if(m.vn.toLowerCase().trim()!==key)return false;
+    // Same word, but only count as "marked" if it's saved from THIS deck
+    return m.deckId===curDeckId;
+  });
 }
 function togMarkWord(ev,word,gloss){
   if(ev){ev.stopPropagation();ev.preventDefault();}
@@ -1058,20 +1066,24 @@ function togMarkWord(ev,word,gloss){
   if(!word)return;
   word=word.replace(/&quot;/g,'"');
   var key=word.toLowerCase().trim();
-  var idx=markedWords.findIndex(function(m){return m.vn.toLowerCase().trim()===key;});
+  // Capture current deck context
+  var c=curCard();
+  var curDeckId=c?c.deckId:null;
+  var curDeckName='Other';
+  if(curDeckId){
+    var curDk=decks.find(function(d){return d.id===curDeckId;});
+    if(curDk)curDeckName=curDk.name;
+  }
+  // CRITICAL FIX: dedup by word+deck (not just word) so same word can be saved
+  // from multiple decks independently.
+  var idx=markedWords.findIndex(function(m){
+    return m.vn.toLowerCase().trim()===key && m.deckId===curDeckId;
+  });
   if(idx>=0){
     markedWords.splice(idx,1);
     toast('Removed: '+word);
   } else {
-    // Capture deck context at save time
-    var c=curCard();
-    var deckId=c?c.deckId:null;
-    var deckName='Other';
-    if(deckId){
-      var dk=decks.find(function(d){return d.id===deckId;});
-      if(dk)deckName=dk.name;
-    }
-    markedWords.push({vn:word, gloss:gloss||'', ts:Date.now(), deckId:deckId, deckName:deckName});
+    markedWords.push({vn:word, gloss:gloss||'', ts:Date.now(), deckId:curDeckId, deckName:curDeckName});
     toast('Marked: '+word);
   }
   saveMarkedWords();
@@ -1181,10 +1193,11 @@ function renderMarkedPanel(){
       items.forEach(function(m){
         var safeVn=mwEsc(m.vn);
         var safeGloss=mwEsc(m.gloss||'(no translation)');
-        html+='<div class="mw-item" data-vn="'+safeVn+'">'+
+        var safeDeckId=mwEsc(m.deckId||'');
+        html+='<div class="mw-item" data-vn="'+safeVn+'" data-deck-id="'+safeDeckId+'">'+
           '<div class="mw-row">'+
             '<button class="mw-tap" onclick="mwTap(this)">'+safeVn+'</button>'+
-            '<button class="mw-del" onclick="mwDelete(\''+safeVn.replace(/'/g,"\\'")+'\')" title="Delete">✓</button>'+
+            '<button class="mw-del" onclick="mwDelete(\''+safeVn.replace(/'/g,"\\'")+'\',\''+safeDeckId.replace(/'/g,"\\'")+'\')" title="Delete">✓</button>'+
           '</div>'+
           '<div class="mw-gloss">'+safeGloss+'</div>'+
         '</div>';
@@ -1222,19 +1235,30 @@ function mwTap(btn){
   document.querySelectorAll('.mw-item.expanded').forEach(function(el){if(el!==item)el.classList.remove('expanded');});
   item.classList.toggle('expanded');
 }
-function mwDelete(vn){
+function mwDelete(vn, deckId){
   // Decode HTML entities back to original chars
   vn=vn.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'");
   var key=vn.toLowerCase().trim();
-  var idx=markedWords.findIndex(function(m){return m.vn.toLowerCase().trim()===key;});
+  // If deckId provided, match only entry from that deck. Otherwise match any (for legacy callers).
+  var idx;
+  if(deckId!==undefined && deckId!==null && deckId!==''){
+    idx=markedWords.findIndex(function(m){return m.vn.toLowerCase().trim()===key && m.deckId===deckId;});
+  }else{
+    idx=markedWords.findIndex(function(m){return m.vn.toLowerCase().trim()===key;});
+  }
   if(idx<0)return;
   markedWords.splice(idx,1);
   saveMarkedWords();
   renderMarkedPanel();
   updMarkedCounter();
+  // Refresh stars on the current card (which may be in a different deck)
   document.querySelectorAll('.vc-star').forEach(function(s){
     var sw=(s.dataset.word||'').toLowerCase().trim();
-    if(sw===key){s.textContent='☆';s.classList.remove('marked');}
+    if(sw===key){
+      var nowMarked=isWordMarked(s.dataset.word);
+      s.textContent=nowMarked?'★':'☆';
+      s.classList.toggle('marked',nowMarked);
+    }
   });
 }
 function clearAllMarked(){
@@ -1627,18 +1651,32 @@ function gsParseCsv(text){
 
 function gsFetchTab(sheetId, tabName){
   var url='https://docs.google.com/spreadsheets/d/'+encodeURIComponent(sheetId)+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(tabName);
-  return fetch(url,{credentials:'omit'}).then(function(res){
+  // Bypass service worker for cross-origin Google fetch (cache:'no-store' tells SW to skip)
+  // Also include cache-bust query param to be safe
+  var bustUrl=url+'&_t='+Date.now();
+  return fetch(bustUrl,{
+    credentials:'omit',
+    cache:'no-store',
+    mode:'cors',
+    redirect:'follow'
+  }).then(function(res){
     if(!res.ok){
-      if(res.status===404)throw new Error('Tab "'+tabName+'" not found');
-      throw new Error('HTTP '+res.status);
+      if(res.status===404)throw new Error('Tab "'+tabName+'" not found (HTTP 404)');
+      throw new Error('HTTP '+res.status+' '+res.statusText);
     }
     return res.text();
   }).then(function(txt){
-    // gviz with bad sheet returns HTML — detect
-    if(txt.indexOf('<!DOCTYPE')===0||txt.indexOf('<html')===0){
-      throw new Error('Tab "'+tabName+'" not accessible (sheet may be private or tab missing)');
+    if(!txt||txt.length<2)throw new Error('Empty response');
+    if(txt.indexOf('<!DOCTYPE')===0||txt.indexOf('<html')===0||txt.indexOf('<HTML')===0){
+      throw new Error('Got HTML instead of CSV (sheet may be private or tab "'+tabName+'" missing)');
     }
     return gsParseCsv(txt);
+  }).catch(function(err){
+    // Re-throw with more context if it's a generic TypeError (network/CORS failure)
+    if(err.name==='TypeError'){
+      throw new Error('Network error — '+err.message+' (try clearing the app cache: close & reopen)');
+    }
+    throw err;
   });
 }
 
