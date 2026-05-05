@@ -321,12 +321,12 @@ textarea:focus{border-color:var(--acc);}
     </div>
     <div id="tipsPanel" style="display: block;">
       <div id="tipsLbl">📖 STUDY TIP</div>
-      <div id="tipsTxt"><span style="color:#00d4aa;font-weight:900">💬</span> <b style="color:#ffd700;font-weight:900">gọi</b> <b style="color:#ffd700;font-weight:900">món</b> = "order food/call a dish." Very natural restaurant phrase. <b style="color:#ffd700;font-weight:900">món</b> = dish/course.</div>
+      <div id="tipsTxt"></div>
       <div id="genTipRow" style="display:none;margin-top:8px;text-align:center;"><button id="genTipBtn" onclick="genTip()" style="background:rgba(255,107,53,.12);border:1.5px solid #ff6b35;border-radius:99px;color:#ff6b35;font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;padding:5px 14px;cursor:pointer;">Generate Tip with AI</button><div id="genTipStatus" style="font-size:10px;color:#666;margin-top:3px;"></div></div>
-      <div id="gramSect" style="display: block;">
+      <div id="gramSect" style="display: none;">
         <div id="gramLbl">📝 GRAMMAR NOTE</div>
-        <div id="gramTxt"><b style="color:#00d4aa;font-size:15px;">gì</b> <span style="color:#888;font-size:12px;">what (question AND statement)</span><br><span style="font-size:13px;color:#e0e0e0;line-height:1.8;">In questions: <b style="color:#ffd700;font-weight:900">Bạn</b> <b style="color:#ffd700;font-weight:900">muốn</b> <b style="color:#ffd700;font-weight:900">gì</b>? = What <b style="color:#ffd700;font-weight:900">do</b> you want? In statements: <b style="color:#ffd700;font-weight:900">những</b> <b style="color:#ffd700;font-weight:900">gì</b> <b style="color:#ffd700;font-weight:900">tôi</b> <b style="color:#ffd700;font-weight:900">thích</b> = what I like. <b style="color:#ffd700;font-weight:900">không</b> <b style="color:#ffd700;font-weight:900">có</b> <b style="color:#ffd700;font-weight:900">gì</b> = nothing / you're welcome! Same word does both jobs.</span></div>
-        <div id="gramTags"><span style="padding: 3px 8px; border-radius: 99px; font-size: 11px; font-weight: 800; cursor: pointer; background: rgba(0, 212, 170, 0.1); border: 1px solid rgba(0, 212, 170, 0.3); color: rgb(0, 212, 170);">gì</span></div>
+        <div id="gramTxt"></div>
+        <div id="gramTags"></div>
       </div>
     </div>
     <div id="futureSpace"></div>
@@ -508,7 +508,7 @@ var GRAM=[
 
 var BD=[0,1,2,4,8,16];
 var SK='vc4';
-var decks=[],cards=[],actDeck=null,Q=[],qp=0,front='vn',brkOn=false,studyOn=false,loopOn=false,tipsOn=false,dueBox=1;
+var decks=[],cards=[],actDeck=null,Q=[],qp=0,front='vn',brkOn=false,studyOn=false,loopOn=false,tipsOn=true,dueBox=1;
 
 function saveData(){try{localStorage.setItem(SK,JSON.stringify({decks:decks,cards:cards,actDeck:actDeck,qp:qp}));}catch(e){}}
 function loadData(){try{var r=localStorage.getItem(SK);if(!r)return;var d=JSON.parse(r);decks=d.decks||[];cards=(d.cards||[]).map(norm);}catch(e){decks=[];cards=[];}}
