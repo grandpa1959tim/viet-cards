@@ -401,6 +401,28 @@ textarea:focus{border-color:var(--acc);}
     </div>
   </div>
   <div class="sg">
+    <h3>Google Sheets Sync</h3>
+    <div id="gsStatus" style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.25);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#e0e0e0;line-height:1.5;">Not configured.</div>
+    <label style="display:block;font-size:11px;color:#888;margin:6px 0 4px 2px;">Google Sheet URL or ID</label>
+    <input type="text" id="gsSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..." style="width:100%;padding:9px 10px;background:rgba(255,255,255,.03);border:1px solid var(--brd);border-radius:8px;color:#fff;font-size:12px;font-family:inherit;margin-bottom:8px;">
+    <button class="bb btea" onclick="gsSyncNow()" style="margin-bottom:8px">🔄 Sync from Google Sheets Now</button>
+    <div style="display:flex;align-items:center;gap:10px;margin:6px 0 8px;font-size:12px;color:#aaa;">
+      <label class="tg" style="margin:0;"><input type="checkbox" id="gsAutoSync" onchange="gsSaveCfg()"><span class="ts"></span></label>
+      <span>Auto-sync on app open</span>
+    </div>
+    <div id="gsLog" style="display:none;background:rgba(255,255,255,.03);border:1px solid var(--brd);border-radius:10px;padding:10px;font-size:11px;color:#aaa;line-height:1.7;margin-top:6px;max-height:180px;overflow-y:auto;font-family:monospace;"></div>
+    <div style="background:rgba(255,255,255,.03);border:1px solid var(--brd);border-radius:10px;padding:10px;font-size:11px;color:#888;line-height:1.7;margin-top:6px;">
+      <strong style="color:var(--teal);">Setup (one time):</strong><br>
+      1. In your Google Sheet, name each <em>tab</em> to match a deck name (case-insensitive).<br>
+      2. Each tab needs columns: <code style="color:var(--gold);">English | Vietnamese | Breakdown | Note</code> (in row 1).<br>
+      3. File → Share → "Anyone with the link" → Viewer.<br>
+      4. Paste the sheet URL above and tap <em>Sync Now</em>.<br><br>
+      <strong style="color:var(--gold);">What syncs:</strong> Card content (English, Vietnamese, breakdown, notes).<br>
+      <strong style="color:var(--gold);">What's preserved:</strong> Your study progress (box level, due dates, starred, marked words).<br>
+      <strong style="color:#ff8da0;">What's NOT auto-deleted:</strong> Cards that exist locally but not in the sheet stay (delete them manually if needed).
+    </div>
+  </div>
+  <div class="sg">
     <h3>Advanced</h3>
     <button class="bb btea" onclick="doSaveHTML()" style="margin-bottom:8px">Save as index.html (for GitHub)</button>
     <button class="bb bsec" onclick="togPaste()">Import JSON Backup (Paste)</button>
@@ -1280,7 +1302,7 @@ function goTab(t){
   document.querySelectorAll('.tb').forEach(function(el,i){el.classList.toggle('on',['study','add','search','decks','boxes','settings','tones'][i]===t);});
   document.querySelectorAll('.pn').forEach(function(el){el.classList.remove('on');});
   document.getElementById('pn-'+t).classList.add('on');
-  if(t==='boxes')renderBoxes();if(t==='decks')renderDecks();if(t==='settings'){drawQR();refreshBackupInfo();}if(t==='tones')renderTones();
+  if(t==='boxes')renderBoxes();if(t==='decks')renderDecks();if(t==='settings'){drawQR();refreshBackupInfo();gsRestoreCfg();}if(t==='tones')renderTones();
 }
 
 function drawQR(){var url=location.href.split('?')[0];document.getElementById('qrUrl').textContent=url;document.getElementById('qrImg').src='https://api.qrserver.com/v1/create-qr-code/?size=190x190&data='+encodeURIComponent(url);}
@@ -1368,6 +1390,234 @@ function refreshBackupInfo(){
     '<span style="color:#aaa;">Saved: '+lastCount+' cards · Now: <strong style="color:#fff;">'+cards.length+' cards</strong></span>';
 }
 function togPaste(){var box=document.getElementById('pasteBox');box.style.display=box.style.display==='none'?'block':'none';}
+
+// =====================================================================
+// GOOGLE SHEETS SYNC — pull card content from a public Google Sheet.
+// Each tab name matches a deck name. Columns: English | Vietnamese | Breakdown | Note
+// Study progress (box, nr, ord, starred) is preserved by matching VN text.
+// =====================================================================
+var GS_KEY='vc4_gsync_cfg';
+
+function gsLoadCfg(){
+  try{var raw=localStorage.getItem(GS_KEY);if(!raw)return null;return JSON.parse(raw);}catch(e){return null;}
+}
+function gsSaveCfg(){
+  var url=(document.getElementById('gsSheetUrl')||{}).value||'';
+  var auto=(document.getElementById('gsAutoSync')||{}).checked||false;
+  var cfg={url:url.trim(),auto:auto,lastSync:gsLoadCfg()&&gsLoadCfg().lastSync||null,lastResult:gsLoadCfg()&&gsLoadCfg().lastResult||null};
+  try{localStorage.setItem(GS_KEY,JSON.stringify(cfg));}catch(e){}
+  gsRefreshUI();
+}
+function gsExtractId(url){
+  if(!url)return '';
+  url=url.trim();
+  // Match /d/{ID}/ pattern
+  var m=url.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
+  if(m)return m[1];
+  // If user just pasted the ID
+  if(/^[a-zA-Z0-9_-]{20,}$/.test(url))return url;
+  return '';
+}
+function gsRefreshUI(){
+  var el=document.getElementById('gsStatus');
+  if(!el)return;
+  var cfg=gsLoadCfg();
+  if(!cfg||!cfg.url){
+    el.innerHTML='<span style="color:#888;">Not configured.</span>';
+    return;
+  }
+  var id=gsExtractId(cfg.url);
+  if(!id){
+    el.innerHTML='<strong style="color:var(--no);">⚠ Invalid Sheet URL or ID.</strong>';
+    return;
+  }
+  var status='<strong style="color:var(--teal);">✓ Sheet ID:</strong> <code style="color:#aaa;font-size:11px;">'+id.slice(0,16)+'…</code><br>';
+  if(cfg.lastSync){
+    var d=new Date(cfg.lastSync);
+    var ago=Math.floor((Date.now()-d)/60000);
+    var agoTxt=ago<1?'just now':(ago<60?ago+' min ago':(Math.floor(ago/60)<24?Math.floor(ago/60)+'h ago':Math.floor(ago/1440)+'d ago'));
+    status+='<span style="color:#999;font-size:11px;">Last synced: '+agoTxt+' · '+d.toLocaleString()+'</span>';
+    if(cfg.lastResult)status+='<br><span style="color:#9bdacb;font-size:11px;">'+cfg.lastResult+'</span>';
+  }else{
+    status+='<span style="color:#888;font-size:11px;">Never synced.</span>';
+  }
+  el.innerHTML=status;
+}
+function gsLog(msg, color){
+  var box=document.getElementById('gsLog');
+  if(!box)return;
+  box.style.display='block';
+  var t=new Date().toLocaleTimeString();
+  var c=color||'#aaa';
+  box.innerHTML+='<div style="color:'+c+';">['+t+'] '+msg+'</div>';
+  box.scrollTop=box.scrollHeight;
+}
+
+// Parse one CSV row, handling quoted fields with commas inside
+function gsParseCsvRow(line){
+  var out=[],cur='',inQ=false;
+  for(var i=0;i<line.length;i++){
+    var ch=line[i];
+    if(inQ){
+      if(ch==='"'){
+        if(line[i+1]==='"'){cur+='"';i++;}
+        else inQ=false;
+      } else cur+=ch;
+    } else {
+      if(ch==='"')inQ=true;
+      else if(ch===','){out.push(cur);cur='';}
+      else cur+=ch;
+    }
+  }
+  out.push(cur);
+  return out;
+}
+function gsParseCsv(text){
+  // Split on \n but respect quotes
+  var rows=[],cur='',inQ=false;
+  for(var i=0;i<text.length;i++){
+    var ch=text[i];
+    if(ch==='"'){
+      cur+=ch;
+      // Check for escaped quote
+      if(inQ&&text[i+1]==='"'){cur+='"';i++;}
+      else inQ=!inQ;
+    } else if(ch==='\n'&&!inQ){
+      if(cur.length||rows.length)rows.push(cur);cur='';
+    } else if(ch==='\r'&&!inQ){
+      // skip
+    } else {
+      cur+=ch;
+    }
+  }
+  if(cur.length)rows.push(cur);
+  return rows.map(gsParseCsvRow);
+}
+
+function gsFetchTab(sheetId, tabName){
+  var url='https://docs.google.com/spreadsheets/d/'+encodeURIComponent(sheetId)+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(tabName);
+  return fetch(url,{credentials:'omit'}).then(function(res){
+    if(!res.ok){
+      if(res.status===404)throw new Error('Tab "'+tabName+'" not found');
+      throw new Error('HTTP '+res.status);
+    }
+    return res.text();
+  }).then(function(txt){
+    // gviz with bad sheet returns HTML — detect
+    if(txt.indexOf('<!DOCTYPE')===0||txt.indexOf('<html')===0){
+      throw new Error('Tab "'+tabName+'" not accessible (sheet may be private or tab missing)');
+    }
+    return gsParseCsv(txt);
+  });
+}
+
+// Map a CSV row using the header row to pull en/vn/brk/note in any column order
+function gsRowToCard(headerRow, dataRow){
+  var idx={};
+  headerRow.forEach(function(h,i){
+    var hk=(h||'').trim().toLowerCase();
+    if(hk==='english'||hk==='en')idx.en=i;
+    else if(hk==='vietnamese'||hk==='vn'||hk==='viet')idx.vn=i;
+    else if(hk==='breakdown'||hk==='brk')idx.brk=i;
+    else if(hk==='note'||hk==='tip'||hk==='notes')idx.note=i;
+  });
+  if(idx.vn===undefined||idx.en===undefined)return null;
+  return {
+    en:(dataRow[idx.en]||'').trim(),
+    vn:(dataRow[idx.vn]||'').trim(),
+    brk:idx.brk!==undefined?(dataRow[idx.brk]||'').trim():'',
+    note:idx.note!==undefined?(dataRow[idx.note]||'').trim():''
+  };
+}
+
+function gsSyncNow(){
+  // Save current settings first
+  gsSaveCfg();
+  var cfg=gsLoadCfg();
+  if(!cfg||!cfg.url){toast('Enter a Google Sheet URL first');return;}
+  var id=gsExtractId(cfg.url);
+  if(!id){toast('Invalid Sheet URL');return;}
+  document.getElementById('gsLog').innerHTML='';
+  gsLog('Starting sync from sheet '+id.slice(0,16)+'...','#39ff14');
+  if(!decks.length){
+    gsLog('No decks exist locally. Create a deck first, then make a tab in Sheets with the same name.','#ff8da0');
+    return;
+  }
+  var totalAdded=0,totalUpdated=0,totalUnchanged=0,totalSkipped=0;
+  var deckPromises=decks.map(function(deck){
+    return gsFetchTab(id, deck.name).then(function(rows){
+      if(rows.length<2){
+        gsLog('• <b>'+deck.name+'</b>: empty tab','#888');
+        return;
+      }
+      var header=rows[0];
+      var added=0,updated=0,unchanged=0,skipped=0;
+      // Build VN→card map for this deck
+      var vnMap={};
+      cards.forEach(function(c){
+        if(c.deckId===deck.id&&c.vn)vnMap[c.vn.trim().toLowerCase()]=c;
+      });
+      for(var r=1;r<rows.length;r++){
+        var row=rows[r];
+        if(!row||row.length===0)continue;
+        var card=gsRowToCard(header,row);
+        if(!card||!card.vn||!card.en){skipped++;continue;}
+        var key=card.vn.trim().toLowerCase();
+        var existing=vnMap[key];
+        if(existing){
+          // Update content fields ONLY — preserve study progress
+          var changed=false;
+          if(existing.en!==card.en){existing.en=card.en;changed=true;}
+          if(existing.brk!==card.brk){existing.brk=card.brk;changed=true;}
+          if(existing.note!==card.note){existing.note=card.note;changed=true;}
+          if(changed)updated++;else unchanged++;
+        } else {
+          // New card — add with default progress
+          var maxOrd=0;
+          cards.forEach(function(c){if(c.deckId===deck.id&&c.ord>maxOrd)maxOrd=c.ord;});
+          cards.push(norm({
+            id:rnd(),deckId:deck.id,en:card.en,vn:card.vn,brk:card.brk,note:card.note,
+            box:1,nr:Date.now(),ord:maxOrd+1,starred:false
+          }));
+          added++;
+        }
+      }
+      totalAdded+=added;totalUpdated+=updated;totalUnchanged+=unchanged;totalSkipped+=skipped;
+      var color=added||updated?'#39ff14':'#aaa';
+      gsLog('• <b>'+deck.name+'</b>: '+added+' added, '+updated+' updated, '+unchanged+' unchanged'+(skipped?', '+skipped+' skipped (no VN/EN)':''),color);
+    }).catch(function(err){
+      gsLog('✗ <b>'+deck.name+'</b>: '+err.message,'#ff8da0');
+    });
+  });
+  Promise.all(deckPromises).then(function(){
+    saveData();
+    rebuildQ();
+    if(typeof renderCard==='function')try{renderCard();}catch(e){}
+    var summary=totalAdded+' added, '+totalUpdated+' updated, '+totalUnchanged+' unchanged';
+    gsLog('Done. '+summary,'#39ff14');
+    var cfg2=gsLoadCfg()||{};
+    cfg2.lastSync=new Date().toISOString();
+    cfg2.lastResult=summary;
+    try{localStorage.setItem(GS_KEY,JSON.stringify(cfg2));}catch(e){}
+    gsRefreshUI();
+    if(totalAdded||totalUpdated)toast('✓ '+summary);
+    else toast('All decks already in sync');
+  });
+}
+
+function gsRestoreCfg(){
+  var cfg=gsLoadCfg();if(!cfg)return;
+  var u=document.getElementById('gsSheetUrl');if(u&&cfg.url)u.value=cfg.url;
+  var a=document.getElementById('gsAutoSync');if(a)a.checked=!!cfg.auto;
+  gsRefreshUI();
+}
+function gsMaybeAutoSync(){
+  var cfg=gsLoadCfg();
+  if(cfg&&cfg.auto&&cfg.url&&navigator.onLine){
+    setTimeout(gsSyncNow,1500);
+  }
+}
+
 function doImportPaste(){
   var txt=document.getElementById('pasteInp').value.trim();if(!txt){toast('Nothing to import');return;}
   try{
@@ -1879,6 +2129,7 @@ window.onload=function(){
   loadMarkedWords();
   updMarkedCounter();
   rebuildQ();
+  gsMaybeAutoSync();
   if(qp>=Q.length)qp=0;
   renderCard();renderDecks();
   // Load voices when available
