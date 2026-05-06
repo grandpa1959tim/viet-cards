@@ -1364,7 +1364,13 @@ function renderDecks(){
   var allRow=document.createElement('div');allRow.className='dkcard'+(actDeck===null?' sel':'');allRow.style.cursor='pointer';
   var allInfo=document.createElement('div');allInfo.className='dkinfo';
   allInfo.innerHTML='<h3>All Decks</h3><p>'+cards.length+' cards total</p>';
-  allRow.appendChild(allInfo);allRow.onclick=function(){setDeck(null);};el.appendChild(allRow);
+  allRow.appendChild(allInfo);
+  // Dedup all button on All Decks row
+  var dedupAll=document.createElement('button');dedupAll.className='dkdel';dedupAll.textContent='🧹 Dedup All';
+  dedupAll.style.color='#39ff14';dedupAll.style.borderColor='rgba(57,255,20,.4)';
+  dedupAll.onclick=function(e){e.stopPropagation();dedupCards(null);};
+  allRow.appendChild(dedupAll);
+  allRow.onclick=function(){setDeck(null);};el.appendChild(allRow);
   decks.forEach(function(dk){
     var dc=cards.filter(function(c){return c.deckId===dk.id;});
     var due=dc.filter(function(c){return isDue(c);}).length;
@@ -1372,16 +1378,62 @@ function renderDecks(){
     var row=document.createElement('div');row.className='dkcard'+(actDeck===dkId?' sel':'');row.style.cursor='pointer';
     var info=document.createElement('div');info.className='dkinfo';info.style.flex='1';
     info.innerHTML='<h3>'+dk.name+'</h3><p>'+dc.length+' cards'+(due?' - <span style="color:var(--no)">'+due+' due</span>':'')+'</p>';
+    var dedup=document.createElement('button');dedup.className='dkdel';dedup.textContent='🧹';dedup.title='Remove duplicates';
+    dedup.style.color='#39ff14';dedup.style.borderColor='rgba(57,255,20,.4)';
+    dedup.onclick=(function(id){return function(e){e.stopPropagation();dedupCards(id);};})(dkId);
     var del=document.createElement('button');del.className='dkdel';del.textContent='Delete';
     del.onclick=function(e){e.stopPropagation();delDeck(dkId);};
     var rst=document.createElement('button');rst.className='dkdel';rst.textContent='Reset';
     rst.style.color='#ff8c00';rst.style.borderColor='rgba(255,140,0,.3)';
     rst.onclick=(function(id){return function(e){e.stopPropagation();resetDeck(id);};})(dkId);
-    row.appendChild(info);row.appendChild(rst);row.appendChild(del);
+    row.appendChild(info);row.appendChild(dedup);row.appendChild(rst);row.appendChild(del);
     row.onclick=function(){setDeck(dkId);};
     el.appendChild(row);
   });
   renderMod();
+}
+
+// Remove cards with identical Vietnamese text within the specified deck (or all decks if deckId is null).
+// When duplicates are found, KEEP the card with the highest box level (most study progress),
+// or if tied, the one with the most recent next-review date.
+function dedupCards(deckId){
+  var scope=deckId?cards.filter(function(c){return c.deckId===deckId;}):cards;
+  // Group by VN sentence + deck (so identical VN in different decks are NOT merged)
+  var groups={};
+  scope.forEach(function(c){
+    if(!c.vn)return;
+    var key=c.deckId+'||'+c.vn.trim().toLowerCase();
+    if(!groups[key])groups[key]=[];
+    groups[key].push(c);
+  });
+  // Find duplicate groups
+  var dupGroups=Object.keys(groups).filter(function(k){return groups[k].length>1;});
+  if(!dupGroups.length){
+    toast('No duplicates found');
+    return;
+  }
+  var totalDupes=dupGroups.reduce(function(sum,k){return sum+groups[k].length-1;},0);
+  var deckName=deckId?(decks.find(function(d){return d.id===deckId;})||{name:'this deck'}).name:'all decks';
+  if(!confirm('Found '+totalDupes+' duplicate card'+(totalDupes!==1?'s':'')+' in '+deckName+'.\n\nKeep the card with the most study progress, delete the rest?'))return;
+  // For each group, keep the best card and delete the others
+  var toDelete={};
+  dupGroups.forEach(function(k){
+    var group=groups[k];
+    // Sort: highest box level first, then most recent nr (next-review)
+    group.sort(function(a,b){
+      if((b.box||0)!==(a.box||0))return (b.box||0)-(a.box||0);
+      return (b.nr||0)-(a.nr||0);
+    });
+    // Keep group[0], mark rest for deletion
+    for(var i=1;i<group.length;i++){
+      toDelete[group[i].id]=true;
+    }
+  });
+  cards=cards.filter(function(c){return !toDelete[c.id];});
+  saveData();
+  rebuildQ();
+  renderDecks();
+  toast('Removed '+totalDupes+' duplicate'+(totalDupes!==1?'s':''));
 }
 
 function renderMod(){
