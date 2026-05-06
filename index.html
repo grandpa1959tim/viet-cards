@@ -2421,7 +2421,7 @@ function renderDecks(){
     var row=document.createElement('div');row.style.cssText='border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:space-between;';
     var info=document.createElement('div');
     var due=dc.filter(function(c){return isDue(c);}).length;
-    info.innerHTML='<h3 style="margin:0;color:#f5f5f0;font-size:13px;">'+dk.name+'</h3><p style="margin:4px 0 0 0;color:#666;font-size:11px;">'+dc.length+' cards'+(due?' ('+due+' due)':')');
+    info.innerHTML='<h3 style="margin:0;color:#f5f5f0;font-size:13px;">'+dk.name+'</h3><p style="margin:4px 0 0 0;color:#666;font-size:11px;">'+dc.length+' cards'+(due?' - <span style="color:var(--no)">'+due+' due</span>':'')+'</p>';
     row.appendChild(info);
     
     var btnGroup=document.createElement('div');btnGroup.style.cssText='display:flex;gap:6px;';
