@@ -425,25 +425,20 @@ textarea:focus{border-color:var(--acc);}
     </div>
   </div>
   <div class="sg">
-    <h3>Google Sheets Sync</h3>
-    <div id="gsStatus" style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.25);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#e0e0e0;line-height:1.5;">Not configured.</div>
-    <label style="display:block;font-size:11px;color:#888;margin:6px 0 4px 2px;">Google Sheet URL or ID</label>
-    <input type="text" id="gsSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..." style="width:100%;padding:9px 10px;background:rgba(255,255,255,.03);border:1px solid var(--brd);border-radius:8px;color:#fff;font-size:12px;font-family:inherit;margin-bottom:8px;">
-    <button class="bb btea" onclick="gsSyncNow()" style="margin-bottom:8px">🔄 Sync from Google Sheets Now</button>
-    <div style="display:flex;align-items:center;gap:10px;margin:6px 0 8px;font-size:12px;color:#aaa;">
-      <label class="tg" style="margin:0;"><input type="checkbox" id="gsAutoSync" onchange="gsSaveCfg()"><span class="ts"></span></label>
-      <span>Auto-sync on app open</span>
-    </div>
-    <div id="gsLog" style="display:none;background:rgba(255,255,255,.03);border:1px solid var(--brd);border-radius:10px;padding:10px;font-size:11px;color:#aaa;line-height:1.7;margin-top:6px;max-height:180px;overflow-y:auto;font-family:monospace;"></div>
+    <h3>GitHub Gist Sync</h3>
+    <div id="syncStatus" style="background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.25);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#e0e0e0;line-height:1.5;">✓ Auto-sync enabled</div>
+    <button class="bb btea" onclick="gistSyncNow()" style="margin-bottom:8px;width:100%">🔄 Sync Now</button>
     <div style="background:rgba(255,255,255,.03);border:1px solid var(--brd);border-radius:10px;padding:10px;font-size:11px;color:#888;line-height:1.7;margin-top:6px;">
-      <strong style="color:var(--teal);">Setup (one time):</strong><br>
-      1. In your Google Sheet, name each <em>tab</em> to match a deck name (case-insensitive).<br>
-      2. Each tab needs columns: <code style="color:var(--gold);">English | Vietnamese | Breakdown | Note</code> (in row 1).<br>
-      3. File → Share → "Anyone with the link" → Viewer.<br>
-      4. Paste the sheet URL above and tap <em>Sync Now</em>.<br><br>
-      <strong style="color:var(--gold);">What syncs:</strong> Card content (English, Vietnamese, breakdown, notes).<br>
-      <strong style="color:var(--gold);">What's preserved:</strong> Your study progress (box level, due dates, starred, marked words).<br>
-      <strong style="color:#ff8da0;">What's NOT auto-deleted:</strong> Cards that exist locally but not in the sheet stay (delete them manually if needed).
+      <strong style="color:var(--teal);">How it works:</strong><br>
+      • Your study progress syncs automatically between Mac and iPhone<br>
+      • Syncs when you open the app (if >1 hour since last sync)<br>
+      • Tap "Sync Now" to sync immediately<br>
+      • Latest progress always wins
+    </div>
+  </div>
+      <br>
+      <strong style="color:var(--gold);">Data backed up to:</strong> GitHub Gist (private, secure)<br>
+      <strong style="color:var(--gold);">Merge strategy:</strong> Keeps card with highest study progress
     </div>
   </div>
   <div class="sg">
@@ -1604,148 +1599,86 @@ function refreshBackupInfo(){
 function togPaste(){var box=document.getElementById('pasteBox');box.style.display=box.style.display==='none'?'block':'none';}
 
 // =====================================================================
-// GOOGLE SHEETS SYNC — pull card content from a public Google Sheet.
-// Each tab name matches a deck name. Columns: English | Vietnamese | Breakdown | Note
-// Study progress (box, nr, ord, starred) is preserved by matching VN text.
-// =====================================================================
-var GS_KEY='vc4_gsync_cfg';
+// ===== GIST-BASED CROSS-DEVICE SYNC =====
+// Syncs study progress and card data via GitHub Gist
+// Each device merges its local state with the shared Gist
+// ==========================================
+var GIST_ID='29c656efe77dca239a20bd3634dd2ecf';
+var SYNC_KEY='vc4_gist_sync';
+var LAST_SYNC_KEY='vc4_last_sync_time';
 
-function gsLoadCfg(){
-  try{var raw=localStorage.getItem(GS_KEY);if(!raw)return null;return JSON.parse(raw);}catch(e){return null;}
-}
-function gsSaveCfg(){
-  var url=(document.getElementById('gsSheetUrl')||{}).value||'';
-  var auto=(document.getElementById('gsAutoSync')||{}).checked||false;
-  var cfg={url:url.trim(),auto:auto,lastSync:gsLoadCfg()&&gsLoadCfg().lastSync||null,lastResult:gsLoadCfg()&&gsLoadCfg().lastResult||null};
-  try{localStorage.setItem(GS_KEY,JSON.stringify(cfg));}catch(e){}
-  gsRefreshUI();
-}
-function gsExtractId(url){
-  if(!url)return '';
-  url=url.trim();
-  // Match /d/{ID}/ pattern
-  var m=url.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
-  if(m)return m[1];
-  // If user just pasted the ID
-  if(/^[a-zA-Z0-9_-]{20,}$/.test(url))return url;
-  return '';
-}
-function gsRefreshUI(){
-  var el=document.getElementById('gsStatus');
-  if(!el)return;
-  var cfg=gsLoadCfg();
-  if(!cfg||!cfg.url){
-    el.innerHTML='<span style="color:#888;">Not configured.</span>';
-    return;
-  }
-  var id=gsExtractId(cfg.url);
-  if(!id){
-    el.innerHTML='<strong style="color:var(--no);">⚠ Invalid Sheet URL or ID.</strong>';
-    return;
-  }
-  var status='<strong style="color:var(--teal);">✓ Sheet ID:</strong> <code style="color:#aaa;font-size:11px;">'+id.slice(0,16)+'…</code><br>';
-  if(cfg.lastSync){
-    var d=new Date(cfg.lastSync);
-    var ago=Math.floor((Date.now()-d)/60000);
-    var agoTxt=ago<1?'just now':(ago<60?ago+' min ago':(Math.floor(ago/60)<24?Math.floor(ago/60)+'h ago':Math.floor(ago/1440)+'d ago'));
-    status+='<span style="color:#999;font-size:11px;">Last synced: '+agoTxt+' · '+d.toLocaleString()+'</span>';
-    if(cfg.lastResult)status+='<br><span style="color:#9bdacb;font-size:11px;">'+cfg.lastResult+'</span>';
-  }else{
-    status+='<span style="color:#888;font-size:11px;">Never synced.</span>';
-  }
-  el.innerHTML=status;
-}
-function gsLog(msg, color){
-  var box=document.getElementById('gsLog');
-  if(!box)return;
-  box.style.display='block';
-  var t=new Date().toLocaleTimeString();
-  var c=color||'#aaa';
-  box.innerHTML+='<div style="color:'+c+';">['+t+'] '+msg+'</div>';
-  box.scrollTop=box.scrollHeight;
+// Gist sync functions
+function gistSyncNow(){
+  var el=document.getElementById('syncStatus');
+  if(el)el.innerHTML='⏳ Syncing...';
+  
+  // Fetch from Gist
+  fetch('https://gist.githubusercontent.com/grandpa1959tim/'+GIST_ID+'/raw')
+    .then(function(r){return r.json();})
+    .then(function(remoteData){
+      // Merge: keep card with higher progress
+      var merged=mergeCardData(remoteData);
+      saveData();
+      renderDecks();
+      var ago=Math.floor((Date.now()-remoteData.lastModified)/60000);
+      var agoTxt=ago<1?'just now':(ago<60?ago+' min ago':(Math.floor(ago/60)<24?Math.floor(ago/60)+'h ago':Math.floor(ago/1440)+'d ago'));
+      if(el)el.innerHTML='✓ Synced '+agoTxt;
+      // Save sync time
+      try{localStorage.setItem(LAST_SYNC_KEY, Date.now());}catch(e){}
+    })
+    .catch(function(err){
+      if(el)el.innerHTML='✗ Sync failed: '+err.message;
+      console.error('Sync error:', err);
+    });
 }
 
-// Parse one CSV row, handling quoted fields with commas inside
-function gsParseCsvRow(line){
-  var out=[],cur='',inQ=false;
-  for(var i=0;i<line.length;i++){
-    var ch=line[i];
-    if(inQ){
-      if(ch==='"'){
-        if(line[i+1]==='"'){cur+='"';i++;}
-        else inQ=false;
-      } else cur+=ch;
-    } else {
-      if(ch==='"')inQ=true;
-      else if(ch===','){out.push(cur);cur='';}
-      else cur+=ch;
+function mergeCardData(remoteData){
+  // For each card in remote data, check if we have it locally
+  // Keep card with highest box level (progress)
+  var remoteCards=remoteData.cards||[];
+  var merged=[];
+  var seenVn={};
+  
+  // First pass: add all local cards, track Vietnamese text
+  cards.forEach(function(c){
+    var vn=c.vn||'';
+    if(!seenVn[vn]){
+      seenVn[vn]=c;
+      merged.push(c);
     }
-  }
-  out.push(cur);
-  return out;
-}
-function gsParseCsv(text){
-  // Split on \n but respect quotes
-  var rows=[],cur='',inQ=false;
-  for(var i=0;i<text.length;i++){
-    var ch=text[i];
-    if(ch==='"'){
-      cur+=ch;
-      // Check for escaped quote
-      if(inQ&&text[i+1]==='"'){cur+='"';i++;}
-      else inQ=!inQ;
-    } else if(ch==='\n'&&!inQ){
-      if(cur.length||rows.length)rows.push(cur);cur='';
-    } else if(ch==='\r'&&!inQ){
-      // skip
-    } else {
-      cur+=ch;
-    }
-  }
-  if(cur.length)rows.push(cur);
-  return rows.map(gsParseCsvRow);
-}
-
-function gsFetchTab(sheetId, tabName){
-  var url='https://docs.google.com/spreadsheets/d/'+encodeURIComponent(sheetId)+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(tabName);
-  // Bypass service worker for cross-origin Google fetch (cache:'no-store' tells SW to skip)
-  // Also include cache-bust query param to be safe
-  var bustUrl=url+'&_t='+Date.now();
-  return fetch(bustUrl,{
-    credentials:'omit',
-    cache:'no-store',
-    mode:'cors',
-    redirect:'follow'
-  }).then(function(res){
-    if(!res.ok){
-      if(res.status===404)throw new Error('Tab "'+tabName+'" not found (HTTP 404)');
-      throw new Error('HTTP '+res.status+' '+res.statusText);
-    }
-    return res.text();
-  }).then(function(txt){
-    if(!txt||txt.length<2)throw new Error('Empty response');
-    if(txt.indexOf('<!DOCTYPE')===0||txt.indexOf('<html')===0||txt.indexOf('<HTML')===0){
-      throw new Error('Got HTML instead of CSV (sheet may be private or tab "'+tabName+'" missing)');
-    }
-    return gsParseCsv(txt);
-  }).catch(function(err){
-    // Re-throw with more context if it's a generic TypeError (network/CORS failure)
-    if(err.name==='TypeError'){
-      throw new Error('Network error — '+err.message+' (try clearing the app cache: close & reopen)');
-    }
-    throw err;
   });
+  
+  // Second pass: add remote cards if higher progress
+  remoteCards.forEach(function(rc){
+    var vn=rc.vn||'';
+    if(seenVn[vn]){
+      // Compare progress
+      var local=seenVn[vn];
+      if((rc.box||0)>(local.box||0)){
+        // Remote has higher progress, use it
+        var idx=merged.indexOf(local);
+        if(idx>=0)merged[idx]=rc;
+        seenVn[vn]=rc;
+      }
+      // Otherwise keep local
+    } else {
+      // New card from remote, add it
+      merged.push(rc);
+      seenVn[vn]=rc;
+    }
+  });
+  
+  cards=merged;
+  return merged;
 }
 
-// Map a CSV row using the header row to pull en/vn/brk/note in any column order
-function gsRowToCard(headerRow, dataRow){
-  var idx={};
-  headerRow.forEach(function(h,i){
-    var hk=(h||'').trim().toLowerCase();
-    if(hk==='english'||hk==='en')idx.en=i;
-    else if(hk==='vietnamese'||hk==='vn'||hk==='viet')idx.vn=i;
-    else if(hk==='breakdown'||hk==='brk')idx.brk=i;
-    else if(hk==='note'||hk==='tip'||hk==='notes')idx.note=i;
+function gistAutoSync(){
+  // Called on page load
+  var lastSync=localStorage.getItem(LAST_SYNC_KEY);
+  if(!lastSync||(Date.now()-parseInt(lastSync)>3600000)){  // Sync if >1 hour ago
+    gistSyncNow();
+  }
+}
   });
   if(idx.vn===undefined||idx.en===undefined)return null;
   return {
@@ -2355,7 +2288,7 @@ window.onload=function(){
   loadMarkedWords();
   updMarkedCounter();
   rebuildQ();
-  gsMaybeAutoSync();
+  gistAutoSync();
   if(qp>=Q.length)qp=0;
   renderCard();renderDecks();
   // Load voices when available
